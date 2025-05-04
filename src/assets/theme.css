@@ -1,0 +1,55 @@
+body {
+    background: linear-gradient(to bottom, #0a0f1a, #000);
+    color: #e0f8ff;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.sidebar {
+    background-color: #111;
+    border-right: 1px solid #2af2ff33;
+    height: 100vh;
+    padding: 1rem;
+    box-shadow: 0 0 20px #2af2ff33;
+}
+
+.sidebar a {
+    color: #2af2ff;
+    display: block;
+    margin: 1rem 0;
+    text-decoration: none;
+}
+
+.card-glow {
+    background-color: #111;
+    border: 1px solid #2af2ff22;
+    box-shadow: 0 0 10px #2af2ff55;
+    color: white;
+}
+
+.table-glow thead {
+    background-color: #111a2b; /* solid dark navy */
+    color: #ffffff; /* pure white text */
+    border: 2px solid #2af2ff66;
+}
+
+.table-glow thead th {
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-color: #2af2ff33;
+}
+
+.table-glow {
+    border: 1px solid #2af2ff33;
+    box-shadow: 0 0 12px #2af2ff55;
+    background-color: #0a0f1a !important;
+    color: #e0f8ff;
+}
+
+.table-glow thead {
+    background-color: #2af2ff11;
+    color: #2af2ff;
+}
+
+.table-glow th, .table-glow td {
+    border-color: #2af2ff22 !important;
+}
