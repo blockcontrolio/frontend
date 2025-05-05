@@ -1,10 +1,16 @@
 <script>
-import {fetchAccounts, sendTransfer} from '../services/api'
+import {fetchAccounts, sendExternalWithdrawal, sendInternalTransfer} from '../services/api'
 
 export default {
   data() {
     return {
+      selectedForm: 'internal', // or 'internal'
       accounts: [], // should be populated externally
+      internal: {
+        from: '',
+        to: '',
+        amount: null
+      },
       transfer: {
         accountId: '',
         to: '',
@@ -18,7 +24,18 @@ export default {
   },
   computed: {
     selectedAccount() {
-      return this.accounts.find(acc => acc.id === this.transfer.accountId);
+      switch (this.selectedForm) {
+        case "internal": {
+          return this.accounts.find(acc => acc.id === this.internal.from);
+        }
+        case "external" : {
+          return this.accounts.find(acc => acc.id === this.transfer.accountId);
+        }
+      }
+    },
+    availableTargetAccounts() {
+      if (!this.internal.from) return this.accounts;
+      return this.accounts.filter(acc => acc.id !== this.internal.from);
     },
     hasErrors() {
       return !!this.errors.to || !!this.errors.amount;
@@ -32,6 +49,8 @@ export default {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
       if (!this.transfer.to) {
         this.errors.to = 'Address is required';
+      } else if (this.transfer.to.length !== 40) {
+        this.errors.to = `Hex string has length ${this.transfer.to.length}, want 40 for common Address`;
       } else if (!hexRegex.test(this.transfer.to)) {
         this.errors.to = 'Must be a valid hex string (e.g., 0x123abc...)';
       } else {
@@ -39,7 +58,12 @@ export default {
       }
     },
     validateAmount() {
-      const amountStr = this.transfer.amount?.toString();
+      let amountStr;
+      if (this.selectedForm === 'internal') {
+        amountStr = this.internal.amount?.toString();
+      } else if (this.selectedForm === 'external') {
+        amountStr = this.transfer.amount?.toString();
+      }
       if (!amountStr || parseFloat(amountStr) <= 0) {
         this.errors.amount = 'Amount must be greater than zero';
         return;
@@ -51,18 +75,31 @@ export default {
         this.errors.amount = '';
       }
     },
-    async submitTransfer() {
+    async submitExternalWithdrawal() {
       this.validateTo();
       this.validateAmount();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       try {
-        await sendTransfer(this.transfer)
-        alert('Transfer submitted!')
+        await sendExternalWithdrawal(this.transfer)
+        alert('External withdrawal submitted!')
         // optionally reset form
         this.transfer = {accountId: '', to: '', amount: null}
       } catch (err) {
         console.error(err)
-        alert('Failed to submit transfer')
+        alert('Failed to submit external withdrawal')
+      }
+    },
+    async submitInternalTransfer() {
+      this.validateAmount();
+      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      try {
+        await sendInternalTransfer(this.internal)
+        alert('Internal Transfer submitted!')
+        // optionally reset form
+        this.internal = {from: '', to: '', amount: null}
+      } catch (err) {
+        console.error(err)
+        alert('Failed to submit internal transfer')
       }
     },
   }
@@ -73,8 +110,77 @@ export default {
   <h3 class="mb-3">Asset Transfer</h3>
 
   <div class="d-flex justify-content-center mt-5">
-    <form @submit.prevent="submitTransfer" class="transfer-form bg-dark p-4 rounded shadow">
-      <h3 class="mb-4 text-center">Make a Transfer</h3>
+    <div class="type-selector">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input bg-dark border-primary" type="radio" id="internalRadio" value="internal"
+               v-model="selectedForm"/>
+        <label class="form-check-label text-white fw-bold" for="internalRadio">Internal Transfer</label>
+      </div>
+      <div class="form-check form-check-inline me-3">
+        <input class="form-check-input bg-dark border-primary" type="radio" id="externalRadio" value="external"
+               v-model="selectedForm"/>
+        <label class="form-check-label text-white fw-bold" for="externalRadio">External Withdrawal</label>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="selectedForm === 'internal'" class="d-flex justify-content-center mt-5">
+    <form @submit.prevent="submitInternalTransfer" class="transfer-form bg-dark p-4 rounded shadow">
+      <h3 class="mb-4 text-center">Transfer between Accounts</h3>
+
+      <!-- Source Account -->
+      <div class="mb-3">
+        <label class="form-label">From Account</label>
+        <select v-model="internal.from" class="form-select bg-dark border-info" required>
+          <option disabled value="">-- source account --</option>
+          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
+            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          </option>
+        </select>
+        <div v-if="selectedAccount" class="mt-1 text-info small"> Balance: {{ selectedAccount.balance }} ETH</div>
+      </div>
+
+      <!-- Target Account -->
+      <div class="mb-3">
+        <label class="form-label">To Account</label>
+        <select v-model="internal.to"
+                class="form-select bg-dark border-info"
+                required>
+          <option disabled value="">-- target account --</option>
+          <option v-for="acc in availableTargetAccounts" :key="acc.ref + '-to'" :value="acc.id">
+            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Amount -->
+      <div class="mb-3">
+        <label class="form-label">Amount ETH</label>
+        <input
+            v-model="internal.amount"
+            type="number"
+            step="0.000000000000000001"
+            class="form-control bg-dark border-info no-spinner text-white"
+            placeholder="Amount to send"
+            @input="validateAmount"
+        />
+        <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
+        <div v-if="selectedAccount" class="">
+          <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(selectedAccount.balance)"
+               class="form-text text-warning">Amount exceeds account balance!
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-outline-primary" :disabled="hasErrors">Send</button>
+      </div>
+    </form>
+  </div>
+
+  <div v-else-if="selectedForm === 'external'" class="d-flex justify-content-center mt-5">
+    <form @submit.prevent="submitExternalWithdrawal" class="transfer-form bg-dark p-4 rounded shadow">
+      <h3 class="mb-4 text-center">Withdraw to external Address</h3>
 
       <div class="mb-3">
         <label class="form-label">From Account</label>
@@ -91,7 +197,7 @@ export default {
         <label class="form-label">To Address</label>
         <input
             v-model="transfer.to"
-            class="form-control bg-dark border-info"
+            class="form-control bg-dark border-info text-white"
             placeholder="Recipient hex address"
             @input="validateTo"
         />
@@ -104,7 +210,7 @@ export default {
             v-model="transfer.amount"
             type="number"
             step="0.000000000000000001"
-            class="form-control bg-dark border-info no-spinner"
+            class="form-control bg-dark border-info no-spinner text-white"
             placeholder="Amount to send"
             @input="validateAmount"
         />
@@ -125,6 +231,7 @@ export default {
 </template>
 
 <style scoped>
+.type-selector,
 .transfer-form {
   width: 100%;
   max-width: 500px;
