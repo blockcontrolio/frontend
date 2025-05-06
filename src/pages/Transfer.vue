@@ -19,7 +19,9 @@ export default {
       errors: {
         to: '',
         amount: ''
-      }
+      },
+      transferSuccess: null,
+      transferError: null,
     };
   },
   computed: {
@@ -41,16 +43,20 @@ export default {
       return !!this.errors.to || !!this.errors.amount;
     },
   },
-  async mounted() {
-    this.accounts = await fetchAccounts()
+  mounted() {
+    this.fetchAccounts();
   },
   methods: {
+    async fetchAccounts() {
+      let responsePromise = await fetchAccounts();
+      this.accounts = await responsePromise.json();
+    },
     validateTo() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
       if (!this.transfer.to) {
         this.errors.to = 'Address is required';
-      } else if (this.transfer.to.length !== 40) {
-        this.errors.to = `Hex string has length ${this.transfer.to.length}, want 40 for common Address`;
+      } else if (this.transfer.to.length !== 42) {
+        this.errors.to = 'Hex string has invalid length';
       } else if (!hexRegex.test(this.transfer.to)) {
         this.errors.to = 'Must be a valid hex string (e.g., 0x123abc...)';
       } else {
@@ -76,32 +82,59 @@ export default {
       }
     },
     async submitExternalWithdrawal() {
+      this.resetError();
       this.validateTo();
       this.validateAmount();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       try {
-        await sendExternalWithdrawal(this.transfer)
-        alert('External withdrawal submitted!')
-        // optionally reset form
-        this.transfer = {accountId: '', to: '', amount: null}
+        const response = await sendExternalWithdrawal(this.transfer)
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleTransferError(err);
+        } else {
+          this.transferSuccess = await response.json();
+          // reset form
+          this.transfer = {accountId: '', to: '', amount: null}
+        }
       } catch (err) {
-        console.error(err)
-        alert('Failed to submit external withdrawal')
+        this.handleUnknownError(err);
       }
     },
     async submitInternalTransfer() {
+      this.resetError();
       this.validateAmount();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       try {
-        await sendInternalTransfer(this.internal)
-        alert('Internal Transfer submitted!')
-        // optionally reset form
-        this.internal = {from: '', to: '', amount: null}
+        const response = await sendInternalTransfer(this.internal);
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleTransferError(err);
+        } else {
+          this.transferSuccess = await response.json();
+          // reset form
+          this.internal = {from: '', to: '', amount: null}
+        }
       } catch (err) {
-        console.error(err)
-        alert('Failed to submit internal transfer')
+        this.handleUnknownError(err);
       }
     },
+    resetError() {
+      this.transferSuccess = null;
+      this.transferError = null;
+    },
+    handleUnknownError(err) {
+      console.error(err)
+      this.transferError = {
+        error: 'Network Error',
+        message: err.message
+      };
+    },
+    handleTransferError(err) {
+      this.transferError = {
+        error: err.error || 'Error',
+        message: err.message || 'Unknown error occurred.'
+      };
+    }
   }
 };
 </script>
@@ -113,11 +146,13 @@ export default {
     <div class="type-selector">
       <div class="form-check form-check-inline">
         <input class="form-check-input bg-dark border-primary" type="radio" id="internalRadio" value="internal"
+               v-on:change="resetError"
                v-model="selectedForm"/>
         <label class="form-check-label text-white fw-bold" for="internalRadio">Internal Transfer</label>
       </div>
       <div class="form-check form-check-inline me-3">
         <input class="form-check-input bg-dark border-primary" type="radio" id="externalRadio" value="external"
+               v-on:change="resetError"
                v-model="selectedForm"/>
         <label class="form-check-label text-white fw-bold" for="externalRadio">External Withdrawal</label>
       </div>
@@ -228,6 +263,19 @@ export default {
     </form>
   </div>
 
+  <!-- Success Message -->
+  <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
+    ✅ You transferred {{ transferSuccess.amount }} ETH to {{ transferSuccess.to }}
+    <br/>
+    Tx hash: <code>{{ transferSuccess.txHash }}</code>
+  </div>
+
+  <!-- Error Message -->
+  <div v-if="transferError" class="alert custom-error-alert mt-3">
+    ❌ <strong>{{ transferError.error }}</strong><br/>
+    <span>{{ transferError.message }}</span>
+  </div>
+
 </template>
 
 <style scoped>
@@ -248,4 +296,18 @@ input[type=number].no-spinner::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.custom-success-alert {
+  background-color: #111827;
+  border-color: #2af2ff;
+  border-radius: 0.375rem;
+}
+
+.custom-error-alert {
+  background-color: #1f1f2e; /* deep space dark */
+  border-color: #ff4c4c; /* electric red/orange */
+  color: #ffcccc; /* light red text for readability */
+  border-radius: 0.375rem;
+}
+
 </style>
