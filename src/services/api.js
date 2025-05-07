@@ -1,3 +1,5 @@
+import accounts from "../pages/Accounts.vue";
+
 const API_URL = 'http://localhost:8080/api/v1';
 let xApiKey = localStorage.getItem('x-api-key') || '';
 
@@ -8,6 +10,17 @@ export async function fetchAccounts() {
             'x-api-key': xApiKey
         }
     })
+}
+
+export async function createAccount(newAccount) {
+    return await fetch(`${API_URL}/accounts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': xApiKey
+        },
+        body: JSON.stringify(newAccount)
+    });
 }
 
 export async function sendInternalTransfer(data) {

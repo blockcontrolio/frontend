@@ -1,9 +1,7 @@
 <script>
 import {useRouter} from "vue-router";
+import {createAccount, fetchAccounts} from '../services/api'
 import {formatDate} from "../js/utils.js";
-
-const API_URL = 'http://localhost:8080/api/v1/accounts';
-const xApiKey = localStorage.getItem('x-api-key') || '';
 
 export default {
   setup() {
@@ -12,38 +10,25 @@ export default {
   },
   data() {
     return {
+      accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
       searchQuery: '',
       accounts: [],
-      newAccount: {name: '', ref: ''},
+      newAccount: {name: '', ref: '', type: null},
       showCreateForm: false
     }
   },
   methods: {
     formatDate,
     async fetchAccounts() {
-      const res = await fetch(API_URL, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': xApiKey
-        }
-      });
-      if (res.ok) {
-        this.accounts = await res.json();
-      }
+      let res = await fetchAccounts();
+      this.accounts = await res.json();
     },
     async createAccount() {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': xApiKey
-        },
-        body: JSON.stringify(this.newAccount)
-      });
+      const res = await createAccount(this.newAccount);
       if (res.ok) {
         const added = await res.json();
         this.accounts.push({...added, show: false});
-        this.newAccount = {ref: '', name: ''}; // clear inputs
+        this.newAccount = {ref: '', name: '', type: null}; // clear inputs
         this.showCreateForm = false; // hide form
       } else {
         alert('Failed to create account');
@@ -54,6 +39,12 @@ export default {
     this.fetchAccounts();
   },
   computed: {
+    availableAccountTypes() {
+      if (this.accounts.length === 0) {
+        return ['ADMIN'];
+      }
+      return this.accountTypes;
+    },
     filteredAccounts() {
       const query = this.searchQuery.toLowerCase().trim();
       if (!query) return this.accounts;
@@ -81,6 +72,16 @@ export default {
           class="form-control bg-dark text-white border-info mb-2"
           placeholder="Account Name"
       />
+      <select
+          v-model="newAccount.type"
+          class="form-select bg-dark border-info mb-2 w-25"
+          required
+      >
+        <option disabled value="">-- source account --</option>
+        <option v-for="type in availableAccountTypes" :key="type" :value="type">
+          {{ type }}
+        </option>
+      </select>
       <input
           v-model="newAccount.ref"
           class="form-control bg-dark text-white border-info mb-2"
@@ -153,9 +154,9 @@ export default {
 </template>
 
 <style scoped>
-input.form-control.bg-dark.text-white::placeholder {
-  color: #cccccc;
-  opacity: 0.7;
+input::placeholder,
+select {
+  color: #ccc;
 }
 
 input.form-control.bg-dark.text-white {

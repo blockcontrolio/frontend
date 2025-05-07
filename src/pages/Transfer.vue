@@ -48,8 +48,8 @@ export default {
   },
   methods: {
     async fetchAccounts() {
-      let responsePromise = await fetchAccounts();
-      this.accounts = await responsePromise.json();
+      let res = await fetchAccounts();
+      this.accounts = await res.json();
     },
     validateTo() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
