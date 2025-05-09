@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Dashboard from '../pages/Dashboard.vue'
 import Transfer from '../pages/Transfer.vue'
 import Accounts from '../pages/Accounts.vue'
+import Transactions from '../pages/Transactions.vue'
 import Settings from '../pages/Settings.vue'
 import AccountDetails from "../pages/AccountDetails.vue";
 
@@ -20,6 +21,10 @@ const routes = [
         path: '/accounts/:id',
         name: 'account-details',
         component: AccountDetails
+    },
+    {
+        path: '/transactions',
+        component: Transactions
     },
     {
         path: '/transfers/:accountId',

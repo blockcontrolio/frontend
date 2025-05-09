@@ -119,6 +119,7 @@ export default {
           <th scope="col">Ref</th>
           <th scope="col">Balance</th>
           <th scope="col">Account ID</th>
+          <th scope="col">Type</th>
           <th scope="col">Created</th>
           <th scope="col" class="text-center">Status</th>
           <th scope="col" style="width: 100px;">Recent Transfers</th>
@@ -135,6 +136,7 @@ export default {
               {{ acc.id.substring(0, 6) }}…{{ acc.id.substring(acc.id.length - 4) }}
             </router-link>
           </td>
+          <td>{{ acc.type }}</td>
           <td>{{ formatDate(acc.createTime) }}</td>
           <td class="text-center">
             <span class="badge bg-success">Active</span>
