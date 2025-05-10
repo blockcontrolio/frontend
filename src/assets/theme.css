@@ -22,7 +22,6 @@ body {
 .card-glow {
     background-color: #111;
     border: 1px solid #2af2ff22;
-    box-shadow: 0 0 10px #2af2ff55;
     color: white;
 }
 
