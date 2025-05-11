@@ -1,5 +1,11 @@
 <script>
-import {fetchAccounts, sendExternalWithdrawal, sendInternalTransfer} from '../services/api'
+import {
+  fetchAccounts,
+  fetchBalances,
+  fetchTokens,
+  sendExternalWithdrawal,
+  sendInternalTransfer
+} from '../services/api'
 
 export default {
   data() {
@@ -8,20 +14,25 @@ export default {
       accounts: [], // should be populated externally
       internal: {
         from: '',
+        tokenId: null,
         to: '',
         amount: null
       },
       transfer: {
         accountId: '',
+        tokenId: null,
         to: '',
         amount: null
       },
+      tokens: [], // fetched from API
       errors: {
         to: '',
         amount: ''
       },
       transferSuccess: null,
       transferError: null,
+      accountBalances: [],
+      tokenBalance: {}
     };
   },
   computed: {
@@ -42,14 +53,33 @@ export default {
     hasErrors() {
       return !!this.errors.to || !!this.errors.amount;
     },
+    selectedToken() {
+      return this.tokens?.find(t => t.id === this.internal.tokenId) || null;
+    }
   },
   mounted() {
+    this.fetchTokens();
     this.fetchAccounts();
   },
   methods: {
+    async fetchTokens() {
+      let res = await fetchTokens()
+      this.tokens = await res.json();
+    },
     async fetchAccounts() {
       let res = await fetchAccounts();
       this.accounts = await res.json();
+    },
+    async fetchBalances() {
+      const accountId = this.selectedAccount.id;
+      let res = await fetchBalances(accountId);
+      this.accountBalances = await res.json();
+    },
+    showBalance() {
+      this.tokenBalance = this.accountBalances
+          .find(b => {
+            return b.id === this.selectedToken.id
+          })
     },
     validateTo() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
@@ -166,13 +196,41 @@ export default {
       <!-- Source Account -->
       <div class="mb-3">
         <label class="form-label">From Account</label>
-        <select v-model="internal.from" class="form-select bg-dark border-info" required>
+        <select v-model="internal.from" class="form-select bg-dark border-info" required
+                v-on:change="fetchBalances">
           <option disabled value="">-- source account --</option>
           <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
-        <div v-if="selectedAccount" class="mt-1 text-info small"> Balance: {{ selectedAccount.balance }} ETH</div>
+        <!-- acc balance preview -->
+        <div v-if="selectedAccount && selectedToken" class="mt-1 balance">
+          <span class="text-info small label">Balance:</span> <span class="value">{{ this.tokenBalance?.amount }} {{this.tokenBalance?.symbol}}</span>
+        </div>
+      </div>
+
+      <!-- Token Selection -->
+      <div class="mb-3">
+        <label class="form-label">Select Token</label>
+        <select
+            v-model="internal.tokenId"
+            class="form-select bg-dark border-info text-white"
+            v-on:change="showBalance"
+        >
+          <option :value="null">Ether (ETH)</option>
+          <option
+              v-for="token in tokens"
+              :key="token.id"
+              :value="token.id"
+          >
+            {{ token.name }} ({{ token.symbol }})
+          </option>
+        </select>
+        <!-- token details preview -->
+        <div v-if="selectedToken" class="token-info-box mt-3">
+          <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
+          <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
+        </div>
       </div>
 
       <!-- Target Account -->
@@ -190,7 +248,7 @@ export default {
 
       <!-- Amount -->
       <div class="mb-3">
-        <label class="form-label">Amount ETH</label>
+        <label class="form-label">Amount</label>
         <input
             v-model="internal.amount"
             type="number"
@@ -201,7 +259,7 @@ export default {
         />
         <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
         <div v-if="selectedAccount" class="">
-          <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(selectedAccount.balance)"
+          <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(tokenBalance?.amount)"
                class="form-text text-warning">Amount exceeds account balance!
           </div>
         </div>
@@ -219,15 +277,44 @@ export default {
 
       <div class="mb-3">
         <label class="form-label">From Account</label>
-        <select v-model="transfer.accountId" class="form-select bg-dark border-info" required>
+        <select v-model="transfer.accountId" class="form-select bg-dark border-info" required
+                v-on:change="fetchBalances">
           <option disabled value="">-- choose account --</option>
           <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
-        <div v-if="selectedAccount" class="mt-1 text-info small"> Balance: {{ selectedAccount.balance }} ETH</div>
+        <!-- acc balance preview -->
+        <div v-if="selectedAccount && selectedToken" class="mt-1 balance">
+          <span class="text-info small label">Balance:</span> <span class="value">{{ this.tokenBalance?.amount }} {{this.tokenBalance?.symbol}}</span>
+        </div>
       </div>
 
+      <!-- Token Selection -->
+      <div class="mb-3">
+        <label class="form-label">Select Token</label>
+        <select
+            v-model="internal.tokenId"
+            class="form-select bg-dark border-info text-white"
+            v-on:change="showBalance"
+        >
+          <option :value="null">Ether (ETH)</option>
+          <option
+              v-for="token in tokens"
+              :key="token.id"
+              :value="token.id"
+          >
+            {{ token.name }} ({{ token.symbol }})
+          </option>
+        </select>
+        <!-- token details preview -->
+        <div v-if="selectedToken" class="token-info-box mt-3">
+          <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
+          <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
+        </div>
+      </div>
+
+      <!-- Target Address -->
       <div class="mb-3">
         <label class="form-label">To Address</label>
         <input
@@ -240,7 +327,7 @@ export default {
       </div>
 
       <div class="mb-3">
-        <label class="form-label">Amount ETH</label>
+        <label class="form-label">Amount</label>
         <input
             v-model="transfer.amount"
             type="number"
@@ -251,7 +338,7 @@ export default {
         />
         <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
         <div v-if="selectedAccount" class="">
-          <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(selectedAccount.balance)"
+          <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(tokenBalance?.amount)"
                class="form-text text-warning">Amount exceeds account balance!
           </div>
         </div>
@@ -265,7 +352,7 @@ export default {
 
   <!-- Success Message -->
   <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
-    ✅ You transferred {{ transferSuccess.amount }} ETH to {{ transferSuccess.to }}
+    ✅ You transferred {{ transferSuccess.amount }} {{ selectedToken.name }} ({{ selectedToken.symbol }}) to {{ transferSuccess.to }}
     <br/>
     Tx hash: <code>{{ transferSuccess.txHash }}</code>
   </div>
@@ -308,6 +395,27 @@ input[type=number].no-spinner::-webkit-inner-spin-button {
   border-color: #ff4c4c; /* electric red/orange */
   color: #ffcccc; /* light red text for readability */
   border-radius: 0.375rem;
+}
+
+.token-info-box {
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid #00ffff55;
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.balance .label,
+.token-info-box .label {
+  color: #89ffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.balance .value,
+.token-info-box .value {
+  color: #ffffff;
+  font-size: 0.875rem;
+  word-break: break-all;
 }
 
 </style>

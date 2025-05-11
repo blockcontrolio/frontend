@@ -12,7 +12,7 @@ export async function fetchAccounts() {
 }
 
 export async function fetchTokens() {
-    return await fetch(`${API_URL}/transfers/tokens`, {
+    return await fetch(`${API_URL}/tokens`, {
         headers: {
             'x-api-key': xApiKey
         }
@@ -31,6 +31,16 @@ export async function fetchAccount(id) {
     });
 }
 
+export async function fetchBalances(accountId) {
+    return await fetch(`${API_URL}/accounts/${accountId}/balances`, {
+        headers: {
+            'x-api-key': xApiKey,
+        },
+    }).catch(err => {
+        console.error('Failed to load account balance', err);
+    });
+}
+
 export async function createAccount(newAccount) {
     return await fetch(`${API_URL}/accounts`, {
         method: 'POST',
@@ -45,6 +55,7 @@ export async function sendInternalTransfer(data) {
     return await fetch(`${API_URL}/transfers/internal`, {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey
         },
         body: JSON.stringify(data)
@@ -55,6 +66,7 @@ export async function sendExternalWithdrawal(data) {
     return await fetch(`${API_URL}/transfers/withdrawals`, {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey
         },
         body: JSON.stringify(data)
