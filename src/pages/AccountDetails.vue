@@ -1,13 +1,12 @@
 <script>
 import {formatDate} from "../js/utils.js";
-
-const API_URL = 'http://localhost:8080/api/v1/accounts';
-const xApiKey = localStorage.getItem('x-api-key') || '';
+import {fetchAccount, fetchBalances, updateAccount} from "../services/api.js";
 
 export default {
   data() {
     return {
       account: null,
+      balances: []
     };
   },
   mounted() {
@@ -17,40 +16,24 @@ export default {
       return;
     }
     this.fetchAccount(id);
+    this.fetchBalances(id);
   },
   methods: {
     formatDate,
     async fetchAccount(id) {
-      try {
-        const res = await fetch(`${API_URL}/${id}`, {
-          headers: {
-            'x-api-key': xApiKey,
-          },
-        });
-        if (res.ok) {
-          this.account = await res.json();
-        } else {
-          console.error('Failed to fetch account data');
-        }
-      } catch (error) {
-        console.error('Error fetching account:', error);
-      }
+      let res = await fetchAccount(id);
+      this.account = await res.json();
     },
-
+    async fetchBalances(id) {
+      let res = await fetchBalances(id);
+      this.balances = await res.json();
+    },
     async updateAccount() {
-      try {
-        await fetch(`${API_URL}/${this.account.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': xApiKey,
-          },
-          body: JSON.stringify(this.account),
-        });
-        alert('Account updated!');
-      } catch (error) {
-        console.error('Error updating account:', error);
+      const id = this.$route.params.id;
+      let newModel = {
+        name: this.account.name
       }
+      await updateAccount(id, newModel);
     },
     goBack() {
       this.$router.push('/accounts');
@@ -86,10 +69,22 @@ export default {
       </div>
 
       <div class="row mb-2">
-        <div class="col-4"><strong>Balance:</strong></div>
-        <div class="col-8">{{ account.balance }} ETH</div>
+        <div class="col-4"><strong>Token Balances:</strong></div>
+        <div class="col-8">
+          <div v-if="this.balances && this.balances.length">
+            <div
+                v-for="token in this.balances"
+                :key="token.id"
+                class="d-flex justify-content-between align-items-center border-bottom border-info py-1"
+            >
+              <span class="text-white">{{ token.name }} ({{ token.symbol }})</span>
+              <span class="text-info mono">{{ token.amount }}</span>
+            </div>
+          </div>
+          <div v-else class="text-muted">No token balances</div>
+        </div>
       </div>
-      <div class="row mb-2">
+      <div class="row my-2">
         <div class="col-4"><strong>Created:</strong></div>
         <div class="col-8">{{ formatDate(account.createTime) }}</div>
       </div>

@@ -31,6 +31,19 @@ export async function fetchAccount(id) {
     });
 }
 
+export async function updateAccount(id, accountInfo) {
+    await fetch(`${API_URL}/accounts/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': xApiKey,
+        },
+        body: JSON.stringify(accountInfo),
+    }).catch(err => {
+        console.error('Error updating account:', err);
+    });
+}
+
 export async function fetchBalances(accountId) {
     return await fetch(`${API_URL}/accounts/${accountId}/balances`, {
         headers: {
