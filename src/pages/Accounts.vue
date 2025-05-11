@@ -115,11 +115,11 @@ export default {
       <table class="table table-dark table-hover table-bordered table-glow">
         <thead>
         <tr>
+          <th scope="col">Account ID</th>
           <th scope="col">Name</th>
           <th scope="col">Ref</th>
-          <th scope="col">Balance</th>
-          <th scope="col">Account ID</th>
           <th scope="col">Type</th>
+          <th scope="col">Address</th>
           <th scope="col">Created</th>
           <th scope="col" class="text-center">Status</th>
           <th scope="col" style="width: 100px;">Recent Transfers</th>
@@ -127,16 +127,16 @@ export default {
         </thead>
         <tbody>
         <tr v-for="acc in filteredAccounts" :key="acc.ref">
-          <td>{{ acc.name || '(Unnamed)' }}</td>
-          <td>{{ acc.ref }}</td>
-          <td>{{ acc.balance }}</td>
           <td>
             <router-link :to="{ name: 'account-details', params: { id: acc.id } }"
                          class="text-info">
               {{ acc.id.substring(0, 6) }}…{{ acc.id.substring(acc.id.length - 4) }}
             </router-link>
           </td>
+          <td>{{ acc.name || '(Unnamed)' }}</td>
+          <td>{{ acc.ref }}</td>
           <td>{{ acc.type }}</td>
+          <td>{{ acc.address }}</td>
           <td>{{ formatDate(acc.createTime) }}</td>
           <td class="text-center">
             <span class="badge bg-success">Active</span>
