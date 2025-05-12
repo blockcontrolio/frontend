@@ -1,5 +1,5 @@
 <script>
-import {formatDate} from "../js/utils.js";
+import {formatAmount, formatDate} from "../js/utils.js";
 import {fetchAccount, fetchBalances, updateAccount} from "../services/api.js";
 
 export default {
@@ -19,6 +19,7 @@ export default {
     this.fetchBalances(id);
   },
   methods: {
+    formatAmount,
     formatDate,
     async fetchAccount(id) {
       let res = await fetchAccount(id);
@@ -78,7 +79,7 @@ export default {
                 class="d-flex justify-content-between align-items-center border-bottom border-info py-1"
             >
               <span class="text-white">{{ token.name }} ({{ token.symbol }})</span>
-              <span class="text-info mono">{{ token.amount }}</span>
+              <span class="text-info mono">{{ formatAmount(token.amount) }}</span>
             </div>
           </div>
           <div v-else class="text-muted">No token balances</div>

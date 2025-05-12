@@ -6,6 +6,7 @@ import {
   sendExternalWithdrawal,
   sendInternalTransfer
 } from '../services/api'
+import {formatAmount} from "../js/utils.js";
 
 export default {
   data() {
@@ -62,6 +63,7 @@ export default {
     this.fetchAccounts();
   },
   methods: {
+    formatAmount,
     async fetchTokens() {
       let res = await fetchTokens()
       this.tokens = await res.json();
@@ -205,7 +207,7 @@ export default {
         </select>
         <!-- acc balance preview -->
         <div v-if="selectedAccount && selectedToken" class="mt-1 balance">
-          <span class="text-info small label">Balance:</span> <span class="value">{{ this.tokenBalance?.amount }} {{this.tokenBalance?.symbol}}</span>
+          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.tokenBalance?.amount) }} {{this.tokenBalance?.symbol}}</span>
         </div>
       </div>
 
@@ -286,7 +288,7 @@ export default {
         </select>
         <!-- acc balance preview -->
         <div v-if="selectedAccount && selectedToken" class="mt-1 balance">
-          <span class="text-info small label">Balance:</span> <span class="value">{{ this.tokenBalance?.amount }} {{this.tokenBalance?.symbol}}</span>
+          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.tokenBalance?.amount) }} {{this.tokenBalance?.symbol}}</span>
         </div>
       </div>
 
