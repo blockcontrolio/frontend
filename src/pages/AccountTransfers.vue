@@ -1,8 +1,6 @@
 <script>
-import {formatDate} from "../js/utils.js";
-
-const API_URL = 'http://localhost:8080/api/v1/transfers';
-const xApiKey = localStorage.getItem('x-api-key') || '';
+import {formatAmount, formatDate} from "../js/utils.js";
+import {fetchTransfers} from "../services/api.js";
 
 export default {
   name: 'Transfers',
@@ -16,16 +14,10 @@ export default {
     this.loadTransfers();
   },
   methods: {
+    formatAmount,
     formatDate,
     async loadTransfers() {
-      const res = await fetch(`${API_URL}?accountId=${this.accountId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': xApiKey
-            }
-          }
-      );
+      const res = await fetchTransfers(this.accountId);
       this.transfers = await res.json();
     },
     goBack() {
@@ -58,7 +50,7 @@ export default {
       <tbody>
       <tr v-for="tx in transfers" :key="tx.txHash">
         <td>{{ tx.to }}</td>
-        <td>{{ tx.amount }}</td>
+        <td>{{ formatAmount(tx.amount) }}</td>
         <td class="text-center">
           <span
               :class="{ 'bg-success': tx.status === 'SUCCESS', 'bg-warning text-dark': tx.status === 'PENDING', 'bg-danger': tx.status === 'FAILED' }">

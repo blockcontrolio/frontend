@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080/api/v1';
+const API_URL = import.meta.env.VITE_API_BASE;
 let xApiKey = localStorage.getItem('x-api-key') || '';
 
 export async function fetchAccounts() {
@@ -50,7 +50,7 @@ export async function fetchBalances(accountId) {
             'x-api-key': xApiKey,
         },
     }).catch(err => {
-        console.error('Failed to load account balance', err);
+        console.error('Failed to load account asset balances', err);
     });
 }
 
@@ -61,6 +61,19 @@ export async function createAccount(newAccount) {
             'x-api-key': xApiKey
         },
         body: JSON.stringify(newAccount)
+    });
+}
+
+export async function fetchTransfers(accountId) {
+    return await fetch(`${API_URL}/transfers?accountId=${accountId}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': xApiKey
+            }
+        }
+    ).catch(err => {
+        console.error('Failed to load account transfers', err);
     });
 }
 
