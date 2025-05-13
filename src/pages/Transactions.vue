@@ -132,14 +132,4 @@ export default {
   letter-spacing: 0.05em;
 }
 
-.mono {
-  font-family: 'Courier New', monospace;
-  font-size: 0.875rem;
-  word-break: break-all;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
 </style>

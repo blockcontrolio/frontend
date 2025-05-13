@@ -1,0 +1,155 @@
+<script>
+import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
+
+export default {
+  name: 'Tokens',
+  data() {
+    return {
+      tokens: [],
+      accounts: [],
+      showCreateForm: false,
+      newToken: {
+        name: '',
+        symbol: '',
+        accountId: ''
+      }
+    };
+  },
+  mounted() {
+    this.fetchTokens();
+  },
+  methods: {
+    async fetchTokens() {
+      const res = await fetchTokens();
+      this.tokens = await res.json();
+    },
+    async fetchAccounts() {
+      const res = await fetchAccounts();
+      this.accounts = await res.json();
+    },
+    async createToken() {
+      const payload = {
+        name: this.newToken.name,
+        symbol: this.newToken.symbol,
+        accountId: this.newToken.accountId
+      };
+
+      const res = await createToken(payload);
+      if (res.ok) {
+        this.showCreateForm = false;
+        this.newToken = {name: '', symbol: '', accountId: ''};
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.message}`);
+      }
+    },
+    copyToClipboard(value) {
+      navigator.clipboard.writeText(value)
+          .then(() => {
+            console.log('Wallet address copied:', value);
+            // optional: show toast or temporary success indicator
+          })
+          .catch(err => {
+            console.error('Failed to copy:', err);
+          });
+    }
+  }
+};
+</script>
+
+<template>
+  <div>
+    <h3 class="mb-4 text-info">Token Management</h3>
+
+    <!-- Toggle Create Form -->
+    <div v-if="!showCreateForm" class="mb-3 text-end">
+      <button class="btn btn-outline-info" @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
+        Create New Token
+      </button>
+    </div>
+
+    <!-- Create Token Form -->
+    <form v-else @submit.prevent="createToken" class="mb-4">
+      <input v-model="newToken.name" class="form-control bg-dark text-white border-info mb-2"
+             placeholder="Token Name"
+             required/>
+      <input v-model="newToken.symbol" class="form-control bg-dark text-white border-info mb-2"
+             placeholder="Symbol"
+             required/>
+
+      <div class="mb-3">
+        <select v-model="newToken.accountId" class="form-select bg-dark border-info" required>
+          <option disabled value="">-- owner account --</option>
+          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
+            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          </option>
+        </select>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button
+            class="btn btn-outline-danger"
+            type="button"
+            @click="showCreateForm = false"
+        >
+          Cancel
+        </button>
+        <button class="btn btn-outline-primary" type="submit">
+          Create Token
+        </button>
+      </div>
+    </form>
+
+    <!-- Token Cards -->
+    <div v-if="tokens && tokens.length > 0" class="row mt-4 g-3">
+      <div v-for="token in tokens" :key="token.id" class="col-12">
+        <div class="card bg-dark text-white border border-info shadow-sm p-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div>
+              <div class="h5 mb-0">
+                <span class="text-info">{{ token.name }}</span> <span class="">({{ token.symbol }})</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <span class="label text-secondary me-2">Issuer Counterparty:</span>
+            <span>{{ token.counterparty?.name }}</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <span class="mono small me-2">
+              {{ token.address }}
+              <i class="bi bi-clipboard pointer text-info"
+                 @click="copyToClipboard(token.address)"
+                 title="Copy to clipboard">
+              </i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="">No tokens created yet.</div>
+
+  </div>
+</template>
+
+<style scoped>
+input::placeholder,
+select {
+  color: #ccc;
+}
+
+input.form-control.bg-dark.text-white {
+  color: #ffffff;
+  border-color: #2af2ff;
+}
+
+input.form-control.bg-dark.text-white:focus {
+  border-color: #2af2ff;
+  box-shadow: 0 0 0 0.2rem rgba(42, 242, 255, 0.25);
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+</style>

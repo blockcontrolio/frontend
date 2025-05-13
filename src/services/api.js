@@ -26,6 +26,17 @@ export async function fetchTokens() {
     });
 }
 
+export async function createToken(payload) {
+    return await fetch(`${apiBaseUrl}/tokens`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
 export async function fetchAccount(id) {
     return await fetch(`${apiBaseUrl}/accounts/${id}`, {
         headers: {
