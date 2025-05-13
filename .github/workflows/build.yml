@@ -14,7 +14,7 @@ on:
 env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY: blockcontrolio/frontend
-  API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  API_BASE_URL: ${{ env.API_BASE_URL }}
 
 jobs:
   frontend-build:
@@ -46,7 +46,7 @@ jobs:
           IMAGE_URI=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
           
           echo "Building image: $IMAGE_URI"
-          docker build --build-arg VITE_API_BASE=$API_BASE_URL -t $IMAGE_URI .
+          docker build --build-arg API_URL=$API_BASE_URL -t $IMAGE_URI .
           
           echo "Pushing image to ECR..."
           docker push $IMAGE_URI
