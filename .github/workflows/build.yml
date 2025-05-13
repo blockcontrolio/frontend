@@ -47,7 +47,9 @@ jobs:
           IMAGE_URI=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
           
           echo "Building image: $IMAGE_URI"
+          echo $API_BASE_URL
           docker build --build-arg API_URL=$API_BASE_URL -t $IMAGE_URI .
           
           echo "Pushing image to ECR..."
           docker push $IMAGE_URI
+        
