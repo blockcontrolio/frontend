@@ -8,8 +8,8 @@ COPY index.html ./
 COPY vite.config.js ./
 COPY src ./src
 
-ARG VITE_API_BASE
-ENV VITE_API_BASE=$VITE_API_BASE
+ARG API_URL
+ENV VITE_API_BASE=$API_URL
 
 RUN npm install && npm run build
 
