@@ -1,6 +1,7 @@
 <script>
 import {fetchTransactions} from "../services/api.js";
 import {formatDate} from "../js/utils.js";
+import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js";
 
 export default {
   data() {
@@ -17,14 +18,12 @@ export default {
       this.transactions = await res.json();
     },
     formatDate,
-    copyToClipboard(text) {
-      navigator.clipboard.writeText(text)
+    isClipboardSupported,
+    copyHash(txHash) {
+      copyToClipboard(txHash)
           .then(() => {
-            console.log('Tx Hash copied:', text);
+            console.log('Tx Hash copied:', txHash);
             // optional: show toast or temporary success indicator
-          })
-          .catch(err => {
-            console.error('Failed to copy:', err);
           });
     }
   }
@@ -74,8 +73,8 @@ export default {
           <span class="label">Hash:</span>
           <span class="value mono d-flex align-items-center gap-2">
             {{ tx.hash }}
-            <i class="bi bi-clipboard pointer text-info"
-               @click="copyToClipboard(tx.hash)"
+            <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
+               @click="copyHash(tx.hash)"
                title="Copy to clipboard">
             </i>
           </span>

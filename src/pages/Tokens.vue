@@ -1,5 +1,6 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
+import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js"
 
 export default {
   name: 'Tokens',
@@ -43,14 +44,12 @@ export default {
         alert(`Error: ${err.message}`);
       }
     },
-    copyToClipboard(value) {
-      navigator.clipboard.writeText(value)
+    isClipboardSupported,
+    copyAddress(address) {
+      copyToClipboard(address)
           .then(() => {
-            console.log('Wallet address copied:', value);
+            console.log('Wallet address copied:', address);
             // optional: show toast or temporary success indicator
-          })
-          .catch(err => {
-            console.error('Failed to copy:', err);
           });
     }
   }
@@ -118,8 +117,8 @@ export default {
           <div class="d-flex align-items-center">
             <span class="mono small me-2">
               {{ token.address }}
-              <i class="bi bi-clipboard pointer text-info"
-                 @click="copyToClipboard(token.address)"
+              <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
+                 @click="copyAddress(token.address)"
                  title="Copy to clipboard">
               </i>
             </span>
