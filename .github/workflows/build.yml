@@ -14,11 +14,11 @@ on:
 env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY: blockcontrolio/frontend
-  API_BASE_URL: ${{ secrets.API_BASE_URL }}
-
+  
 jobs:
   frontend-build:
     runs-on: ubuntu-latest
+    environment: demo
 
     permissions:
       packages: write
@@ -37,6 +37,8 @@ jobs:
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: true
 
       - name: Build, tag, and push Docker image to Amazon ECR
         run: |
@@ -44,7 +46,7 @@ jobs:
           IMAGE_URI=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
           
           echo "Building image: $IMAGE_URI"
-          docker build --build-arg VITE_API_BASE=$API_BASE_URL -t $IMAGE_URI .
+          docker build -t $IMAGE_URI .
           
           echo "Pushing image to ECR..."
           docker push $IMAGE_URI

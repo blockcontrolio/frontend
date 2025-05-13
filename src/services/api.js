@@ -1,10 +1,14 @@
-const API_URL = import.meta.env.VITE_API_BASE;
-let xApiKey = localStorage.getItem('x-api-key') || '';
+const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
+
+function loadApiKey() {
+    return localStorage.getItem('x-api-key') || '';
+}
 
 export async function fetchAccounts() {
-    return await fetch(`${API_URL}/accounts`, {
+    return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
-            'x-api-key': xApiKey
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
         }
     }).catch(err => {
         console.error('Failed to load accounts', err);
@@ -12,9 +16,10 @@ export async function fetchAccounts() {
 }
 
 export async function fetchTokens() {
-    return await fetch(`${API_URL}/tokens`, {
+    return await fetch(`${apiBaseUrl}/tokens`, {
         headers: {
-            'x-api-key': xApiKey
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
         }
     }).catch(err => {
         console.error('Error fetching account:', err);
@@ -22,9 +27,10 @@ export async function fetchTokens() {
 }
 
 export async function fetchAccount(id) {
-    return await fetch(`${API_URL}/accounts/${id}`, {
+    return await fetch(`${apiBaseUrl}/accounts/${id}`, {
         headers: {
-            'x-api-key': xApiKey,
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey(),
         },
     }).catch(err => {
         console.error('Failed to load tokens', err);
@@ -32,11 +38,11 @@ export async function fetchAccount(id) {
 }
 
 export async function updateAccount(id, accountInfo) {
-    await fetch(`${API_URL}/accounts/${id}`, {
+    await fetch(`${apiBaseUrl}/accounts/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': xApiKey,
+            'x-api-key': loadApiKey(),
         },
         body: JSON.stringify(accountInfo),
     }).catch(err => {
@@ -45,9 +51,10 @@ export async function updateAccount(id, accountInfo) {
 }
 
 export async function fetchBalances(accountId) {
-    return await fetch(`${API_URL}/accounts/${accountId}/balances`, {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances`, {
         headers: {
-            'x-api-key': xApiKey,
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey(),
         },
     }).catch(err => {
         console.error('Failed to load account asset balances', err);
@@ -55,21 +62,22 @@ export async function fetchBalances(accountId) {
 }
 
 export async function createAccount(newAccount) {
-    return await fetch(`${API_URL}/accounts`, {
+    return await fetch(`${apiBaseUrl}/accounts`, {
         method: 'POST',
         headers: {
-            'x-api-key': xApiKey
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
         },
         body: JSON.stringify(newAccount)
     });
 }
 
 export async function fetchTransfers(accountId) {
-    return await fetch(`${API_URL}/transfers?accountId=${accountId}`,
+    return await fetch(`${apiBaseUrl}/transfers?accountId=${accountId}`,
         {
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': xApiKey
+                'x-api-key': loadApiKey()
             }
         }
     ).catch(err => {
@@ -78,31 +86,32 @@ export async function fetchTransfers(accountId) {
 }
 
 export async function sendInternalTransfer(data) {
-    return await fetch(`${API_URL}/transfers/internal`, {
+    return await fetch(`${apiBaseUrl}/transfers/internal`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': xApiKey
+            'x-api-key': loadApiKey()
         },
         body: JSON.stringify(data)
     });
 }
 
 export async function sendExternalWithdrawal(data) {
-    return await fetch(`${API_URL}/transfers/withdrawals`, {
+    return await fetch(`${apiBaseUrl}/transfers/withdrawals`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': xApiKey
+            'x-api-key': loadApiKey()
         },
         body: JSON.stringify(data)
     })
 }
 
 export async function fetchTransactions() {
-    return await fetch(`${API_URL}/transactions`, {
+    return await fetch(`${apiBaseUrl}/transactions`, {
         headers: {
-            'X-API-Key': xApiKey
+            'Content-Type': 'application/json',
+            'X-API-Key': loadApiKey()
         }
     }).catch(err => {
         console.error('Failed to fetch transactions', err);

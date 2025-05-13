@@ -7,10 +7,9 @@ COPY package.json ./
 COPY index.html ./
 COPY vite.config.js ./
 COPY src ./src
-COPY public ./public
 
-ARG VITE_API_BASE
-ENV VITE_API_BASE=$VITE_API_BASE
+ARG API_BASE_URL
+ENV VITE_API_BASE=$API_BASE_URL
 
 RUN npm install && npm run build
 
@@ -21,7 +20,8 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy custom nginx config (optional)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY demo-nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
