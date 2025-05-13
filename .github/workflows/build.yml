@@ -19,6 +19,7 @@ env:
 jobs:
   frontend-build:
     runs-on: ubuntu-latest
+    environment: demo
 
     permissions:
       packages: write
