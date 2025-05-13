@@ -7,7 +7,6 @@ COPY package.json ./
 COPY index.html ./
 COPY vite.config.js ./
 COPY src ./src
-COPY public ./public
 
 ARG VITE_API_BASE
 ENV VITE_API_BASE=$VITE_API_BASE
