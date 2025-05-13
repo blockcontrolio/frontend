@@ -5,6 +5,7 @@ let xApiKey = localStorage.getItem('x-api-key') || '';
 export async function fetchAccounts() {
     return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey
         }
     }).catch(err => {
@@ -15,6 +16,7 @@ export async function fetchAccounts() {
 export async function fetchTokens() {
     return await fetch(`${apiBaseUrl}/tokens`, {
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey
         }
     }).catch(err => {
@@ -25,6 +27,7 @@ export async function fetchTokens() {
 export async function fetchAccount(id) {
     return await fetch(`${apiBaseUrl}/accounts/${id}`, {
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey,
         },
     }).catch(err => {
@@ -48,6 +51,7 @@ export async function updateAccount(id, accountInfo) {
 export async function fetchBalances(accountId) {
     return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances`, {
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey,
         },
     }).catch(err => {
@@ -59,6 +63,7 @@ export async function createAccount(newAccount) {
     return await fetch(`${apiBaseUrl}/accounts`, {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': xApiKey
         },
         body: JSON.stringify(newAccount)
@@ -103,6 +108,7 @@ export async function sendExternalWithdrawal(data) {
 export async function fetchTransactions() {
     return await fetch(`${apiBaseUrl}/transactions`, {
         headers: {
+            'Content-Type': 'application/json',
             'X-API-Key': xApiKey
         }
     }).catch(err => {
