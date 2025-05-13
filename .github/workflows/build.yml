@@ -14,8 +14,7 @@ on:
 env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY: blockcontrolio/frontend
-  API_BASE_URL: ${{ secrets.API_BASE_URL }}
-
+  
 jobs:
   frontend-build:
     runs-on: ubuntu-latest
@@ -52,4 +51,6 @@ jobs:
           
           echo "Pushing image to ECR..."
           docker push $IMAGE_URI
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
         
