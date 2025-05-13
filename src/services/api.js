@@ -1,8 +1,9 @@
-const API_URL = import.meta.env.VITE_API_BASE;
+const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
+
 let xApiKey = localStorage.getItem('x-api-key') || '';
 
 export async function fetchAccounts() {
-    return await fetch(`${API_URL}/accounts`, {
+    return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
             'x-api-key': xApiKey
         }
@@ -12,7 +13,7 @@ export async function fetchAccounts() {
 }
 
 export async function fetchTokens() {
-    return await fetch(`${API_URL}/tokens`, {
+    return await fetch(`${apiBaseUrl}/tokens`, {
         headers: {
             'x-api-key': xApiKey
         }
@@ -22,7 +23,7 @@ export async function fetchTokens() {
 }
 
 export async function fetchAccount(id) {
-    return await fetch(`${API_URL}/accounts/${id}`, {
+    return await fetch(`${apiBaseUrl}/accounts/${id}`, {
         headers: {
             'x-api-key': xApiKey,
         },
@@ -32,7 +33,7 @@ export async function fetchAccount(id) {
 }
 
 export async function updateAccount(id, accountInfo) {
-    await fetch(`${API_URL}/accounts/${id}`, {
+    await fetch(`${apiBaseUrl}/accounts/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -45,7 +46,7 @@ export async function updateAccount(id, accountInfo) {
 }
 
 export async function fetchBalances(accountId) {
-    return await fetch(`${API_URL}/accounts/${accountId}/balances`, {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances`, {
         headers: {
             'x-api-key': xApiKey,
         },
@@ -55,7 +56,7 @@ export async function fetchBalances(accountId) {
 }
 
 export async function createAccount(newAccount) {
-    return await fetch(`${API_URL}/accounts`, {
+    return await fetch(`${apiBaseUrl}/accounts`, {
         method: 'POST',
         headers: {
             'x-api-key': xApiKey
@@ -65,7 +66,7 @@ export async function createAccount(newAccount) {
 }
 
 export async function fetchTransfers(accountId) {
-    return await fetch(`${API_URL}/transfers?accountId=${accountId}`,
+    return await fetch(`${apiBaseUrl}/transfers?accountId=${accountId}`,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ export async function fetchTransfers(accountId) {
 }
 
 export async function sendInternalTransfer(data) {
-    return await fetch(`${API_URL}/transfers/internal`, {
+    return await fetch(`${apiBaseUrl}/transfers/internal`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export async function sendInternalTransfer(data) {
 }
 
 export async function sendExternalWithdrawal(data) {
-    return await fetch(`${API_URL}/transfers/withdrawals`, {
+    return await fetch(`${apiBaseUrl}/transfers/withdrawals`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ export async function sendExternalWithdrawal(data) {
 }
 
 export async function fetchTransactions() {
-    return await fetch(`${API_URL}/transactions`, {
+    return await fetch(`${apiBaseUrl}/transactions`, {
         headers: {
             'X-API-Key': xApiKey
         }
