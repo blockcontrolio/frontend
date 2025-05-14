@@ -1,4 +1,4 @@
-name: Build and Push Frontend to GHCR
+name: Build, Push to ECR, Deploy to ECS
 
 on:
   push:
@@ -16,7 +16,7 @@ env:
   ECR_REPOSITORY: blockcontrolio/frontend
   
 jobs:
-  frontend-build:
+  frontend-build-push-deploy:
     runs-on: ubuntu-latest
     environment: demo
 
@@ -45,8 +45,27 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           IMAGE_URI=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
           
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
           echo "Building image: $IMAGE_URI"
           docker build -t $IMAGE_URI .
           
           echo "Pushing image to ECR..."
           docker push $IMAGE_URI
+
+      - name: Render new ECS task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition-family: frontend
+          container-name: frontend
+          image: ${{ env.IMAGE_URI }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          cluster: blockcontrolio-demo-cluster
+          service: frontend-service-xakmtm23
+          wait-for-service-stability: true
+          
