@@ -65,7 +65,7 @@ export default {
   methods: {
     formatAmount,
     async fetchTokens() {
-      let res = await fetchTokens()
+      const res = await fetchTokens()
       this.tokens = await res.json();
     },
     async fetchAccounts() {
@@ -213,13 +213,13 @@ export default {
 
       <!-- Token Selection -->
       <div class="mb-3">
-        <label class="form-label">Select Token</label>
+        <label class="form-label">Select Asset</label>
         <select
             v-model="internal.tokenId"
-            class="form-select bg-dark border-info text-white"
+            class="form-select bg-dark border-info" required
             v-on:change="showBalance"
         >
-          <option :value="null">Ether (ETH)</option>
+          <option disabled value="">-- select asset --</option>
           <option
               v-for="token in tokens"
               :key="token.id"
@@ -294,13 +294,12 @@ export default {
 
       <!-- Token Selection -->
       <div class="mb-3">
-        <label class="form-label">Select Token</label>
+        <label class="form-label">Select Asset</label>
         <select
             v-model="internal.tokenId"
-            class="form-select bg-dark border-info text-white"
+            class="form-select bg-dark border-info" required
             v-on:change="showBalance"
         >
-          <option :value="null">Ether (ETH)</option>
           <option
               v-for="token in tokens"
               :key="token.id"
@@ -322,7 +321,8 @@ export default {
         <input
             v-model="transfer.to"
             class="form-control bg-dark border-info text-white"
-            placeholder="Recipient hex address"
+            placeholder="Recipient hex address 0x..."
+            pattern="^0x[a-fA-F0-9]{40}$"
             @input="validateTo"
         />
         <div v-if="errors.to" class="form-text text-danger">{{ errors.to }}</div>
