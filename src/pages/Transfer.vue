@@ -201,7 +201,7 @@ export default {
         <select v-model="internal.from" class="form-select bg-dark border-info" required
                 v-on:change="fetchBalances">
           <option disabled value="">-- source account --</option>
-          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
+          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
@@ -242,7 +242,7 @@ export default {
                 class="form-select bg-dark border-info"
                 required>
           <option disabled value="">-- target account --</option>
-          <option v-for="acc in availableTargetAccounts" :key="acc.ref + '-to'" :value="acc.id">
+          <option v-for="acc in availableTargetAccounts" :key="acc.id + '-to'" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
@@ -282,7 +282,7 @@ export default {
         <select v-model="transfer.accountId" class="form-select bg-dark border-info" required
                 v-on:change="fetchBalances">
           <option disabled value="">-- choose account --</option>
-          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
+          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
