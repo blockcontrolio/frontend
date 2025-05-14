@@ -1,4 +1,4 @@
-name: Build, Push Frontend to GHCR, Deploy to ECS
+name: Build, Push to ECR, Deploy to ECS
 
 on:
   push:
@@ -16,7 +16,7 @@ env:
   ECR_REPOSITORY: blockcontrolio/frontend
   
 jobs:
-  frontend-build-and-deploy:
+  frontend-build-push-deploy:
     runs-on: ubuntu-latest
     environment: demo
 
