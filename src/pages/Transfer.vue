@@ -14,21 +14,21 @@ export default {
       selectedForm: 'internal', // or 'internal'
       accounts: [], // should be populated externally
       internal: {
-        from: '',
-        tokenId: null,
-        to: '',
+        from: "",
+        tokenId: "",
+        to: "",
         amount: null
       },
       transfer: {
-        accountId: '',
-        tokenId: null,
-        to: '',
+        accountId: "",
+        tokenId: "",
+        to: "",
         amount: null
       },
       tokens: [], // fetched from API
       errors: {
-        to: '',
-        amount: ''
+        to: "",
+        amount: ""
       },
       transferSuccess: null,
       transferError: null,
