@@ -229,7 +229,7 @@ export default {
           </option>
         </select>
         <!-- token details preview -->
-        <div v-if="selectedToken" class="token-info-box mt-3">
+        <div v-if="selectedToken?.counterparty" class="token-info-box mt-3">
           <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
           <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
         </div>
@@ -309,7 +309,7 @@ export default {
           </option>
         </select>
         <!-- token details preview -->
-        <div v-if="selectedToken" class="token-info-box mt-3">
+        <div v-if="selectedToken?.counterparty" class="token-info-box mt-3">
           <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
           <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
         </div>
