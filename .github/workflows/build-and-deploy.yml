@@ -57,14 +57,14 @@ jobs:
         id: render
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: .github/ecs-task-definition.json
+          task-definition-family: frontend
           container-name: frontend
           image: ${{ env.IMAGE_URI }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
           service: frontend-service-xakmtm23
           cluster: blockcontrolio-demo-cluster
-          wait-for-service-stability: true
-          task-definition: ${{ steps.render.outputs.task-definition }}
+          
