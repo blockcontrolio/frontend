@@ -65,6 +65,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.render.outputs.task-definition }}
-          service: frontend-service-xakmtm23
           cluster: blockcontrolio-demo-cluster
+          service: frontend-service-xakmtm23
+          wait-for-service-stability: true
           
