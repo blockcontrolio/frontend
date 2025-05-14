@@ -45,8 +45,20 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           IMAGE_URI=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
           
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
           echo "Building image: $IMAGE_URI"
           docker build -t $IMAGE_URI .
           
           echo "Pushing image to ECR..."
           docker push $IMAGE_URI
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-update-task-definition@v1
+        with:
+          service: frontend-service-xakmtm23
+          cluster: blockcontrolio-demo-cluster
+          container-name: frontend
+          image: ${{ env.IMAGE_URI }}
+          wait-for-service-stability: true
+          task-definition: frontend
