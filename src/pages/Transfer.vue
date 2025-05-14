@@ -14,21 +14,21 @@ export default {
       selectedForm: 'internal', // or 'internal'
       accounts: [], // should be populated externally
       internal: {
-        from: '',
-        tokenId: null,
-        to: '',
+        from: "",
+        tokenId: "",
+        to: "",
         amount: null
       },
       transfer: {
-        accountId: '',
-        tokenId: null,
-        to: '',
+        accountId: "",
+        tokenId: "",
+        to: "",
         amount: null
       },
       tokens: [], // fetched from API
       errors: {
-        to: '',
-        amount: ''
+        to: "",
+        amount: ""
       },
       transferSuccess: null,
       transferError: null,
@@ -65,7 +65,7 @@ export default {
   methods: {
     formatAmount,
     async fetchTokens() {
-      let res = await fetchTokens()
+      const res = await fetchTokens()
       this.tokens = await res.json();
     },
     async fetchAccounts() {
@@ -201,7 +201,7 @@ export default {
         <select v-model="internal.from" class="form-select bg-dark border-info" required
                 v-on:change="fetchBalances">
           <option disabled value="">-- source account --</option>
-          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
+          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
@@ -213,13 +213,13 @@ export default {
 
       <!-- Token Selection -->
       <div class="mb-3">
-        <label class="form-label">Select Token</label>
+        <label class="form-label">Select Asset</label>
         <select
             v-model="internal.tokenId"
-            class="form-select bg-dark border-info text-white"
+            class="form-select bg-dark border-info" required
             v-on:change="showBalance"
         >
-          <option :value="null">Ether (ETH)</option>
+          <option disabled value="">-- select asset --</option>
           <option
               v-for="token in tokens"
               :key="token.id"
@@ -229,7 +229,7 @@ export default {
           </option>
         </select>
         <!-- token details preview -->
-        <div v-if="selectedToken" class="token-info-box mt-3">
+        <div v-if="selectedToken?.counterparty" class="token-info-box mt-3">
           <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
           <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
         </div>
@@ -242,7 +242,7 @@ export default {
                 class="form-select bg-dark border-info"
                 required>
           <option disabled value="">-- target account --</option>
-          <option v-for="acc in availableTargetAccounts" :key="acc.ref + '-to'" :value="acc.id">
+          <option v-for="acc in availableTargetAccounts" :key="acc.id + '-to'" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
@@ -282,7 +282,7 @@ export default {
         <select v-model="transfer.accountId" class="form-select bg-dark border-info" required
                 v-on:change="fetchBalances">
           <option disabled value="">-- choose account --</option>
-          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
+          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
@@ -294,13 +294,12 @@ export default {
 
       <!-- Token Selection -->
       <div class="mb-3">
-        <label class="form-label">Select Token</label>
+        <label class="form-label">Select Asset</label>
         <select
             v-model="internal.tokenId"
-            class="form-select bg-dark border-info text-white"
+            class="form-select bg-dark border-info" required
             v-on:change="showBalance"
         >
-          <option :value="null">Ether (ETH)</option>
           <option
               v-for="token in tokens"
               :key="token.id"
@@ -310,7 +309,7 @@ export default {
           </option>
         </select>
         <!-- token details preview -->
-        <div v-if="selectedToken" class="token-info-box mt-3">
+        <div v-if="selectedToken?.counterparty" class="token-info-box mt-3">
           <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
           <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
         </div>
@@ -322,7 +321,8 @@ export default {
         <input
             v-model="transfer.to"
             class="form-control bg-dark border-info text-white"
-            placeholder="Recipient hex address"
+            placeholder="Recipient hex address 0x..."
+            pattern="^0x[a-fA-F0-9]{40}$"
             @input="validateTo"
         />
         <div v-if="errors.to" class="form-text text-danger">{{ errors.to }}</div>
