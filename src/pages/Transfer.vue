@@ -6,7 +6,7 @@ import {
   sendExternalWithdrawal,
   sendInternalTransfer
 } from '../services/api'
-import {formatAmount} from "../js/utils.js";
+import {etherScanLink, formatAmount} from "../js/utils.js";
 
 export default {
   data() {
@@ -51,6 +51,7 @@ export default {
     this.fetchAccounts();
   },
   methods: {
+    etherScanLink,
     formatAmount,
     async fetchTokens() {
       const res = await fetchTokens()
@@ -351,7 +352,9 @@ export default {
   <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
     ✅ You transferred {{ transferSuccess.amount }} {{ assetBalance?.name }} ({{ assetBalance?.symbol }}) to {{ transferSuccess.to }}
     <br/>
-    Tx hash: <code>{{ transferSuccess.txHash }}</code>
+    Tx hash: <a class="ether-scan-link" :href="etherScanLink(transferSuccess.txHash)" target="_blank" rel="noopener noreferrer">
+      <code>{{ transferSuccess.txHash }}</code>
+    </a>
   </div>
 
   <!-- Error Message -->

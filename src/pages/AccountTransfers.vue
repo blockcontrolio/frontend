@@ -1,5 +1,5 @@
 <script>
-import {formatAmount, formatDate} from "../js/utils.js";
+import {etherScanLink, formatAmount, formatDate} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
 
 export default {
@@ -14,6 +14,7 @@ export default {
     this.loadTransfers();
   },
   methods: {
+    etherScanLink,
     formatAmount,
     formatDate,
     async loadTransfers() {
@@ -52,15 +53,17 @@ export default {
         <td>{{ tx.to }}</td>
         <td>{{ formatAmount(tx.amount) }}</td>
         <td class="text-center">
-          <span
+          <span class="badge"
               :class="{ 'bg-success': tx.status === 'SUCCESS', 'bg-warning text-dark': tx.status === 'PENDING', 'bg-danger': tx.status === 'FAILED' }">
             {{ tx.status }}
           </span>
         </td>
         <td>
-          <code class="">
-            {{ tx.txHash.slice(0, 10) }}...
-          </code>
+          <a class="ether-scan-link" :href="etherScanLink(tx.txHash)" target="_blank" rel="noopener noreferrer">
+            <code>
+              {{ tx.txHash.slice(0, 10) }}...
+            </code>
+          </a>
         </td>
         <td>
           {{ formatDate(tx.createTime) }}

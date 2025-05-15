@@ -62,3 +62,14 @@ body {
 .pointer {
     cursor: pointer;
 }
+
+.ether-scan-link {
+    font-size: 1em;
+    color: #d63384; /* same as default <code> in Bootstrap */
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    text-decoration: none;
+}
+.ether-scan-link:hover {
+    text-decoration: underline;
+}

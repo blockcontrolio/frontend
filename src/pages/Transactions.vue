@@ -1,6 +1,6 @@
 <script>
 import {fetchTransactions} from "../services/api.js";
-import {formatDate} from "../js/utils.js";
+import {etherScanLink, formatDate} from "../js/utils.js";
 import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js";
 
 export default {
@@ -13,6 +13,7 @@ export default {
     this.fetchTransactions();
   },
   methods: {
+    etherScanLink,
     async fetchTransactions() {
       const res = await fetchTransactions();
       this.transactions = await res.json();
@@ -72,7 +73,9 @@ export default {
         <div class="tx-line">
           <span class="label">Hash:</span>
           <span class="value mono d-flex align-items-center gap-2">
-            {{ tx.hash }}
+            <a class="ether-scan-link" :href="etherScanLink(tx.hash)" target="_blank" rel="noopener noreferrer">
+              <code>{{ tx.hash }}</code>
+            </a>
             <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
                @click="copyHash(tx.hash)"
                title="Copy to clipboard">
