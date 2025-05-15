@@ -18,3 +18,7 @@ export function formatAmount(value) {
 export function etherScanLink(txHash) {
     return 'https://explorer-1205614507017352.devnet.alchemy.com/tx/' + txHash;
 }
+
+export function tokenLink(address) {
+    return 'https://explorer-1205614507017352.devnet.alchemy.com/token/' + address;
+}

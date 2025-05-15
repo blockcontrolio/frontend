@@ -1,6 +1,7 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
 import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js"
+import {tokenLink} from "../js/utils.js";
 
 export default {
   name: 'Tokens',
@@ -20,6 +21,7 @@ export default {
     this.fetchTokens();
   },
   methods: {
+    tokenLink,
     async fetchTokens() {
       const res = await fetchTokens();
       this.tokens = await res.json();
@@ -62,7 +64,7 @@ export default {
 
     <!-- Toggle Create Form -->
     <div v-if="!showCreateForm" class="mb-3 text-end">
-      <button class="btn btn-outline-info" @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
+      <button class="btn btn-outline-primary" @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
         Create New Token
       </button>
     </div>
@@ -102,26 +104,31 @@ export default {
     <!-- Token Cards -->
     <div v-if="tokens && tokens.length > 0" class="row mt-4 g-3">
       <div v-for="token in tokens" :key="token.id" class="col-12">
-        <div class="card bg-dark text-white border border-info shadow-sm p-3">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <div>
-              <div class="h5 mb-0">
-                <span class="text-info">{{ token.name }}</span> <span class="">({{ token.symbol }})</span>
+        <div v-if="token.symbol !== 'ETH'" class="card bg-dark text-white border border-info shadow-sm p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column">
+              <div class="mb-1">
+                <div class="h5 mb-0">
+                  <span class="text-info">{{ token.name }}</span> <span class="">({{ token.symbol }})</span>
+                </div>
+              </div>
+              <div v-if="!!!token.own" class="mb-2 me-2">
+                <span class="label text-secondary">Issuer Counterparty:</span>
+                <span>{{ token.counterparty?.name }}</span>
+              </div>
+              <div class="">
+              <span class="mono small">
+                <a class="text-decoration-none me-2" :href="tokenLink(token.address)" target="_blank"
+                   rel="noopener noreferrer">
+                  {{ token.address }}
+                </a>
+                <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
+                   @click="copyAddress(token.address)"
+                   title="Copy to clipboard">
+                </i>
+              </span>
               </div>
             </div>
-          </div>
-          <div class="d-flex align-items-center mb-2">
-            <span class="label text-secondary me-2">Issuer Counterparty:</span>
-            <span>{{ token.counterparty?.name }}</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <span class="mono small me-2">
-              {{ token.address }}
-              <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
-                 @click="copyAddress(token.address)"
-                 title="Copy to clipboard">
-              </i>
-            </span>
           </div>
         </div>
       </div>
