@@ -14,7 +14,10 @@ export default {
       searchQuery: '',
       accounts: [],
       newAccount: {name: '', ref: '', type: null},
-      showCreateForm: false
+      showCreateForm: false,
+      errors: {
+        ref: ""
+      },
     }
   },
   methods: {
@@ -24,6 +27,9 @@ export default {
       this.accounts = await res.json();
     },
     async createAccount() {
+      this.resetError();
+      this.validateRef();
+      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       const res = await createAccount(this.newAccount);
       if (res.ok) {
         const added = await res.json();
@@ -34,6 +40,16 @@ export default {
         alert('Failed to create account');
       }
     },
+    validateRef() {
+      if (this.newAccount.ref.length < 4) {
+        this.errors.ref = 'Ref must be unique and contain at least 4 letters or numbers';
+      } else {
+        this.errors.ref = '';
+      }
+    },
+    resetError() {
+      this.errors.ref = null;
+    }
   },
   mounted() {
     this.fetchAccounts();
@@ -53,7 +69,10 @@ export default {
           (acc.ref || '').toLowerCase().includes(query) ||
           (acc.id || '').includes(query)
       );
-    }
+    },
+    hasErrors() {
+      return !!this.errors.ref;
+    },
   }
 }
 </script>
@@ -86,8 +105,10 @@ export default {
           v-model="newAccount.ref"
           class="form-control bg-dark text-white border-info mb-2"
           placeholder="Reference"
+          @input="validateRef"
           required
       />
+      <div v-if="errors.ref" class="form-text text-light">{{ errors.ref }}</div>
       <div class="d-flex justify-content-end gap-2">
         <button
             class="btn btn-outline-danger"
@@ -96,7 +117,7 @@ export default {
         >
           Cancel
         </button>
-        <button class="btn btn-outline-primary" type="submit">
+        <button class="btn btn-outline-primary" type="submit" :disabled="hasErrors">
           Save Account
         </button>
       </div>

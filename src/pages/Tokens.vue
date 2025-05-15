@@ -112,7 +112,7 @@ export default {
                   <span class="text-info">{{ token.name }}</span> <span class="">({{ token.symbol }})</span>
                 </div>
               </div>
-              <div v-if="!!!token.own" class="mb-2 me-2">
+              <div v-if="token.own === false && token.counterparty" class="mb-2 me-2">
                 <span class="label text-secondary">Issuer Counterparty:</span>
                 <span>{{ token.counterparty?.name }}</span>
               </div>
