@@ -8,7 +8,10 @@ import Settings from '../pages/Settings.vue'
 import AccountDetails from "../pages/AccountDetails.vue";
 
 const routes = [
-    {path: '/', component: Dashboard},
+    {
+        path: '/',
+        redirect: '/accounts' // default route
+    },
     {
         path: '/transfer',
         name: 'Transfer',

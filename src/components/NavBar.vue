@@ -7,7 +7,7 @@ export default {
 <template>
   <div class="sidebar">
     <h4>BlockControl</h4>
-    <router-link to="/">Dashboard</router-link>
+    <router-link v-show="false" to="/">Dashboard</router-link>
     <router-link to="/transfer">Asset Transfer</router-link>
     <router-link to="/accounts">Accounts</router-link>
     <router-link to="/tokens">Tokens</router-link>
