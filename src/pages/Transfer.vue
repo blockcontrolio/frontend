@@ -33,20 +33,11 @@ export default {
       transferSuccess: null,
       transferError: null,
       accountBalances: [],
-      tokenBalance: {}
+      assetBalance: null,
+      selectedTokenInfo: null
     };
   },
   computed: {
-    selectedAccount() {
-      switch (this.selectedForm) {
-        case "internal": {
-          return this.accounts.find(acc => acc.id === this.internal.from);
-        }
-        case "external" : {
-          return this.accounts.find(acc => acc.id === this.transfer.accountId);
-        }
-      }
-    },
     availableTargetAccounts() {
       if (!this.internal.from) return this.accounts;
       return this.accounts.filter(acc => acc.id !== this.internal.from);
@@ -54,9 +45,6 @@ export default {
     hasErrors() {
       return !!this.errors.to || !!this.errors.amount;
     },
-    selectedToken() {
-      return this.tokens?.find(t => t.id === this.internal.tokenId) || null;
-    }
   },
   mounted() {
     this.fetchTokens();
@@ -72,16 +60,22 @@ export default {
       let res = await fetchAccounts();
       this.accounts = await res.json();
     },
-    async fetchBalances() {
-      const accountId = this.selectedAccount.id;
+    async fetchBalances(accountId) {
       let res = await fetchBalances(accountId);
       this.accountBalances = await res.json();
     },
-    showBalance() {
-      this.tokenBalance = this.accountBalances
+    showBalance(assetId) {
+      this.assetBalance = this.accountBalances
           .find(b => {
-            return b.id === this.selectedToken.id
+            return b.id === assetId
           })
+      console.log("Selected asset balance: ", this.assetBalance.id)
+      this.selectedAsset(assetId)
+    },
+    selectedAsset(assetId) {
+      this.selectedTokenInfo = this.tokens
+          .find(t => t.id === assetId);
+      console.log("Selected token info: ", this.selectedTokenInfo.id)
     },
     validateTo() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
@@ -127,6 +121,7 @@ export default {
           this.transferSuccess = await response.json();
           // reset form
           this.transfer = {accountId: '', to: '', amount: null}
+          this.selectedTokenInfo = null
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -145,6 +140,7 @@ export default {
           this.transferSuccess = await response.json();
           // reset form
           this.internal = {from: '', to: '', amount: null}
+          this.selectedTokenInfo = null
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -153,6 +149,8 @@ export default {
     resetError() {
       this.transferSuccess = null;
       this.transferError = null;
+      this.errors.to = '';
+      this.errors.amount = '';
     },
     handleUnknownError(err) {
       console.error(err)
@@ -178,13 +176,13 @@ export default {
     <div class="type-selector">
       <div class="form-check form-check-inline">
         <input class="form-check-input bg-dark border-primary" type="radio" id="internalRadio" value="internal"
-               v-on:change="resetError"
+               v-on:change="resetError(); this.selectedTokenInfo = null; this.assetBalance = null"
                v-model="selectedForm"/>
         <label class="form-check-label text-white fw-bold" for="internalRadio">Internal Transfer</label>
       </div>
       <div class="form-check form-check-inline me-3">
         <input class="form-check-input bg-dark border-primary" type="radio" id="externalRadio" value="external"
-               v-on:change="resetError"
+               v-on:change="resetError(); this.selectedTokenInfo = null; this.assetBalance = null"
                v-model="selectedForm"/>
         <label class="form-check-label text-white fw-bold" for="externalRadio">External Withdrawal</label>
       </div>
@@ -199,15 +197,15 @@ export default {
       <div class="mb-3">
         <label class="form-label">From Account</label>
         <select v-model="internal.from" class="form-select bg-dark border-info" required
-                v-on:change="fetchBalances">
+                v-on:change="fetchBalances(internal.from)">
           <option disabled value="">-- source account --</option>
           <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
         <!-- acc balance preview -->
-        <div v-if="selectedAccount && selectedToken" class="mt-1 balance">
-          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.tokenBalance?.amount) }} {{this.tokenBalance?.symbol}}</span>
+        <div v-if="internal.from && assetBalance" class="mt-1 balance">
+          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.assetBalance.amount) }} {{this.assetBalance.symbol}}</span>
         </div>
       </div>
 
@@ -217,7 +215,7 @@ export default {
         <select
             v-model="internal.tokenId"
             class="form-select bg-dark border-info" required
-            v-on:change="showBalance"
+            v-on:change="showBalance(internal.tokenId)"
         >
           <option disabled value="">-- select asset --</option>
           <option
@@ -229,9 +227,9 @@ export default {
           </option>
         </select>
         <!-- token details preview -->
-        <div v-if="selectedToken?.counterparty" class="token-info-box mt-3">
-          <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
-          <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
+        <div v-if="selectedTokenInfo?.counterparty" class="token-info-box mt-3">
+          <div><span class="label">Address:</span> <span class="value">{{ selectedTokenInfo.address }}</span></div>
+          <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedTokenInfo.counterparty?.name || '—' }}</span></div>
         </div>
       </div>
 
@@ -260,10 +258,8 @@ export default {
             @input="validateAmount"
         />
         <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
-        <div v-if="selectedAccount" class="">
-          <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(tokenBalance?.amount)"
-               class="form-text text-warning">Amount exceeds account balance!
-          </div>
+        <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(assetBalance?.amount)"
+             class="form-text text-warning">Amount exceeds account balance!
         </div>
       </div>
 
@@ -280,15 +276,15 @@ export default {
       <div class="mb-3">
         <label class="form-label">From Account</label>
         <select v-model="transfer.accountId" class="form-select bg-dark border-info" required
-                v-on:change="fetchBalances">
+                v-on:change="fetchBalances(transfer.accountId)">
           <option disabled value="">-- choose account --</option>
           <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
         <!-- acc balance preview -->
-        <div v-if="selectedAccount && selectedToken" class="mt-1 balance">
-          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.tokenBalance?.amount) }} {{this.tokenBalance?.symbol}}</span>
+        <div v-if="transfer.accountId && assetBalance" class="mt-1 balance">
+          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.assetBalance.amount) }} {{this.assetBalance.symbol}}</span>
         </div>
       </div>
 
@@ -296,10 +292,11 @@ export default {
       <div class="mb-3">
         <label class="form-label">Select Asset</label>
         <select
-            v-model="internal.tokenId"
+            v-model="transfer.tokenId"
             class="form-select bg-dark border-info" required
-            v-on:change="showBalance"
+            v-on:change="showBalance(transfer.tokenId)"
         >
+          <option disabled value="">-- select asset --</option>
           <option
               v-for="token in tokens"
               :key="token.id"
@@ -309,9 +306,9 @@ export default {
           </option>
         </select>
         <!-- token details preview -->
-        <div v-if="selectedToken?.counterparty" class="token-info-box mt-3">
-          <div><span class="label">Address:</span> <span class="value">{{ selectedToken.address }}</span></div>
-          <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedToken.counterparty?.name || '—' }}</span></div>
+        <div v-if="selectedTokenInfo?.counterparty" class="token-info-box mt-3">
+          <div><span class="label">Address:</span> <span class="value">{{ selectedTokenInfo.address }}</span></div>
+          <div><span class="label">Issuer Counterparty:</span> <span class="value">{{ selectedTokenInfo.counterparty?.name || '—' }}</span></div>
         </div>
       </div>
 
@@ -339,10 +336,8 @@ export default {
             @input="validateAmount"
         />
         <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
-        <div v-if="selectedAccount" class="">
-          <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(tokenBalance?.amount)"
-               class="form-text text-warning">Amount exceeds account balance!
-          </div>
+        <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(assetBalance?.amount)"
+             class="form-text text-warning">Amount exceeds account balance!
         </div>
       </div>
 
@@ -354,7 +349,7 @@ export default {
 
   <!-- Success Message -->
   <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
-    ✅ You transferred {{ transferSuccess.amount }} {{ selectedToken.name }} ({{ selectedToken.symbol }}) to {{ transferSuccess.to }}
+    ✅ You transferred {{ transferSuccess.amount }} {{ assetBalance?.name }} ({{ assetBalance?.symbol }}) to {{ transferSuccess.to }}
     <br/>
     Tx hash: <code>{{ transferSuccess.txHash }}</code>
   </div>
