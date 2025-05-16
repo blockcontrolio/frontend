@@ -377,13 +377,6 @@ select {
   color: #ccc;
 }
 
-/* hide spinner arrows in number input */
-input[type=number].no-spinner::-webkit-outer-spin-button,
-input[type=number].no-spinner::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
 .custom-success-alert {
   background-color: #111827;
   border-color: #2af2ff;

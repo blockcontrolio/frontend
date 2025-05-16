@@ -1,10 +1,14 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
+import {mintToken, burnToken} from "../services/tokens-api.js";
 import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js"
 import {tokenLink} from "../js/utils.js";
+import MintTokenModal from "../components/modal/MintTokenModal.vue";
+import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 
 export default {
   name: 'Tokens',
+  components: {MintTokenModal, BurnTokenModal},
   data() {
     return {
       tokens: [],
@@ -14,7 +18,10 @@ export default {
         name: '',
         symbol: '',
         accountId: ''
-      }
+      },
+      showMint: false,
+      showBurn: false,
+      selectedToken: {}
     };
   },
   mounted() {
@@ -53,6 +60,22 @@ export default {
             console.log('Wallet address copied:', address);
             // optional: show toast or temporary success indicator
           });
+    },
+    openMintModal(token) {
+      this.selectedToken = token;
+      this.showMint = true;
+    },
+    sendMintRequest({ tokenId, issuerAccountId, recipientAccountId, amount }) {
+      mintToken(tokenId, { issuerAccountId, recipientAccountId, amount });
+      this.showMint = false;
+    },
+    openBurnModal(token) {
+      this.selectedToken = token;
+      this.showBurn = true;
+    },
+    sendBurnRequest({ tokenId, redemptionAccountId, amount }) {
+      burnToken(tokenId, { redemptionAccountId, amount });
+      this.showBurn = false;
     }
   }
 };
@@ -129,11 +152,30 @@ export default {
               </span>
               </div>
             </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-danger px-4" type="button" @click="this.openBurnModal(token); this.fetchAccounts();">Burn</button>
+              <button class="btn btn-outline-primary px-4" type="button" @click="this.openMintModal(token); this.fetchAccounts();">Mint</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div v-else class="">No tokens created yet.</div>
+
+    <BurnTokenModal
+        :visible="showBurn"
+        :accounts="accounts"
+        :tokenId="selectedToken.id"
+        @close="showBurn = false"
+        @submit="sendBurnRequest"
+    />
+    <MintTokenModal
+        :visible="showMint"
+        :accounts="accounts"
+        :tokenId="selectedToken.id"
+        @close="showMint = false"
+        @submit="sendMintRequest"
+    />
 
   </div>
 </template>

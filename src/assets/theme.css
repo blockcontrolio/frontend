@@ -72,3 +72,10 @@ body {
 .ether-scan-link:hover {
     text-decoration: underline;
 }
+
+/* hide spinner arrows in number input */
+input[type=number].no-spinner::-webkit-outer-spin-button,
+input[type=number].no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
