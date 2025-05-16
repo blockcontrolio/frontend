@@ -1,14 +1,13 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
 import {mintToken, burnToken, importToken} from "../services/tokens-api.js";
-import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js"
-import {tokenLink} from "../js/utils.js";
+import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 
 export default {
   name: 'Tokens',
-  components: {MintTokenModal, BurnTokenModal},
+  components: {AddrScanLink, MintTokenModal, BurnTokenModal},
   data() {
     return {
       tokens: [],
@@ -30,7 +29,6 @@ export default {
     this.fetchTokens();
   },
   methods: {
-    tokenLink,
     async fetchTokens() {
       const res = await fetchTokens();
       this.tokens = await res.json();
@@ -64,14 +62,6 @@ export default {
         const err = await res.json();
         alert(`Error: ${err.message}`);
       }
-    },
-    isClipboardSupported,
-    copyAddress(address) {
-      copyToClipboard(address)
-          .then(() => {
-            console.log('Wallet address copied:', address);
-            // optional: show toast or temporary success indicator
-          });
     },
     openMintModal(token) {
       this.selectedToken = token;
@@ -179,18 +169,7 @@ export default {
                 <span class="label text-secondary">Issuer Counterparty:</span>
                 <span>{{ token.counterparty?.name }}</span>
               </div>
-              <div class="">
-              <span class="mono small">
-                <a class="text-decoration-none me-2" :href="tokenLink(token.address)" target="_blank"
-                   rel="noopener noreferrer">
-                  {{ token.address }}
-                </a>
-                <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
-                   @click="copyAddress(token.address)"
-                   title="Copy to clipboard">
-                </i>
-              </span>
-              </div>
+              <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
             <div v-if="token.own" class="d-flex gap-2">
               <button class="btn btn-outline-danger px-4" type="button" @click="this.openBurnModal(token); this.fetchAccounts();">Burn</button>

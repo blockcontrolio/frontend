@@ -22,3 +22,7 @@ export function etherScanLink(txHash) {
 export function tokenLink(address) {
     return 'https://explorer-1205614507017352.devnet.alchemy.com/token/' + address;
 }
+
+export function walletLink(address) {
+    return 'https://explorer-1205614507017352.devnet.alchemy.com/address/' + address;
+}

@@ -6,9 +6,11 @@ import {
   sendExternalWithdrawal,
   sendInternalTransfer
 } from '../services/api'
-import {etherScanLink, formatAmount} from "../js/utils.js";
+import {formatAmount} from "../js/utils.js";
+import TxScanLink from "../components/etherscan/TxScanLink.vue";
 
 export default {
+  components: {TxScanLink},
   data() {
     return {
       selectedForm: 'internal', // or 'internal'
@@ -51,7 +53,6 @@ export default {
     this.fetchAccounts();
   },
   methods: {
-    etherScanLink,
     formatAmount,
     async fetchTokens() {
       const res = await fetchTokens()
@@ -352,9 +353,7 @@ export default {
   <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
     ✅ You transferred {{ transferSuccess.amount }} {{ assetBalance?.name }} ({{ assetBalance?.symbol }}) to {{ transferSuccess.to }}
     <br/>
-    Tx hash: <a class="ether-scan-link" :href="etherScanLink(transferSuccess.txHash)" target="_blank" rel="noopener noreferrer">
-      <code>{{ transferSuccess.txHash }}</code>
-    </a>
+    Tx hash: <tx-scan-link :hash="transferSuccess.txHash"></tx-scan-link>
   </div>
 
   <!-- Error Message -->

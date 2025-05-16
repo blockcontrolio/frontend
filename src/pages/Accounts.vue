@@ -2,8 +2,10 @@
 import {useRouter} from "vue-router";
 import {createAccount, fetchAccounts} from '../services/api'
 import {formatDate} from "../js/utils.js";
+import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
 export default {
+  components: {AddrScanLink},
   setup() {
     let router = useRouter();
     return {router}
@@ -157,7 +159,9 @@ export default {
           <td>{{ acc.name || '(Unnamed)' }}</td>
           <td>{{ acc.ref }}</td>
           <td>{{ acc.type }}</td>
-          <td>{{ acc.address }}</td>
+          <td>
+            <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
+          </td>
           <td>{{ formatDate(acc.createTime) }}</td>
           <td class="text-center">
             <span class="badge bg-success">Active</span>
