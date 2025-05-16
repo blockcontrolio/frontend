@@ -4,6 +4,17 @@ function loadApiKey() {
     return localStorage.getItem('x-api-key') || '';
 }
 
+export async function importToken(payload) {
+    return await fetch(`${apiBaseUrl}/tokens/import`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
 export async function mintToken(tokenId, payload) {
     return await fetch(`${apiBaseUrl}/tokens/${tokenId}/issue`, {
         method: 'POST',

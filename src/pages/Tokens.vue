@@ -1,6 +1,6 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
-import {mintToken, burnToken} from "../services/tokens-api.js";
+import {mintToken, burnToken, importToken} from "../services/tokens-api.js";
 import {copyToClipboard, isClipboardSupported} from "../js/clipboard.js"
 import {tokenLink} from "../js/utils.js";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
@@ -13,7 +13,9 @@ export default {
     return {
       tokens: [],
       accounts: [],
+      showImportForm: false,
       showCreateForm: false,
+      importTokenAddress: '',
       newToken: {
         name: '',
         symbol: '',
@@ -36,6 +38,16 @@ export default {
     async fetchAccounts() {
       const res = await fetchAccounts();
       this.accounts = await res.json();
+    },
+    async importToken() {
+      const res = await importToken({address: this.importTokenAddress});
+      if (res.ok) {
+        this.showImportForm = false;
+        this.importTokenAddress = '';
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.message}`);
+      }
     },
     async createToken() {
       const payload = {
@@ -85,15 +97,43 @@ export default {
   <div>
     <h3 class="mb-4 text-info">Token Management</h3>
 
-    <!-- Toggle Create Form -->
-    <div v-if="!showCreateForm" class="mb-3 text-end">
-      <button class="btn btn-outline-primary" @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
+    <!-- Toggle Import/Create Form -->
+    <div v-if="!showCreateForm && !showImportForm" class="d-flex justify-content-end mb-3 gap-2">
+      <button v-if="!showImportForm" class="btn btn-outline-warning px-4" type="button" @click="showImportForm = !showImportForm">
+        Import
+      </button>
+      <button v-if="!showCreateForm" class="btn btn-outline-primary px-4" type="button" @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
         Create New Token
       </button>
     </div>
 
+    <!-- Import Token Form -->
+    <form v-if="showImportForm" @submit.prevent="importToken" class="mb-4">
+      <div class="mb-3">
+        <input
+            v-model="importTokenAddress"
+            class="form-control bg-dark border-info text-white"
+            placeholder="Token hex address 0x..."
+            pattern="^0x[a-fA-F0-9]{40}$"
+            @input=""
+        />
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <button
+            class="btn btn-outline-danger"
+            type="button"
+            @click="showImportForm = false"
+        >
+          Cancel
+        </button>
+        <button class="btn btn-outline-primary" type="submit">
+          Import Token
+        </button>
+      </div>
+    </form>
+
     <!-- Create Token Form -->
-    <form v-else @submit.prevent="createToken" class="mb-4">
+    <form v-if="showCreateForm" @submit.prevent="createToken" class="mb-4">
       <input v-model="newToken.name" class="form-control bg-dark text-white border-info mb-2"
              placeholder="Token Name"
              required/>
@@ -152,7 +192,7 @@ export default {
               </span>
               </div>
             </div>
-            <div class="d-flex gap-2">
+            <div v-if="token.own" class="d-flex gap-2">
               <button class="btn btn-outline-danger px-4" type="button" @click="this.openBurnModal(token); this.fetchAccounts();">Burn</button>
               <button class="btn btn-outline-primary px-4" type="button" @click="this.openMintModal(token); this.fetchAccounts();">Mint</button>
             </div>
