@@ -66,6 +66,6 @@ jobs:
         with:
           task-definition: ${{ steps.render.outputs.task-definition }}
           cluster: blockcontrolio-demo-cluster
-          service: frontend-service-xakmtm23
+          service: frontend-service
           wait-for-service-stability: true
           
