@@ -1,5 +1,6 @@
 <script>
 import {fetchCounterpartyInfo} from '../services/api.js';
+import {globalState} from "../js/globalState.js";
 
 export default {
   name: "NavBar",
@@ -15,6 +16,11 @@ export default {
     async loadCounterparty() {
       const response = await fetchCounterpartyInfo();
       this.counterparty = await response.json();
+      // Set global values
+      if (this.counterparty?.networks) {
+        globalState.chainId = this.counterparty.networks[0].chainId;
+        globalState.explorerUrl = this.counterparty.networks[0].explorerUrl;
+      }
     }
   }
 }
@@ -42,7 +48,8 @@ export default {
 
       <div v-if="counterparty" class="counterparty-item">
         <div class="counterparty-header mb-2">
-          <h5 class="counterparty-name">{{ counterparty.name }}</h5>
+          <h5 v-if="counterparty.name" class="counterparty-name">{{ counterparty.name }}</h5>
+          <h5 v-else class="text-danger">{{ 'Login Error' }}</h5>
           <span class="status-badge">
             <i class="bi bi-building"></i>
           </span>
@@ -58,7 +65,7 @@ export default {
             </a>
           </div>
         </div>
-        <span class="text-muted" v-else>No networks assigned</span>
+        <span class="text-danger" v-else>No networks loaded</span>
       </div>
 
     </div>
