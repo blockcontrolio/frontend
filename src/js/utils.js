@@ -1,3 +1,5 @@
+import {globalState} from "./globalState.js";
+
 export function formatDate(isoString) {
     const date = new Date(isoString);
     return date.toLocaleString(undefined, {
@@ -16,13 +18,13 @@ export function formatAmount(value) {
 }
 
 export function etherScanLink(txHash) {
-    return 'https://explorer-1205614507017352.devnet.alchemy.com/tx/' + txHash;
+    return `${globalState.explorerUrl}/tx/${txHash}`;
 }
 
 export function tokenLink(address) {
-    return 'https://explorer-1205614507017352.devnet.alchemy.com/token/' + address;
+    return `${globalState.explorerUrl}/token/${address}`;
 }
 
 export function walletLink(address) {
-    return 'https://explorer-1205614507017352.devnet.alchemy.com/address/' + address;
+    return `${globalState.explorerUrl}/address/${address}`;
 }

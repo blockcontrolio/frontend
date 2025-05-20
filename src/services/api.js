@@ -4,6 +4,17 @@ function loadApiKey() {
     return localStorage.getItem('x-api-key') || '';
 }
 
+export async function fetchCounterpartyInfo() {
+    return await fetch(`${apiBaseUrl}/counterparties`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        }
+    }).catch(err => {
+        console.error('Failed to load counterparties/networks info', err);
+    });
+}
+
 export async function fetchAccounts() {
     return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
