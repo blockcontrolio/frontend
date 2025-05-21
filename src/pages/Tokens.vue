@@ -4,6 +4,7 @@ import {mintToken, burnToken, importToken} from "../services/tokens-api.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
+import {formatAmount} from "../js/utils.js";
 
 export default {
   name: 'Tokens',
@@ -29,6 +30,7 @@ export default {
     this.fetchTokens();
   },
   methods: {
+    formatAmount,
     async fetchTokens() {
       const res = await fetchTokens();
       this.tokens = await res.json();
@@ -162,18 +164,29 @@ export default {
             <div class="d-flex flex-column">
               <div class="mb-1">
                 <div class="h5 mb-0">
-                  <span class="text-info">{{ token.name }}</span> <span class="">({{ token.symbol }})</span>
+                  <span class="text-info me-2">{{ token.name }}</span><span class="">({{ token.symbol }})</span>
                 </div>
               </div>
-              <div v-if="token.own === false && token.counterparty" class="mb-2 me-2">
-                <span class="label text-secondary">Issuer Counterparty:</span>
+              <div v-if="token.own && token.totalSupply" class="mb-1">
+                  <span class="label text-secondary me-2">Total Supply:</span>
+                  <span>{{ formatAmount(token.totalSupply) }}</span>
+              </div>
+              <div v-if="token.own === false && token.counterparty" class="mb-1">
+                <span class="label text-secondary me-2">Issuer Counterparty:</span>
                 <span>{{ token.counterparty?.name }}</span>
               </div>
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
             <div v-if="token.own" class="d-flex gap-2">
-              <button class="btn btn-outline-danger px-4" type="button" @click="this.openBurnModal(token); this.fetchAccounts();">Burn</button>
-              <button class="btn btn-outline-primary px-4" type="button" @click="this.openMintModal(token); this.fetchAccounts();">Mint</button>
+              <button class="btn btn-outline-danger px-4" type="button"
+                      @click="this.openBurnModal(token); this.fetchAccounts();"
+                      :disabled="!!!token.totalSupply">
+                Burn
+              </button>
+              <button class="btn btn-outline-primary px-4" type="button"
+                      @click="this.openMintModal(token); this.fetchAccounts();">
+                Mint
+              </button>
             </div>
           </div>
         </div>
