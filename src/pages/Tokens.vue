@@ -5,10 +5,12 @@ import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 import {formatAmount} from "../js/utils.js";
+import TxToast from "../components/toast/TxToast.vue";
+import ErrorToast from "../components/toast/ErrorToast.vue";
 
 export default {
   name: 'Tokens',
-  components: {AddrScanLink, MintTokenModal, BurnTokenModal},
+  components: {AddrScanLink, MintTokenModal, BurnTokenModal, TxToast, ErrorToast},
   data() {
     return {
       tokens: [],
@@ -23,7 +25,9 @@ export default {
       },
       showMint: false,
       showBurn: false,
-      selectedToken: {}
+      selectedToken: {},
+      txSuccess: null,
+      txError: null
     };
   },
   mounted() {
@@ -46,7 +50,7 @@ export default {
         this.importTokenAddress = '';
       } else {
         const err = await res.json();
-        alert(`Error: ${err.message}`);
+        alert(`Error: ${err.message}`); // todo show toast
       }
     },
     async createToken() {
@@ -69,16 +73,54 @@ export default {
       this.selectedToken = token;
       this.showMint = true;
     },
-    sendMintRequest({ tokenId, issuerAccountId, recipientAccountId, amount }) {
-      mintToken(tokenId, { issuerAccountId, recipientAccountId, amount });
+    async sendMintRequest({tokenId, issuerAccountId, recipientAccountId, amount}) {
+      try {
+        let response = await mintToken(tokenId, {issuerAccountId, recipientAccountId, amount});
+        if (response.ok) {
+          let message = `Token ${this.selectedToken?.symbol} minted with amount ${amount}`
+          this.txSuccess = {...(await response.json()), message};
+        } else {
+          const err = await response.json();
+          this.txError = {
+            error: err.error || 'Error',
+            message: err.message || 'Something went wrong'
+          };
+        }
+      } catch (err) {
+        this.txSuccess = null;
+        console.error(err)
+        this.txError = {
+          error: 'Network Error',
+          message: err.message
+        };
+      }
       this.showMint = false;
     },
     openBurnModal(token) {
       this.selectedToken = token;
       this.showBurn = true;
     },
-    sendBurnRequest({ tokenId, redemptionAccountId, amount }) {
-      burnToken(tokenId, { redemptionAccountId, amount });
+    async sendBurnRequest({tokenId, redemptionAccountId, amount}) {
+      try {
+        let response = await burnToken(tokenId, {redemptionAccountId, amount});
+        if (response.ok) {
+          let message = `Token ${this.selectedToken?.symbol} burned with amount ${amount}`
+          this.txSuccess = {...(await response.json()), message};
+        } else {
+          const err = await response.json();
+          this.txError = {
+            error: err.error || 'Error',
+            message: err.message || 'Something went wrong'
+          };
+        }
+      } catch (err) {
+        this.txSuccess = null;
+        console.error(err)
+        this.txError = {
+          error: 'Network Error',
+          message: err.message
+        };
+      }
       this.showBurn = false;
     }
   }
@@ -91,10 +133,12 @@ export default {
 
     <!-- Toggle Import/Create Form -->
     <div v-if="!showCreateForm && !showImportForm" class="d-flex justify-content-end mb-3 gap-2">
-      <button v-if="!showImportForm" class="btn btn-outline-warning px-4" type="button" @click="showImportForm = !showImportForm">
+      <button v-if="!showImportForm" class="btn btn-outline-warning px-4" type="button"
+              @click="showImportForm = !showImportForm">
         Import
       </button>
-      <button v-if="!showCreateForm" class="btn btn-outline-primary px-4" type="button" @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
+      <button v-if="!showCreateForm" class="btn btn-outline-primary px-4" type="button"
+              @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
         Create New Token
       </button>
     </div>
@@ -158,7 +202,7 @@ export default {
 
     <!-- Token Cards -->
     <div v-if="tokens && tokens.length > 0" class="row mt-4 g-3">
-      <div v-for="token in tokens" :key="token.id" class="col-12">
+      <div v-for="token in tokens" :key="token.id">
         <div v-if="token.symbol !== 'ETH'" class="card bg-dark text-white border border-info shadow-sm p-3">
           <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex flex-column">
@@ -194,21 +238,30 @@ export default {
     </div>
     <div v-else class="">No tokens created yet.</div>
 
-    <BurnTokenModal
+    <BurnTokenModal v-if="selectedToken"
         :visible="showBurn"
         :accounts="accounts"
-        :tokenId="selectedToken.id"
+        :tokenId="selectedToken?.id"
         @close="showBurn = false"
         @submit="sendBurnRequest"
     />
-    <MintTokenModal
+    <MintTokenModal v-if="selectedToken"
         :visible="showMint"
         :accounts="accounts"
-        :tokenId="selectedToken.id"
+        :tokenId="selectedToken?.id"
         @close="showMint = false"
         @submit="sendMintRequest"
     />
-
+    <TxToast
+        v-if="txSuccess"
+        :txData="txSuccess"
+        @closed="txSuccess = null; selectedToken = null"
+    />
+    <ErrorToast
+        v-if="txError"
+        :error="txError"
+        @closed="txError = null; selectedToken = null"
+    />
   </div>
 </template>
 
