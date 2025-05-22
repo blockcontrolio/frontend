@@ -10,7 +10,13 @@ import ErrorToast from "../components/toast/ErrorToast.vue";
 
 export default {
   name: 'Tokens',
-  components: {AddrScanLink, MintTokenModal, BurnTokenModal, TxToast, ErrorToast},
+  components: {
+    MintTokenModal,
+    BurnTokenModal,
+    AddrScanLink,
+    TxToast,
+    ErrorToast
+  },
   data() {
     return {
       tokens: [],
@@ -27,7 +33,8 @@ export default {
       showBurn: false,
       selectedToken: {},
       txSuccess: null,
-      txError: null
+      txError: null,
+      actions: ['Pause', 'Unpause', 'Freeze', 'Block', 'Unblock']
     };
   },
   mounted() {
@@ -69,6 +76,7 @@ export default {
         alert(`Error: ${err.message}`);
       }
     },
+    // mint
     openMintModal(token) {
       this.selectedToken = token;
       this.showMint = true;
@@ -96,6 +104,7 @@ export default {
       }
       this.showMint = false;
     },
+    // burn
     openBurnModal(token) {
       this.selectedToken = token;
       this.showBurn = true;
@@ -222,15 +231,32 @@ export default {
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
             <div v-if="token.own" class="d-flex gap-2">
-              <button class="btn btn-outline-danger px-4" type="button"
-                      @click="this.openBurnModal(token); this.fetchAccounts();"
-                      :disabled="!!!token.totalSupply">
-                Burn
-              </button>
-              <button class="btn btn-outline-primary px-4" type="button"
-                      @click="this.openMintModal(token); this.fetchAccounts();">
-                Mint
-              </button>
+              <div v-if="token.own" class="dropdown ms-auto">
+                <button
+                    class="btn btn-outline-primary dropdown-toggle px-4"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                >
+                  Manage
+                </button>
+                <ul class="dropdown-menu bg-dark text-white border border-info">
+                  <li>
+                    <a href="#" class="dropdown-item text-primary btn-outline-primary"
+                       @click.prevent="openMintModal(token); fetchAccounts();"
+                    >
+                      🪙 Mint
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-danger"
+                       :class="{ disabled: !token.totalSupply }"
+                       @click.prevent="openBurnModal(token); fetchAccounts();"
+                    >
+                      🔥 Burn
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
