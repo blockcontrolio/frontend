@@ -36,3 +36,25 @@ export async function burnToken(tokenId, payload) {
         body: JSON.stringify(payload)
     });
 }
+
+export async function pause(tokenId, pauserAccountId) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/pause`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify({pauserAccountId})
+    });
+}
+
+export async function unpause(tokenId, pauserAccountId) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/unpause`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify({pauserAccountId})
+    });
+}

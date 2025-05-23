@@ -1,9 +1,10 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
-import {mintToken, burnToken, importToken} from "../services/tokens-api.js";
+import {mintToken, burnToken, importToken, pause, unpause} from "../services/tokens-api.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
+import PauseTokenModal from "../components/modal/PauseTokenModal.vue"
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
@@ -13,6 +14,7 @@ export default {
   components: {
     MintTokenModal,
     BurnTokenModal,
+    PauseTokenModal,
     AddrScanLink,
     TxToast,
     ErrorToast
@@ -34,7 +36,8 @@ export default {
       selectedToken: {},
       txSuccess: null,
       txError: null,
-      actions: ['Pause', 'Unpause', 'Freeze', 'Block', 'Unblock']
+      actions: ['Mint', 'Burn', 'Pause', 'Unpause', 'Freeze', 'Block', 'Unblock'],
+      modalType: ''
     };
   },
   mounted() {
@@ -131,6 +134,61 @@ export default {
         };
       }
       this.showBurn = false;
+    },
+    // pause
+    openPauseModal(token) {
+      this.selectedToken = token;
+      this.modalType = 'pause';
+    },
+    async sendPauseRequest({tokenId, pauserAccountId}) {
+      await this.handleRequest(() => {
+        return pause(tokenId, pauserAccountId);
+      }, (response) => {
+        let message = `Token ${this.selectedToken?.symbol} paused for all operations`
+        this.txSuccess = {...(response.json()), message};
+      });
+    },
+    // unpause
+    openUnpauseModal(token) {
+      this.selectedToken = token;
+      this.modalType = 'unpause';
+    },
+    async sendUnpauseRequest({tokenId, pauserAccountId}) {
+      await this.handleRequest(() => {
+        return unpause(tokenId, pauserAccountId);
+      }, (response) => {
+        let message = `Token ${this.selectedToken?.symbol} unpaused for all operations`
+        this.txSuccess = {...(response.json()), message};
+      });
+    },
+    async handleRequest(operation, okCallback) {
+      try {
+        let response = await operation();
+        if (response.ok) {
+          await okCallback()
+        } else {
+          const err = await response.json();
+          this.handleTxError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+      this.modalType = '';
+    },
+    handleTxError(err) {
+      this.txSuccess = null;
+      this.txError = {
+        error: err.error || 'Error',
+        message: err.message || 'Something went wrong'
+      };
+    },
+    handleUnknownError(err) {
+      console.error(err)
+      this.txSuccess = null;
+      this.transferError = {
+        error: 'Network Error',
+        message: err.message
+      };
     }
   }
 };
@@ -255,6 +313,20 @@ export default {
                       🔥 Burn
                     </a>
                   </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openPauseModal(token); fetchAccounts();"
+                    >
+                      Pause
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openUnpauseModal(token); fetchAccounts();"
+                    >
+                      Unpause
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -278,6 +350,23 @@ export default {
         @close="showMint = false"
         @submit="sendMintRequest"
     />
+    <PauseTokenModal v-if="selectedToken"
+                     :modalType="'pause'"
+                     :visible="this.modalType === 'pause'"
+                     :accounts="accounts"
+                     :tokenId="selectedToken?.id"
+                     @close="this.modalType = ''"
+                     @submit="sendPauseRequest"
+    />
+    <PauseTokenModal v-if="selectedToken"
+                     :modalType="'unpause'"
+                     :visible="this.modalType === 'unpause'"
+                     :accounts="accounts"
+                     :tokenId="selectedToken?.id"
+                     @close="this.modalType = ''"
+                     @submit="sendUnpauseRequest"
+    />
+
     <TxToast
         v-if="txSuccess"
         :txData="txSuccess"
