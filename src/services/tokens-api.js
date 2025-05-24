@@ -58,3 +58,36 @@ export async function unpause(tokenId, pauserAccountId) {
         body: JSON.stringify({pauserAccountId})
     });
 }
+
+export async function freeze(tokenId, payload) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/freeze`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
+export async function block(tokenId, payload) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/block-user`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
+export async function unblock(tokenId, payload) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/unblock-user`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}

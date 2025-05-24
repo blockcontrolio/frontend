@@ -1,6 +1,6 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
-import {mintToken, burnToken, importToken, pause, unpause} from "../services/tokens-api.js";
+import {mintToken, burnToken, importToken, pause, unpause, freeze, block, unblock} from "../services/tokens-api.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
@@ -31,17 +31,16 @@ export default {
         symbol: '',
         accountId: ''
       },
-      showMint: false,
-      showBurn: false,
-      selectedToken: {},
+      selectedToken: null,
       txSuccess: null,
       txError: null,
-      actions: ['Mint', 'Burn', 'Pause', 'Unpause', 'Freeze', 'Block', 'Unblock'],
+      operations: ['mint', 'burn', 'pause', 'unpause', 'freeze', 'block', 'unblock'],
       modalType: ''
     };
   },
   mounted() {
     this.fetchTokens();
+    this.fetchAccounts();
   },
   methods: {
     formatAmount,
@@ -79,93 +78,74 @@ export default {
         alert(`Error: ${err.message}`);
       }
     },
-    // mint
-    openMintModal(token) {
+    openModal(token, modalType) {
+      this.validateModalType(modalType);
       this.selectedToken = token;
-      this.showMint = true;
+      this.modalType = modalType;
     },
-    async sendMintRequest({tokenId, issuerAccountId, recipientAccountId, amount}) {
-      try {
-        let response = await mintToken(tokenId, {issuerAccountId, recipientAccountId, amount});
-        if (response.ok) {
-          let message = `Token ${this.selectedToken?.symbol} minted with amount ${amount}`
-          this.txSuccess = {...(await response.json()), message};
-        } else {
-          const err = await response.json();
-          this.txError = {
-            error: err.error || 'Error',
-            message: err.message || 'Something went wrong'
-          };
-        }
-      } catch (err) {
-        this.txSuccess = null;
-        console.error(err)
-        this.txError = {
-          error: 'Network Error',
-          message: err.message
-        };
+    validateModalType(modalType) {
+      let ok = this.operations.find(m => m === modalType);
+      if (!ok) {
+        alert('Modal type not registered')
       }
-      this.showMint = false;
     },
-    // burn
-    openBurnModal(token) {
-      this.selectedToken = token;
-      this.showBurn = true;
+    // all requests
+    async sendMintRequest({tokenId, issuerAccountId, recipientAccountId, amount}) {
+      await this.handleRequest(() => {
+        return mintToken(tokenId, {issuerAccountId, recipientAccountId, amount});
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} minted with amount ${amount}`;
+      });
     },
     async sendBurnRequest({tokenId, redemptionAccountId, amount}) {
-      try {
-        let response = await burnToken(tokenId, {redemptionAccountId, amount});
-        if (response.ok) {
-          let message = `Token ${this.selectedToken?.symbol} burned with amount ${amount}`
-          this.txSuccess = {...(await response.json()), message};
-        } else {
-          const err = await response.json();
-          this.txError = {
-            error: err.error || 'Error',
-            message: err.message || 'Something went wrong'
-          };
-        }
-      } catch (err) {
-        this.txSuccess = null;
-        console.error(err)
-        this.txError = {
-          error: 'Network Error',
-          message: err.message
-        };
-      }
-      this.showBurn = false;
-    },
-    // pause
-    openPauseModal(token) {
-      this.selectedToken = token;
-      this.modalType = 'pause';
+      await this.handleRequest(() => {
+        return burnToken(tokenId, {redemptionAccountId, amount});
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} burned with amount ${amount}`;
+      });
     },
     async sendPauseRequest({tokenId, pauserAccountId}) {
       await this.handleRequest(() => {
         return pause(tokenId, pauserAccountId);
-      }, (response) => {
-        let message = `Token ${this.selectedToken?.symbol} paused for all operations`
-        this.txSuccess = {...(response.json()), message};
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} paused for all operations`;
       });
-    },
-    // unpause
-    openUnpauseModal(token) {
-      this.selectedToken = token;
-      this.modalType = 'unpause';
     },
     async sendUnpauseRequest({tokenId, pauserAccountId}) {
       await this.handleRequest(() => {
         return unpause(tokenId, pauserAccountId);
-      }, (response) => {
-        let message = `Token ${this.selectedToken?.symbol} unpaused for all operations`
-        this.txSuccess = {...(response.json()), message};
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} unpaused for all operations`;
       });
     },
-    async handleRequest(operation, okCallback) {
+    async sendFreezeRequest({tokenId, custodianAccountId, user, amount}) {
+      await this.handleRequest(() => {
+        return freeze(tokenId, {custodianAccountId, user, amount});
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} freeze done with amount ${amount}`;
+      });
+    },
+    async sendBlockUserRequest({tokenId, limiterAccountId, user}) {
+      await this.handleRequest(() => {
+        return block(tokenId, {limiterAccountId, user});
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} blocked for the address`;
+      });
+    },
+    async sendUnblockUserRequest({tokenId, limiterAccountId, user}) {
+      await this.handleRequest(() => {
+        return unblock(tokenId, {limiterAccountId, user});
+      }, () => {
+        return `Token ${this.selectedToken?.symbol} unblocked for the address`;
+      });
+    },
+    // base request
+    async handleRequest(operation, okMsgProvider) {
       try {
         let response = await operation();
         if (response.ok) {
-          await okCallback()
+          let message = okMsgProvider();
+          this.txSuccess = {...(await response.json()), message};
         } else {
           const err = await response.json();
           this.handleTxError(err);
@@ -205,7 +185,7 @@ export default {
         Import
       </button>
       <button v-if="!showCreateForm" class="btn btn-outline-primary px-4" type="button"
-              @click="showCreateForm = !showCreateForm; this.fetchAccounts();">
+              @click="showCreateForm = !showCreateForm">
         Create New Token
       </button>
     </div>
@@ -279,8 +259,8 @@ export default {
                 </div>
               </div>
               <div v-if="token.own && token.totalSupply" class="mb-1">
-                  <span class="label text-secondary me-2">Total Supply:</span>
-                  <span>{{ formatAmount(token.totalSupply) }}</span>
+                <span class="label text-secondary me-2">Total Supply:</span>
+                <span>{{ formatAmount(token.totalSupply) }}</span>
               </div>
               <div v-if="token.own === false && token.counterparty" class="mb-1">
                 <span class="label text-secondary me-2">Issuer Counterparty:</span>
@@ -288,6 +268,7 @@ export default {
               </div>
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
+            <!-- Token Operations -->
             <div v-if="token.own" class="d-flex gap-2">
               <div v-if="token.own" class="dropdown ms-auto">
                 <button
@@ -300,7 +281,7 @@ export default {
                 <ul class="dropdown-menu bg-dark text-white border border-info">
                   <li>
                     <a href="#" class="dropdown-item text-primary btn-outline-primary"
-                       @click.prevent="openMintModal(token); fetchAccounts();"
+                       @click.prevent="openModal(token, 'mint')"
                     >
                       🪙 Mint
                     </a>
@@ -308,23 +289,44 @@ export default {
                   <li>
                     <a href="#" class="dropdown-item text-danger"
                        :class="{ disabled: !token.totalSupply }"
-                       @click.prevent="openBurnModal(token); fetchAccounts();"
+                       @click.prevent="openModal(token, 'burn')"
                     >
                       🔥 Burn
                     </a>
                   </li>
                   <li>
                     <a href="#" class="dropdown-item text-warning"
-                       @click.prevent="openPauseModal(token); fetchAccounts();"
+                       @click.prevent="openModal(token, 'pause')"
                     >
                       Pause
                     </a>
                   </li>
                   <li>
                     <a href="#" class="dropdown-item text-warning"
-                       @click.prevent="openUnpauseModal(token); fetchAccounts();"
+                       @click.prevent="openModal(token, 'unpause')"
                     >
                       Unpause
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openModal(token, 'freeze')"
+                    >
+                      Freeze
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openModal(token, 'block')"
+                    >
+                      Block
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openModal(token, 'unblock')"
+                    >
+                      Unblock
                     </a>
                   </li>
                 </ul>
@@ -336,31 +338,27 @@ export default {
     </div>
     <div v-else class="">No tokens created yet.</div>
 
-    <BurnTokenModal v-if="selectedToken"
-        :visible="showBurn"
-        :accounts="accounts"
-        :tokenId="selectedToken?.id"
-        @close="showBurn = false"
-        @submit="sendBurnRequest"
+    <BurnTokenModal v-if="this.modalType === 'burn' && this.selectedToken"
+                    :accounts="accounts"
+                    :tokenId="selectedToken?.id"
+                    @close="this.modalType = ''"
+                    @submit="sendBurnRequest"
     />
-    <MintTokenModal v-if="selectedToken"
-        :visible="showMint"
-        :accounts="accounts"
-        :tokenId="selectedToken?.id"
-        @close="showMint = false"
-        @submit="sendMintRequest"
+    <MintTokenModal v-if="this.modalType === 'mint' && this.selectedToken"
+                    :accounts="accounts"
+                    :tokenId="selectedToken?.id"
+                    @close="this.modalType = ''"
+                    @submit="sendMintRequest"
     />
-    <PauseTokenModal v-if="selectedToken"
+    <PauseTokenModal v-if="this.modalType === 'pause' && this.selectedToken"
                      :modalType="'pause'"
-                     :visible="this.modalType === 'pause'"
                      :accounts="accounts"
                      :tokenId="selectedToken?.id"
                      @close="this.modalType = ''"
                      @submit="sendPauseRequest"
     />
-    <PauseTokenModal v-if="selectedToken"
+    <PauseTokenModal v-if="this.modalType === 'unpause' && this.selectedToken"
                      :modalType="'unpause'"
-                     :visible="this.modalType === 'unpause'"
                      :accounts="accounts"
                      :tokenId="selectedToken?.id"
                      @close="this.modalType = ''"
