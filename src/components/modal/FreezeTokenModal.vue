@@ -35,7 +35,7 @@ export default {
       this.errors.user = validateAddress(this.form.user);
     },
     validateAmount() {
-      this.errors.amount = validateAmount(this.form.amount)
+      this.errors.amount = validateAmount(this.form.amount, true)
     },
     hasErrors() {
       return !!this.errors.user || !!this.errors.amount;

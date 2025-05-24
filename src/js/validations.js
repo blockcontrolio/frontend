@@ -1,14 +1,28 @@
-export function validateAmount(amount) {
+export function validateAmount(amount, allowZero = false) {
     let amountStr = amount?.toString();
-    if (!amountStr || parseFloat(amountStr) <= 0) {
+    if (!amountStr) {
+        return 'Amount is required';
+    }
+
+    const parsedAmount = parseFloat(amountStr);
+    if (isNaN(parsedAmount)) {
+        return 'Amount must be a valid number';
+    }
+
+    if (!allowZero && parsedAmount <= 0) {
         return 'Amount must be greater than zero';
     }
+
+    if (allowZero && parsedAmount < 0) {
+        return 'Amount must be zero or greater';
+    }
+
     const decimalPart = amountStr.split('.')[1];
     if (decimalPart && decimalPart.length > 18) {
         return 'Amount must have at most 18 decimal places';
-    } else {
-        return '';
     }
+
+    return '';
 }
 
 export function validateAddress(address) {

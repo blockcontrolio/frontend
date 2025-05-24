@@ -283,9 +283,9 @@ export default {
                   <span class="text-info me-2">{{ token.name }}</span><span class="">({{ token.symbol }})</span>
                 </div>
               </div>
-              <div v-if="token.own && token.totalSupply" class="mb-1">
+              <div v-if="token.own" class="mb-1">
                 <span class="label text-secondary me-2">Total Supply:</span>
-                <span>{{ formatAmount(token.totalSupply) }}</span>
+                <span>{{ formatAmount(token?.totalSupply) }}</span>
               </div>
               <div v-if="token.own === false && token.counterparty" class="mb-1">
                 <span class="label text-secondary me-2">Issuer Counterparty:</span>
