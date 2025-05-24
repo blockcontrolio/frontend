@@ -1,12 +1,13 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
 import {mintToken, burnToken, importToken, pause, unpause, freeze, block, unblock} from "../services/tokens-api.js";
+import {formatAmount} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 import PauseTokenModal from "../components/modal/PauseTokenModal.vue"
 import FreezeTokenModal from "../components/modal/FreezeTokenModal.vue";
-import {formatAmount} from "../js/utils.js";
+import BlockTokenModal from "../components/modal/BlockTokenModal.vue";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 
@@ -17,6 +18,7 @@ export default {
     BurnTokenModal,
     PauseTokenModal,
     FreezeTokenModal,
+    BlockTokenModal,
     AddrScanLink,
     TxToast,
     ErrorToast
@@ -143,6 +145,9 @@ export default {
       });
     },
     async sendBlockUserRequest({tokenId, limiterAccountId, user}) {
+      if ([tokenId, limiterAccountId, user].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, limiterAccountId, user) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return block(tokenId, {limiterAccountId, user});
       }, () => {
@@ -150,6 +155,9 @@ export default {
       });
     },
     async sendUnblockUserRequest({tokenId, limiterAccountId, user}) {
+      if ([tokenId, limiterAccountId, user].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, limiterAccountId, user) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return unblock(tokenId, {limiterAccountId, user});
       }, () => {
@@ -386,6 +394,20 @@ export default {
                      :token="this.selectedToken"
                      @close="this.modalType = ''"
                      @submit="sendFreezeRequest"
+    />
+    <BlockTokenModal v-if="this.modalType === 'block' && this.selectedToken"
+                     :modalType="'block'"
+                     :accounts="this.accounts"
+                     :token="this.selectedToken"
+                     @close="this.modalType = ''"
+                     @submit="sendBlockUserRequest"
+    />
+    <BlockTokenModal v-if="this.modalType === 'unblock' && this.selectedToken"
+                     :modalType="'unblock'"
+                     :accounts="this.accounts"
+                     :token="this.selectedToken"
+                     @close="this.modalType = ''"
+                     @submit="sendUnblockUserRequest"
     />
 
     <TxToast
