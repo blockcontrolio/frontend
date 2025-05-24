@@ -10,3 +10,16 @@ export function validateAmount(amount) {
         return '';
     }
 }
+
+export function validateAddress(address) {
+    const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
+    if (!address) {
+        return 'Address is required';
+    } else if (address.length !== 42) {
+        return 'Hex string has invalid length';
+    } else if (!hexRegex.test(address)) {
+        return 'Must be a valid hex string (e.g., 0x123abc...)';
+    } else {
+        return '';
+    }
+}

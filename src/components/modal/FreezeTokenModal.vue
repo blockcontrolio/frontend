@@ -1,5 +1,5 @@
 <script>
-import {validateAmount} from "../../js/validations.js";
+import {validateAddress, validateAmount} from "../../js/validations.js";
 
 export default {
   props: {
@@ -32,16 +32,7 @@ export default {
       });
     },
     validateUser() {
-      const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
-      if (!this.form.user) {
-        this.errors.user = 'Address is required';
-      } else if (this.form.user.length !== 42) {
-        this.errors.user = 'Hex string has invalid length';
-      } else if (!hexRegex.test(this.form.user)) {
-        this.errors.user = 'Must be a valid hex string (e.g., 0x123abc...)';
-      } else {
-        this.errors.user = '';
-      }
+      this.errors.user = validateAddress(this.form.user);
     },
     validateAmount() {
       this.errors.amount = validateAmount(this.form.amount)
