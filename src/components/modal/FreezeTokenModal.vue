@@ -1,4 +1,6 @@
 <script>
+import {validateAmount} from "../../js/validations.js";
+
 export default {
   props: {
     accounts: Array,
@@ -42,17 +44,7 @@ export default {
       }
     },
     validateAmount() {
-      let amountStr = this.form.amount?.toString();
-      if (!amountStr || parseFloat(amountStr) <= 0) {
-        this.errors.amount = 'Amount must be greater than zero';
-        return;
-      }
-      const decimalPart = amountStr.split('.')[1];
-      if (decimalPart && decimalPart.length > 18) {
-        this.errors.amount = 'Amount must have at most 18 decimal places';
-      } else {
-        this.errors.amount = '';
-      }
+      this.errors.amount = validateAmount(this.form.amount)
     },
     hasErrors() {
       return !!this.errors.user || !!this.errors.amount;

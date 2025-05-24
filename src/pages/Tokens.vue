@@ -88,11 +88,14 @@ export default {
     validateModalType(modalType) {
       let ok = this.operations.find(m => m === modalType);
       if (!ok) {
-        alert('Modal type not registered')
+        alert('Invalid modal type')
       }
     },
     // all requests
     async sendMintRequest({tokenId, issuerAccountId, recipientAccountId, amount}) {
+      if ([tokenId, issuerAccountId, recipientAccountId, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, issuerAccountId, recipientAccountId, amount) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return mintToken(tokenId, {issuerAccountId, recipientAccountId, amount});
       }, () => {
@@ -100,6 +103,9 @@ export default {
       });
     },
     async sendBurnRequest({tokenId, redemptionAccountId, amount}) {
+      if ([tokenId, redemptionAccountId, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, redemptionAccountId, amount) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return burnToken(tokenId, {redemptionAccountId, amount});
       }, () => {
@@ -107,6 +113,9 @@ export default {
       });
     },
     async sendPauseRequest({tokenId, pauserAccountId}) {
+      if ([tokenId, pauserAccountId].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, pauserAccountId) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return pause(tokenId, pauserAccountId);
       }, () => {
@@ -114,6 +123,9 @@ export default {
       });
     },
     async sendUnpauseRequest({tokenId, pauserAccountId}) {
+      if ([tokenId, pauserAccountId].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, pauserAccountId) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return unpause(tokenId, pauserAccountId);
       }, () => {
@@ -121,6 +133,9 @@ export default {
       });
     },
     async sendFreezeRequest({tokenId, custodianAccountId, user, amount}) {
+      if ([tokenId, custodianAccountId, user, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, custodianAccountId, user, amount) must be defined and non-empty.');
+      }
       await this.handleRequest(() => {
         return freeze(tokenId, {custodianAccountId, user, amount});
       }, () => {
@@ -341,28 +356,28 @@ export default {
     <div v-else class="">No tokens created yet.</div>
 
     <BurnTokenModal v-if="this.modalType === 'burn' && this.selectedToken"
-                    :accounts="accounts"
-                    :tokenId="selectedToken?.id"
+                    :accounts="this.accounts"
+                    :tokenId="this.selectedToken?.id"
                     @close="this.modalType = ''"
                     @submit="sendBurnRequest"
     />
     <MintTokenModal v-if="this.modalType === 'mint' && this.selectedToken"
-                    :accounts="accounts"
-                    :tokenId="selectedToken?.id"
+                    :accounts="this.accounts"
+                    :tokenId="this.selectedToken?.id"
                     @close="this.modalType = ''"
                     @submit="sendMintRequest"
     />
     <PauseTokenModal v-if="this.modalType === 'pause' && this.selectedToken"
                      :modalType="'pause'"
-                     :accounts="accounts"
-                     :tokenId="selectedToken?.id"
+                     :accounts="this.accounts"
+                     :tokenId="this.selectedToken?.id"
                      @close="this.modalType = ''"
                      @submit="sendPauseRequest"
     />
     <PauseTokenModal v-if="this.modalType === 'unpause' && this.selectedToken"
                      :modalType="'unpause'"
-                     :accounts="accounts"
-                     :tokenId="selectedToken?.id"
+                     :accounts="this.accounts"
+                     :tokenId="this.selectedToken?.id"
                      @close="this.modalType = ''"
                      @submit="sendUnpauseRequest"
     />

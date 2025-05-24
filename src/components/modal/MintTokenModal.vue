@@ -1,4 +1,6 @@
 <script>
+import {validateAmount} from "../../js/validations.js";
+
 export default {
   props: {
     accounts: Array,
@@ -10,11 +12,27 @@ export default {
         issuerAccountId: '',
         recipientAccountId: '',
         amount: 0
-      }
+      },
+      errors: {
+        amount: ''
+      },
     };
   },
   methods: {
+    validateAmount() {
+      this.errors.amount = validateAmount(this.form.amount)
+    },
+    hasErrors() {
+      return !!this.errors.amount;
+    },
+    resetErrors() {
+      this.errors.amount = '';
+    },
     submit() {
+      this.resetErrors();
+      this.validateAmount();
+      if (this.hasErrors()) return;
+      // proceed with sending the request using fetch
       this.$emit('submit', {
         tokenId: this.tokenId,
         ...this.form
@@ -62,9 +80,12 @@ export default {
                    pattern="\d*"
                    min="0"
                    step="1"
+                   @input="validateAmount"
                    required/>
           </div>
+          <div v-if="this.errors.amount" class="form-text text-danger">{{ this.errors.amount }}</div>
         </div>
+
         <div class="modal-footer">
           <button class="btn btn-outline-secondary px-4" @click="$emit('close')">Cancel</button>
           <button class="btn btn-outline-primary px-4" @click="submit">Mint</button>
