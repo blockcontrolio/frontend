@@ -5,6 +5,7 @@ import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 import PauseTokenModal from "../components/modal/PauseTokenModal.vue"
+import FreezeTokenModal from "../components/modal/FreezeTokenModal.vue";
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
@@ -15,6 +16,7 @@ export default {
     MintTokenModal,
     BurnTokenModal,
     PauseTokenModal,
+    FreezeTokenModal,
     AddrScanLink,
     TxToast,
     ErrorToast
@@ -363,6 +365,12 @@ export default {
                      :tokenId="selectedToken?.id"
                      @close="this.modalType = ''"
                      @submit="sendUnpauseRequest"
+    />
+    <FreezeTokenModal v-if="this.modalType === 'freeze' && this.selectedToken"
+                     :accounts="this.accounts"
+                     :token="this.selectedToken"
+                     @close="this.modalType = ''"
+                     @submit="sendFreezeRequest"
     />
 
     <TxToast

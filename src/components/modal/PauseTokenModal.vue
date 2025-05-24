@@ -2,7 +2,6 @@
 export default {
   props: {
     modalType: String,
-    visible: Boolean,
     accounts: Array,
     tokenId: String
   },
@@ -30,7 +29,6 @@ export default {
 </script>
 
 <template>
-  <div v-if="visible">
     <div class="modal fade show d-block" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white border border-warning">
@@ -58,7 +56,6 @@ export default {
       </div>
     </div>
     <div class="modal-backdrop fade show"></div>
-  </div>
 </template>
 
 <style scoped>
