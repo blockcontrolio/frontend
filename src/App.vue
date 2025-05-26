@@ -6,23 +6,29 @@ export default {
   components: {ContactsModal, NavBar},
   data() {
     return {
-      showModal: false
+      showMissingApiKeyModal: false
     };
   },
   mounted() {
     const apiKey = localStorage.getItem('x-api-key');
-    this.showModal = !apiKey;
+    this.showMissingApiKeyModal = !apiKey;
   },
   watch: {
     $route(to) {
-      if (this.showModal && to.path !== '/settings') {
+      if (this.showMissingApiKeyModal && to.path !== '/settings') {
         this.$router.replace('/settings');
       }
     }
   },
   methods: {
+    openMissingApiKeyModal() {
+      this.showMissingApiKeyModal = true;
+    },
+    closeApiKeyModal() {
+      this.showMissingApiKeyModal = false;
+    },
     goToSettings() {
-      this.showModal = false;
+      this.closeApiKeyModal();
       this.$router.push('/settings');
     }
   }
@@ -31,11 +37,11 @@ export default {
 
 <template>
   <div class="d-flex">
-    <NavBar/>
-    <div v-if="!showModal" class="flex-fill p-4">
+    <NavBar @missing-api-key="openMissingApiKeyModal"/>
+    <div v-if="!showMissingApiKeyModal" class="flex-fill p-4">
       <router-view/>
     </div>
-    <ContactsModal v-else :visible="showModal" @go-to-settings="goToSettings"/>
+    <ContactsModal v-else :visible="showMissingApiKeyModal" @go-to-settings="goToSettings"/>
   </div>
 </template>
 
