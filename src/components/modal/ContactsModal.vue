@@ -32,7 +32,7 @@ export default {
           </li>
           <li>
             <strong class="me-1">Telegram:</strong>
-            <a href="https://t.me/yourproject" target="_blank" class="text-info">@web3yurii</a>
+            <a href="https://t.me/web3yurii" target="_blank" class="text-info">@web3yurii</a>
           </li>
         </ul>
       </div>
