@@ -12,7 +12,18 @@ export default {
   mounted() {
     this.loadCounterparty();
   },
+  computed: {
+    hasApiKey() {
+      return !!localStorage.getItem('x-api-key');
+    }
+  },
   methods: {
+    handleClick(e) {
+      if (!this.hasApiKey) {
+        e.preventDefault();
+        this.$emit('missing-api-key'); // trigger parent handler
+      }
+    },
     async loadCounterparty() {
       const response = await fetchCounterpartyInfo();
       this.counterparty = await response.json();
@@ -22,7 +33,8 @@ export default {
         globalState.explorerUrl = this.counterparty.networks[0].explorerUrl;
       }
     }
-  }
+  },
+  emits: ['missing-api-key'],
 }
 </script>
 
@@ -33,10 +45,10 @@ export default {
       <h4>BlockControl</h4>
       <div>
         <router-link v-show="false" to="/">Dashboard</router-link>
-        <router-link to="/transfer">Asset Transfer</router-link>
-        <router-link to="/accounts">Accounts</router-link>
-        <router-link to="/tokens">Tokens</router-link>
-        <router-link to="/transactions">Transactions</router-link>
+        <router-link :to="hasApiKey ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
+        <router-link :to="hasApiKey ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
+        <router-link :to="hasApiKey ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
+        <router-link :to="hasApiKey ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
         <router-link to="/settings">Settings</router-link>
       </div>
     </nav>
