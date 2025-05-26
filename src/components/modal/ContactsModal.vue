@@ -19,11 +19,17 @@ export default {
       v-if="visible">
     <div class="modal-content-custom text-white border border-info p-3">
       <div class="modal-header border-bottom border-info">
-        <h5 class="modal-title text-info">API Key Required</h5>
+        <h5 class="modal-title text-info">Demo API Key Required</h5>
       </div>
       <div class="modal-body">
+        <p class="my-3">
+          This app is currently running in <strong>demo mode</strong>. To access full functionality, including live asset transfers, please request an API key.
+        </p>
+        <p class="mb-3 text-warning">
+          <strong>Important:</strong> This demo is for testing purposes only. Do not transfer significant real assets. The developers are not responsible for any loss of funds.
+        </p>
         <p class="mb-3">
-          This app requires an API key to operate. Please request one to continue.
+          For safe usage, we recommend requesting a <strong>testnet API key</strong>.
         </p>
         <ul class="list-unstyled">
           <li>
