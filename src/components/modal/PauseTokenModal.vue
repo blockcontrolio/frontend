@@ -24,14 +24,15 @@ export default {
         ...this.form
       });
     }
-  }
+  },
+  emits: ['submit', 'close']
 }
 </script>
 
 <template>
     <div class="modal fade show d-block" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border border-warning">
+        <form class="modal-content bg-dark text-white border border-warning" @submit.prevent="submit">
           <div class="modal-header">
             <h5 class="modal-title">{{ name }} Token</h5>
             <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
@@ -50,9 +51,9 @@ export default {
           </div>
           <div class="modal-footer">
             <button class="btn btn-outline-secondary px-4" @click="$emit('close')">Cancel</button>
-            <button class="btn btn-outline-primary px-4" @click="submit">{{ name }}</button>
+            <button class="btn btn-outline-primary px-4" type="submit">{{ name }}</button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
     <div class="modal-backdrop fade show"></div>
