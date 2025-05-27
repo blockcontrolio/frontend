@@ -70,14 +70,17 @@ export default {
       this.accounts = await res.json();
     },
     async importToken() {
-      const res = await importToken({address: this.importTokenAddress});
-      if (res.ok) {
+      let address = this.importTokenAddress;
+      if (address === undefined || address === null || address === '') {
+        throw new Error('All parameters (address) must be defined and non-empty.');
+      }
+      await this.handleRequest(() => {
+        return importToken({address});
+      }, () => {
         this.showImportForm = false;
         this.importTokenAddress = '';
-      } else {
-        const err = await res.json();
-        alert(`Error: ${err.message}`); // todo show toast
-      }
+        return `Token imported`;
+      });
     },
     async createToken() {
       const payload = {
@@ -198,11 +201,11 @@ export default {
       });
     },
     // base request
-    async handleRequest(operation, okMsgProvider) {
+    async handleRequest(operation, onSuccess) {
       try {
         let response = await operation();
         if (response.ok) {
-          let message = okMsgProvider();
+          let message = onSuccess();
           this.txSuccess = {...(await response.json()), message};
         } else {
           const err = await response.json();
