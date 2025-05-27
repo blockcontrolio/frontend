@@ -91,3 +91,25 @@ export async function unblock(tokenId, payload) {
         body: JSON.stringify(payload)
     });
 }
+
+export async function grantRole(tokenId, payload) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/grant-role`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
+export async function revokeRole(tokenId, payload) {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/revoke-role`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': loadApiKey()
+        },
+        body: JSON.stringify(payload)
+    });
+}

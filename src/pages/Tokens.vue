@@ -1,6 +1,16 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
-import {mintToken, burnToken, importToken, pause, unpause, freeze, block, unblock} from "../services/tokens-api.js";
+import {
+  mintToken,
+  burnToken,
+  importToken,
+  pause,
+  unpause,
+  freeze,
+  block,
+  unblock,
+  grantRole, revokeRole
+} from "../services/tokens-api.js";
 import {formatAmount} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
@@ -10,10 +20,12 @@ import FreezeTokenModal from "../components/modal/FreezeTokenModal.vue";
 import BlockTokenModal from "../components/modal/BlockTokenModal.vue";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
+import RolesModal from "../components/modal/RolesModal.vue";
 
 export default {
   name: 'Tokens',
   components: {
+    RolesModal,
     MintTokenModal,
     BurnTokenModal,
     PauseTokenModal,
@@ -39,6 +51,7 @@ export default {
       txSuccess: null,
       txError: null,
       operations: ['mint', 'burn', 'pause', 'unpause', 'freeze', 'block', 'unblock'],
+      roleActions: ['grant', 'revoke'],
       modalType: ''
     };
   },
@@ -88,7 +101,7 @@ export default {
       this.modalType = modalType;
     },
     validateModalType(modalType) {
-      let ok = this.operations.find(m => m === modalType);
+      let ok = this.operations.find(m => m === modalType) || this.roleActions.find(m => m === modalType);
       if (!ok) {
         alert('Invalid modal type')
       }
@@ -162,6 +175,26 @@ export default {
         return unblock(tokenId, {limiterAccountId, user});
       }, () => {
         return `Token ${this.selectedToken?.symbol} unblocked for the address`;
+      });
+    },
+    async sendGrantRoleRequest({tokenId, adminAccountId, userAccountId, role}) {
+      if ([tokenId, adminAccountId, userAccountId, role].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, adminAccountId, userAccountId, role) must be defined and non-empty.');
+      }
+      await this.handleRequest(() => {
+        return grantRole(tokenId, {adminAccountId, userAccountId, role});
+      }, () => {
+        return `Role granted`;
+      });
+    },
+    async sendRevokeRoleRequest({tokenId, adminAccountId, userAccountId, role}) {
+      if ([tokenId, adminAccountId, userAccountId, role].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, adminAccountId, userAccountId, role) must be defined and non-empty.');
+      }
+      await this.handleRequest(() => {
+        return revokeRole(tokenId, {adminAccountId, userAccountId, role});
+      }, () => {
+        return `Role revoked`;
       });
     },
     // base request
@@ -295,6 +328,33 @@ export default {
             </div>
             <!-- Token Operations -->
             <div v-if="token.own" class="d-flex gap-2">
+              <!--roles dropdown-->
+              <div v-if="token.own" class="dropdown ms-auto">
+                <button
+                    class="btn btn-outline-primary dropdown-toggle px-4"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                >
+                  Roles
+                </button>
+                <ul class="dropdown-menu bg-dark text-white border border-info">
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openModal(token, 'grant')"
+                    >
+                      Grant
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" class="dropdown-item text-warning"
+                       @click.prevent="openModal(token, 'revoke')"
+                    >
+                      Revoke
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <!--actions dropdown-->
               <div v-if="token.own" class="dropdown ms-auto">
                 <button
                     class="btn btn-outline-primary dropdown-toggle px-4"
@@ -305,7 +365,7 @@ export default {
                 </button>
                 <ul class="dropdown-menu bg-dark text-white border border-info">
                   <li>
-                    <a href="#" class="dropdown-item text-primary btn-outline-primary"
+                    <a href="#" class="dropdown-item text-primary"
                        @click.prevent="openModal(token, 'mint')"
                     >
                       🪙 Mint
@@ -408,6 +468,20 @@ export default {
                      :token="this.selectedToken"
                      @close="this.modalType = ''"
                      @submit="sendUnblockUserRequest"
+    />
+    <RolesModal v-if="this.modalType === 'grant' && this.selectedToken"
+                :modalType="'grant'"
+                :accounts="this.accounts"
+                :tokenId="this.selectedToken?.id"
+                @close="this.modalType = ''"
+                @submit="sendGrantRoleRequest"
+    />
+    <RolesModal v-if="this.modalType === 'revoke' && this.selectedToken"
+                :modalType="'revoke'"
+                :accounts="this.accounts"
+                :tokenId="this.selectedToken?.id"
+                @close="this.modalType = ''"
+                @submit="sendRevokeRoleRequest"
     />
 
     <TxToast
