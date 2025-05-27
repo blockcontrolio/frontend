@@ -8,9 +8,9 @@ export default {
     txData: {
       required: true,
       validator(val) {
-        return val && typeof val.hash === 'string' && typeof val.message === 'string';
+        return val && typeof val.message === 'string';
       }
-    }, // for success: { message, hash }
+    }, // for success: { message, hash, id }
     autoDismiss: {
       type: Boolean,
       default: true
@@ -52,10 +52,15 @@ export default {
       <div
           class="alert custom-success-alert d-flex justify-content-between align-items-center m-0">
         <!-- ✅ Success -->
-        <div v-if="txData">
-          ✅ Success! {{ txData?.message }}<br/>
+        <div v-if="txData?.hash">
+          ✅ Success! {{ txData.message }}<br/>
           Tx hash:
-          <tx-scan-link :hash="txData?.hash" class="tx-hash"/>
+          <tx-scan-link :hash="txData.hash" class="tx-hash"/>
+        </div>
+        <div v-if="txData?.id">
+          ✅ Success! {{ txData?.message }}<br/>
+          UUID:
+          <span class="mono">{{txData.id}}</span>
         </div>
         <div class="d-flex align-items-center justify-content-center">
           <button

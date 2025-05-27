@@ -39,8 +39,7 @@ export default {
     return {
       tokens: [],
       accounts: [],
-      showImportForm: false,
-      showCreateForm: false,
+      showTokenForm: '', // import, create
       importTokenAddress: '',
       newToken: {
         name: '',
@@ -77,7 +76,7 @@ export default {
       await this.handleRequest(() => {
         return importToken({address});
       }, () => {
-        this.showImportForm = false;
+        this.showTokenForm = null;
         this.importTokenAddress = '';
         return `Token imported`;
       });
@@ -91,7 +90,7 @@ export default {
 
       const res = await createToken(payload);
       if (res.ok) {
-        this.showCreateForm = false;
+        this.showTokenForm = null;
         this.newToken = {name: '', symbol: '', accountId: ''};
       } else {
         const err = await res.json();
@@ -240,19 +239,19 @@ export default {
     <h3 class="mb-4 text-info">Token Management</h3>
 
     <!-- Toggle Import/Create Form -->
-    <div v-if="!showCreateForm && !showImportForm" class="d-flex justify-content-end mb-3 gap-2">
-      <button v-if="!showImportForm" class="btn btn-outline-warning px-4" type="button"
-              @click="showImportForm = !showImportForm">
+    <div v-if="!this.showTokenForm" class="d-flex justify-content-end mb-3 gap-2">
+      <button class="btn btn-outline-warning px-4" type="button"
+              @click="this.showTokenForm = 'import'">
         Import
       </button>
-      <button v-if="!showCreateForm" class="btn btn-outline-primary px-4" type="button"
-              @click="showCreateForm = !showCreateForm">
+      <button class="btn btn-outline-primary px-4" type="button"
+              @click="this.showTokenForm = 'create'">
         Create New Token
       </button>
     </div>
 
     <!-- Import Token Form -->
-    <form v-if="showImportForm" @submit.prevent="importToken" class="mb-4">
+    <form v-if="this.showTokenForm === 'import'" @submit.prevent="importToken" class="mb-4">
       <div class="mb-3">
         <input
             v-model="importTokenAddress"
@@ -266,7 +265,7 @@ export default {
         <button
             class="btn btn-outline-danger"
             type="button"
-            @click="showImportForm = false"
+            @click="this.showTokenForm = null; this.importTokenAddress = ''"
         >
           Cancel
         </button>
@@ -277,7 +276,7 @@ export default {
     </form>
 
     <!-- Create Token Form -->
-    <form v-if="showCreateForm" @submit.prevent="createToken" class="mb-4">
+    <form v-if="this.showTokenForm === 'create'" @submit.prevent="createToken" class="mb-4">
       <input v-model="newToken.name" class="form-control bg-dark text-white border-info mb-2"
              placeholder="Token Name"
              required/>
@@ -298,7 +297,7 @@ export default {
         <button
             class="btn btn-outline-danger"
             type="button"
-            @click="showCreateForm = false"
+            @click="this.showTokenForm = null"
         >
           Cancel
         </button>
@@ -453,10 +452,10 @@ export default {
                      @submit="sendUnpauseRequest"
     />
     <FreezeTokenModal v-if="this.modalType === 'freeze' && this.selectedToken"
-                     :accounts="this.accounts"
-                     :token="this.selectedToken"
-                     @close="this.modalType = ''"
-                     @submit="sendFreezeRequest"
+                      :accounts="this.accounts"
+                      :token="this.selectedToken"
+                      @close="this.modalType = ''"
+                      @submit="sendFreezeRequest"
     />
     <BlockTokenModal v-if="this.modalType === 'block' && this.selectedToken"
                      :modalType="'block'"
