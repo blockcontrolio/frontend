@@ -78,24 +78,22 @@ export default {
       }, () => {
         this.showTokenForm = null;
         this.importTokenAddress = '';
-        return `Token imported`;
+        return `Token has been imported`;
       });
     },
     async createToken() {
-      const payload = {
-        name: this.newToken.name,
-        symbol: this.newToken.symbol,
-        accountId: this.newToken.accountId
-      };
-
-      const res = await createToken(payload);
-      if (res.ok) {
+      if ([this.newToken.name, this.newToken.symbol, this.newToken.accountId]
+          .some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (name, symbol, accountId) must be defined and non-empty.');
+      }
+      await this.handleRequest(() => {
+        return createToken(this.newToken);
+      }, () => {
+        let symbol = this.newToken.symbol;
         this.showTokenForm = null;
         this.newToken = {name: '', symbol: '', accountId: ''};
-      } else {
-        const err = await res.json();
-        alert(`Error: ${err.message}`);
-      }
+        return `Token ${symbol} has been created`;
+      });
     },
     openModal(token, modalType) {
       this.validateModalType(modalType);
