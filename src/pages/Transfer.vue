@@ -35,7 +35,7 @@ export default {
       transferSuccess: null,
       transferError: null,
       accountBalances: [],
-      assetBalance: null,
+      selectedAsset: null,
       selectedTokenInfo: null
     };
   },
@@ -67,14 +67,12 @@ export default {
       this.accountBalances = await res.json();
     },
     showBalance(assetId) {
-      this.assetBalance = this.accountBalances
-          .find(b => {
-            return b.id === assetId
-          })
-      console.log("Selected asset balance: ", this.assetBalance.id)
-      this.selectedAsset(assetId)
+      this.selectedAsset = this.accountBalances
+          .find(b => b.id === assetId)
+      console.log("Selected asset: ", this.selectedAsset.symbol)
+      this.selectedToken(assetId)
     },
-    selectedAsset(assetId) {
+    selectedToken(assetId) {
       this.selectedTokenInfo = this.tokens
           .find(t => t.id === assetId);
       console.log("Selected token info: ", this.selectedTokenInfo.id)
@@ -148,6 +146,11 @@ export default {
         this.handleUnknownError(err);
       }
     },
+    resetSelection() {
+      this.selectedTokenInfo = null;
+      this.selectedAsset = null;
+      this.accountBalances = [];
+    },
     resetError() {
       this.transferSuccess = null;
       this.transferError = null;
@@ -178,13 +181,13 @@ export default {
     <div class="type-selector">
       <div class="form-check form-check-inline">
         <input class="form-check-input bg-dark border-primary" type="radio" id="internalRadio" value="internal"
-               v-on:change="resetError(); this.selectedTokenInfo = null; this.assetBalance = null"
+               v-on:change="this.resetSelection(); this.resetError();"
                v-model="selectedForm"/>
         <label class="form-check-label text-white fw-bold" for="internalRadio">Internal Transfer</label>
       </div>
       <div class="form-check form-check-inline me-3">
         <input class="form-check-input bg-dark border-primary" type="radio" id="externalRadio" value="external"
-               v-on:change="resetError(); this.selectedTokenInfo = null; this.assetBalance = null"
+               v-on:change="this.resetSelection(); this.resetError();"
                v-model="selectedForm"/>
         <label class="form-check-label text-white fw-bold" for="externalRadio">External Withdrawal</label>
       </div>
@@ -199,15 +202,15 @@ export default {
       <div class="mb-3">
         <label class="form-label">From Account</label>
         <select v-model="internal.from" class="form-select bg-dark border-info" required
-                v-on:change="fetchBalances(internal.from)">
+                v-on:change="this.resetSelection(); this.fetchBalances(internal.from); this.internal.tokenId = '';">
           <option disabled value="">-- source account --</option>
           <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
         <!-- acc balance preview -->
-        <div v-if="internal.from && assetBalance" class="mt-1 balance">
-          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.assetBalance.amount) }} {{this.assetBalance.symbol}}</span>
+        <div v-if="internal.from && selectedAsset" class="mt-1 balance">
+          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.selectedAsset.amount) }} {{this.selectedAsset.symbol}}</span>
         </div>
       </div>
 
@@ -221,7 +224,7 @@ export default {
         >
           <option disabled value="">-- select asset --</option>
           <option
-              v-for="token in tokens"
+              v-for="token in this.accountBalances"
               :key="token.id"
               :value="token.id"
           >
@@ -260,7 +263,7 @@ export default {
             @input="validateAmount"
         />
         <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
-        <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(assetBalance?.amount)"
+        <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(selectedAsset?.amount)"
              class="form-text text-warning">Amount exceeds account balance!
         </div>
       </div>
@@ -278,15 +281,15 @@ export default {
       <div class="mb-3">
         <label class="form-label">From Account</label>
         <select v-model="transfer.accountId" class="form-select bg-dark border-info" required
-                v-on:change="fetchBalances(transfer.accountId)">
+                v-on:change="this.resetSelection(); this.fetchBalances(transfer.accountId); this.transfer.tokenId = '';">
           <option disabled value="">-- choose account --</option>
           <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>
         <!-- acc balance preview -->
-        <div v-if="transfer.accountId && assetBalance" class="mt-1 balance">
-          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.assetBalance.amount) }} {{this.assetBalance.symbol}}</span>
+        <div v-if="transfer.accountId && selectedAsset" class="mt-1 balance">
+          <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(this.selectedAsset.amount) }} {{this.selectedAsset.symbol}}</span>
         </div>
       </div>
 
@@ -300,7 +303,7 @@ export default {
         >
           <option disabled value="">-- select asset --</option>
           <option
-              v-for="token in tokens"
+              v-for="token in this.accountBalances"
               :key="token.id"
               :value="token.id"
           >
@@ -338,7 +341,7 @@ export default {
             @input="validateAmount"
         />
         <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
-        <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(assetBalance?.amount)"
+        <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(selectedAsset?.amount)"
              class="form-text text-warning">Amount exceeds account balance!
         </div>
       </div>
@@ -351,7 +354,7 @@ export default {
 
   <!-- Success Message -->
   <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
-    ✅ You transferred {{ transferSuccess.amount }} {{ assetBalance?.name }} ({{ assetBalance?.symbol }}) to {{ transferSuccess.to }}
+    ✅ You transferred {{ transferSuccess.amount }} {{ selectedAsset?.name }} ({{ selectedAsset?.symbol }}) to {{ transferSuccess.to }}
     <br/>
     Tx hash: <tx-scan-link :hash="transferSuccess.txHash"></tx-scan-link>
   </div>
