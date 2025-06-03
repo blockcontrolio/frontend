@@ -7,10 +7,14 @@ import {
   sendInternalTransfer
 } from '../services/api'
 import {formatAmount} from "../js/utils.js";
-import TxScanLink from "../components/etherscan/TxScanLink.vue";
+import TxToast from "../components/toast/TxToast.vue";
+import ErrorToast from "../components/toast/ErrorToast.vue";
 
 export default {
-  components: {TxScanLink},
+  components: {
+    TxToast,
+    ErrorToast
+  },
   data() {
     return {
       selectedForm: 'internal', // or 'internal'
@@ -118,7 +122,7 @@ export default {
           const err = await response.json();
           this.handleTransferError(err);
         } else {
-          this.transferSuccess = await response.json();
+          await this.handleSuccess(response);
           // reset form
           this.transfer = {accountId: '', to: '', amount: null}
           this.selectedTokenInfo = null
@@ -137,7 +141,7 @@ export default {
           const err = await response.json();
           this.handleTransferError(err);
         } else {
-          this.transferSuccess = await response.json();
+          await this.handleSuccess(response);
           // reset form
           this.internal = {from: '', to: '', amount: null}
           this.selectedTokenInfo = null
@@ -156,6 +160,11 @@ export default {
       this.transferError = null;
       this.errors.to = '';
       this.errors.amount = '';
+    },
+    async handleSuccess(response) {
+      let txData = await response.json();
+      let message = `You transferred ${txData.amount} ${this.selectedAsset?.name} (${this.selectedAsset?.symbol}) to ${txData.to}`
+      this.transferSuccess = {hash: txData.txHash, message};
     },
     handleUnknownError(err) {
       console.error(err)
@@ -352,18 +361,16 @@ export default {
     </form>
   </div>
 
-  <!-- Success Message -->
-  <div v-if="transferSuccess" class="alert custom-success-alert mt-3 text-white">
-    ✅ You transferred {{ transferSuccess.amount }} {{ selectedAsset?.name }} ({{ selectedAsset?.symbol }}) to {{ transferSuccess.to }}
-    <br/>
-    Tx hash: <tx-scan-link :hash="transferSuccess.txHash"></tx-scan-link>
-  </div>
-
-  <!-- Error Message -->
-  <div v-if="transferError" class="alert custom-error-alert mt-3">
-    ❌ <strong>{{ transferError.error }}</strong><br/>
-    <span>{{ transferError.message }}</span>
-  </div>
+  <TxToast
+      v-if="transferSuccess"
+      :txData="transferSuccess"
+      @closed="transferSuccess = null; selectedTokenInfo = null"
+  />
+  <ErrorToast
+      v-if="transferError"
+      :error="transferError"
+      @closed="transferError = null; selectedTokenInfo = null"
+  />
 
 </template>
 
@@ -377,19 +384,6 @@ export default {
 input::placeholder,
 select {
   color: #ccc;
-}
-
-.custom-success-alert {
-  background-color: #111827;
-  border-color: #2af2ff;
-  border-radius: 0.375rem;
-}
-
-.custom-error-alert {
-  background-color: #1f1f2e; /* deep space dark */
-  border-color: #ff4c4c; /* electric red/orange */
-  color: #ffcccc; /* light red text for readability */
-  border-radius: 0.375rem;
 }
 
 .token-info-box {
