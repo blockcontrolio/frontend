@@ -9,7 +9,7 @@ export async function importToken(payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -20,7 +20,7 @@ export async function mintToken(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -31,7 +31,7 @@ export async function burnToken(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -42,7 +42,7 @@ export async function pause(tokenId, pauserAccountId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify({pauserAccountId})
     });
@@ -53,7 +53,7 @@ export async function unpause(tokenId, pauserAccountId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify({pauserAccountId})
     });
@@ -64,7 +64,7 @@ export async function freeze(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -75,7 +75,7 @@ export async function block(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -86,7 +86,7 @@ export async function unblock(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -97,7 +97,7 @@ export async function grantRole(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -108,7 +108,7 @@ export async function revokeRole(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });

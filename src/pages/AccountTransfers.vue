@@ -1,10 +1,18 @@
 <script>
-import {etherScanLink, formatAmount, formatDate} from "../js/utils.js";
+import {useExplorerUtils} from "../js/composables/explorerUtils.js";
+import {formatAmount, formatDate} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
 
 export default {
   name: 'Transfers',
   props: ['accountId'],
+  setup() {
+    const {etherScanLink} = useExplorerUtils();
+
+    return {
+      etherScanLink,
+    };
+  },
   data() {
     return {
       transfers: []
@@ -14,7 +22,6 @@ export default {
     this.loadTransfers();
   },
   methods: {
-    etherScanLink,
     formatAmount,
     formatDate,
     async loadTransfers() {

@@ -6,30 +6,30 @@ export default {
   components: {ContactsModal, NavBar},
   data() {
     return {
-      showMissingApiKeyModal: false
+      showContactsModal: false
     };
   },
   mounted() {
     const apiKey = localStorage.getItem('x-api-key');
-    this.showMissingApiKeyModal = !apiKey;
+    this.showContactsModal = !apiKey;
   },
   watch: {
     $route(to) {
-      if (this.showMissingApiKeyModal && to.path !== '/settings') {
-        this.$router.replace('/settings');
+      if (this.showContactsModal && to.path !== '/login') {
+        this.$router.replace('/login');
       }
     }
   },
   methods: {
-    openMissingApiKeyModal() {
-      this.showMissingApiKeyModal = true;
+    openContactsModal() {
+      this.showContactsModal = true;
     },
-    closeApiKeyModal() {
-      this.showMissingApiKeyModal = false;
+    closeModal() {
+      this.showContactsModal = false;
     },
-    goToSettings() {
-      this.closeApiKeyModal();
-      this.$router.push('/settings');
+    goToLogin() {
+      this.closeModal();
+      this.$router.push('/login');
     }
   }
 }
@@ -37,11 +37,11 @@ export default {
 
 <template>
   <div class="d-flex">
-    <NavBar @missing-api-key="openMissingApiKeyModal"/>
-    <div v-if="!showMissingApiKeyModal" class="flex-fill p-4">
+    <NavBar @missing-jwt="openContactsModal"/>
+    <div v-if="!showContactsModal" class="flex-fill p-4">
       <router-view/>
     </div>
-    <ContactsModal v-else :visible="showMissingApiKeyModal" @go-to-settings="goToSettings"/>
+    <ContactsModal v-else :visible="showContactsModal" @go-to-login="goToLogin"/>
   </div>
 </template>
 

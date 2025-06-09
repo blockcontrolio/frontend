@@ -1,12 +1,18 @@
 <script>
+import {useExplorerUtils} from "../../js/composables/explorerUtils.js";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
-import {etherScanLink} from "../../js/utils.js";
 
 export default {
   name: "TxScanLink",
   props: ['hash'],
+  setup() {
+    const {etherScanLink} = useExplorerUtils();
+
+    return {
+      etherScanLink,
+    };
+  },
   methods: {
-    etherScanLink,
     isClipboardSupported,
     copyHash(txHash) {
       copyToClipboard(txHash)

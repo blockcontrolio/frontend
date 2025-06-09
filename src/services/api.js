@@ -8,7 +8,7 @@ export async function fetchCounterpartyInfo() {
     return await fetch(`${apiBaseUrl}/counterparties`, {
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         }
     }).catch(err => {
         console.error('Failed to load counterparties/networks info', err);
@@ -19,7 +19,7 @@ export async function fetchAccounts() {
     return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         }
     }).catch(err => {
         console.error('Failed to load accounts', err);
@@ -30,7 +30,7 @@ export async function fetchTokens() {
     return await fetch(`${apiBaseUrl}/tokens`, {
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         }
     }).catch(err => {
         console.error('Error fetching account:', err);
@@ -42,7 +42,7 @@ export async function createToken(payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(payload)
     });
@@ -52,7 +52,7 @@ export async function fetchAccount(id) {
     return await fetch(`${apiBaseUrl}/accounts/${id}`, {
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey(),
+            'Authorization': `Bearer ${loadApiKey()}`
         },
     }).catch(err => {
         console.error('Failed to load tokens', err);
@@ -64,7 +64,7 @@ export async function updateAccount(id, accountInfo) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey(),
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(accountInfo),
     }).catch(err => {
@@ -76,7 +76,7 @@ export async function fetchBalances(accountId) {
     return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances`, {
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey(),
+            'Authorization': `Bearer ${loadApiKey()}`
         },
     }).catch(err => {
         console.error('Failed to load account asset balances', err);
@@ -88,7 +88,7 @@ export async function createAccount(newAccount) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(newAccount)
     });
@@ -99,7 +99,7 @@ export async function fetchTransfers(accountId) {
         {
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': loadApiKey()
+                'Authorization': `Bearer ${loadApiKey()}`
             }
         }
     ).catch(err => {
@@ -112,7 +112,7 @@ export async function sendInternalTransfer(data) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(data)
     });
@@ -123,7 +123,7 @@ export async function sendExternalWithdrawal(data) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         },
         body: JSON.stringify(data)
     })
@@ -133,7 +133,7 @@ export async function fetchTransactions() {
     return await fetch(`${apiBaseUrl}/transactions`, {
         headers: {
             'Content-Type': 'application/json',
-            'X-API-Key': loadApiKey()
+            'Authorization': `Bearer ${loadApiKey()}`
         }
     }).catch(err => {
         console.error('Failed to fetch transactions', err);
