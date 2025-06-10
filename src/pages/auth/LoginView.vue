@@ -30,10 +30,10 @@ export default {
         }
 
         if (data?.token) {
-          localStorage.setItem("x-api-key", data.token);
+          localStorage.setItem("auth-token", data.token);
           this.$router.push('/');
           await store.fetchCounterparty();
-          networkStore.setNetwork(store.counterparty.networks[0])
+          networkStore.setNetwork(store.counterparty.networks[0]) // select network globally
         } else {
           this.error = "Token not received from server.";
         }
@@ -49,7 +49,7 @@ export default {
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="w-100" style="max-width: 420px;">
       <div class="card bg-dark text-light border-info p-4">
-        <h2 class="text-center text-info mb-4">Sign In</h2>
+        <h3 class="text-center text-info mb-4">Sign In</h3>
         <form @submit.prevent="login">
           <div class="mb-3">
             <label for="email" class="form-label text-info">Email</label>

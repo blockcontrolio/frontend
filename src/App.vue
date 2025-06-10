@@ -10,8 +10,8 @@ export default {
     };
   },
   mounted() {
-    const apiKey = localStorage.getItem('x-api-key');
-    this.showContactsModal = !apiKey;
+    const authToken = localStorage.getItem('auth-token');
+    this.showContactsModal = !authToken;
   },
   watch: {
     $route(to) {

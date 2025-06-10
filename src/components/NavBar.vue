@@ -14,22 +14,22 @@ export default {
     },
   },
   created() {
-    if (this.hasApiKey()) {
+    if (this.hasAuthToken()) {
       this.store.fetchCounterparty();
     }
   },
   methods: {
-    hasApiKey() {
-      return !!localStorage.getItem('x-api-key');
+    hasAuthToken() {
+      return !!localStorage.getItem('auth-token');
     },
     handleClick(e) {
-      if (!this.hasApiKey()) {
+      if (!this.hasAuthToken()) {
         e.preventDefault();
         this.$emit('missing-jwt');
       }
     },
     logout() {
-      localStorage.removeItem("x-api-key");
+      localStorage.removeItem("auth-token");
       resetAllStores();
       this.$router.push("/login");
     }
@@ -45,10 +45,10 @@ export default {
       <h4>BlockControl</h4>
       <div>
         <router-link v-show="false" to="/">Dashboard</router-link>
-        <router-link :to="hasApiKey() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
-        <router-link :to="hasApiKey() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
-        <router-link :to="hasApiKey() ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
-        <router-link :to="hasApiKey() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
+        <router-link :to="hasAuthToken() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
+        <router-link :to="hasAuthToken() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
+        <router-link :to="hasAuthToken() ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
+        <router-link :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
         <router-link v-show="false" to="/settings">Settings</router-link>
       </div>
     </nav>
