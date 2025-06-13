@@ -1,11 +1,17 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
 
-function loadApiKey() {
-    return localStorage.getItem('x-api-key') || '';
-}
-
 function loadAuthToken() {
     return localStorage.getItem('auth-token') || '';
+}
+
+export async function fetchNetworks() {
+    return await fetch(`${apiBaseUrl}/networks`, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).catch(err => {
+        console.error('Failed to load all networks info', err);
+    });
 }
 
 export async function fetchCounterpartyInfo() {
@@ -15,7 +21,7 @@ export async function fetchCounterpartyInfo() {
             'Authorization': `Bearer ${loadAuthToken()}`
         }
     }).catch(err => {
-        console.error('Failed to load counterparties/networks info', err);
+        console.error('Failed to load counterparties info', err);
     });
 }
 

@@ -54,7 +54,7 @@ export default {
         if (data.token) {
           localStorage.setItem("auth-token", data.token);
 
-          const selected = this.networkStore.networks.find(n => n.internalId === this.form.networkId);
+          const selected = this.networkStore.networks.find(n => n.id === this.form.networkId);
           if (selected) this.networkStore.setNetwork(selected);
 
           this.$router.push('/');
@@ -87,7 +87,7 @@ export default {
             <label class="form-label">Select Network</label>
             <select v-model="form.networkId" class="form-select bg-black text-white border-info" required>
               <option disabled value="">Choose a network</option>
-              <option v-for="net in networks" :key="net.internalId" :value="net.internalId">
+              <option v-for="net in networks" :key="net.id" :value="net.id">
                 {{ net.name }}
               </option>
             </select>
