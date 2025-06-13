@@ -7,6 +7,7 @@ import Transactions from '../pages/Transactions.vue'
 import Settings from '../pages/Settings.vue'
 import AccountDetails from "../pages/AccountDetails.vue";
 import LoginView from "../pages/auth/LoginView.vue";
+import RegisterView from "../pages/auth/RegisterView.vue";
 
 const routes = [
     {
@@ -44,6 +45,10 @@ const routes = [
     {
         path: '/login',
         component: LoginView
+    },
+    {
+        path: '/register',
+        component: RegisterView
     }
 ]
 

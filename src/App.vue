@@ -30,6 +30,10 @@ export default {
     goToLogin() {
       this.closeModal();
       this.$router.push('/login');
+    },
+    register() {
+      this.closeModal();
+      this.$router.push('/register');
     }
   }
 }
@@ -41,7 +45,7 @@ export default {
     <div v-if="!showContactsModal" class="flex-fill p-4">
       <router-view/>
     </div>
-    <ContactsModal v-else :visible="showContactsModal" @go-to-login="goToLogin"/>
+    <ContactsModal v-else :visible="showContactsModal" @go-to-login="goToLogin" @proceed-onboarding="register"/>
   </div>
 </template>
 

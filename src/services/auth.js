@@ -7,3 +7,11 @@ export async function login(credentials) {
         body: JSON.stringify(credentials),
     });
 }
+
+export async function register(form) {
+    return await fetch(`${apiBaseUrl}/register`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(form),
+    });
+}

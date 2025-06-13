@@ -47,9 +47,9 @@ export default {
 
 <template>
   <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="w-100" style="max-width: 420px;">
+    <div class="w-50" style="max-width: 500px;">
       <div class="card bg-dark text-light border-info p-4">
-        <h3 class="text-center text-info mb-4">Sign In</h3>
+        <h4 class="text-center text-info mb-4">Sign In</h4>
         <form @submit.prevent="login">
           <div class="mb-3">
             <label for="email" class="form-label text-info">Email</label>
@@ -61,9 +61,13 @@ export default {
             <input v-model="credentials.password" type="password" class="form-control bg-black text-white border-info"
                    required>
           </div>
-          <button type="submit" class="btn btn-outline-info w-100">Log In</button>
+          <button type="submit" class="btn btn-outline-primary w-100">Log In</button>
         </form>
         <div v-if="error" class="text-danger mt-3">{{ error }}</div>
+
+        <div class="mt-3 text-center">
+          <router-link to="/register">Don’t have counterparty? Please onboard</router-link>
+        </div>
       </div>
     </div>
   </div>
