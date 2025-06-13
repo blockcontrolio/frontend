@@ -3,7 +3,11 @@ import {fetchCounterpartyInfo} from "../../services/api.js";
 
 export const useCounterpartyStore = defineStore('counterparty', {
     state: () => ({
-        counterparty: null,
+        counterparty: {
+            internalId: '',
+            name: '',
+            networks: []
+        },
     }),
     actions: {
 
@@ -20,7 +24,7 @@ export const useCounterpartyStore = defineStore('counterparty', {
         },
 
         reset() {
-            this.counterparty = {};
+            this.counterparty = null;
         }
     }
 });

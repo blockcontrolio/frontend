@@ -2,12 +2,14 @@
 
 import {useNetworkStore} from "../../js/stores/networkStore.js";
 import {register} from "../../services/auth.js";
+import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
 
 export default {
   name: "RegisterView",
   setup() {
     const networkStore = useNetworkStore();
-    return {networkStore};
+    const counterpartyStore = useCounterpartyStore();
+    return {networkStore, counterpartyStore};
   },
   data() {
     return {
@@ -53,10 +55,8 @@ export default {
         // Save JWT and select network
         if (data.token) {
           localStorage.setItem("auth-token", data.token);
-
-          const selected = this.networkStore.networks.find(n => n.id === this.form.networkId);
-          if (selected) this.networkStore.setNetwork(selected);
-
+          await this.counterpartyStore.fetchCounterparty();
+          this.networkStore.setNetwork(this.counterpartyStore.counterparty.networks[0]) // select network globally
           this.$router.push('/');
         }
       } catch (err) {

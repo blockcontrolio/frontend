@@ -5,6 +5,11 @@ import {useNetworkStore} from "../../js/stores/networkStore.js";
 
 export default {
   name: "LoginView",
+  setup() {
+    const networkStore = useNetworkStore();
+    const counterpartyStore = useCounterpartyStore();
+    return {networkStore, counterpartyStore};
+  },
   data() {
     return {
       credentials: {
@@ -16,8 +21,6 @@ export default {
   },
   methods: {
     async login() {
-      const store = useCounterpartyStore();
-      const networkStore = useNetworkStore();
       try {
         const response = await login(this.credentials);
         const contentType = response.headers.get("content-type") || "";
@@ -31,9 +34,9 @@ export default {
 
         if (data?.token) {
           localStorage.setItem("auth-token", data.token);
+          await this.counterpartyStore.fetchCounterparty();
+          this.networkStore.setNetwork(this.counterpartyStore.counterparty.networks[0]) // select network globally
           this.$router.push('/');
-          await store.fetchCounterparty();
-          networkStore.setNetwork(store.counterparty.networks[0]) // select network globally
         } else {
           this.error = "Token not received from server.";
         }
