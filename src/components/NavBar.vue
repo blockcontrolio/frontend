@@ -1,40 +1,40 @@
 <script>
-import {fetchCounterpartyInfo} from '../services/api.js';
-import {globalState} from "../js/globalState.js";
+import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
+import {resetAllStores} from "../js/stores/resetStores.js";
 
 export default {
   name: "NavBar",
-  data() {
-    return {
-      counterparty: {}
-    };
-  },
-  mounted() {
-    this.loadCounterparty();
+  setup() {
+    const store = useCounterpartyStore();
+    return {store};
   },
   computed: {
-    hasApiKey() {
-      return !!localStorage.getItem('x-api-key');
+    counterparty() {
+      return this.store.counterparty;
+    },
+  },
+  created() {
+    if (this.hasAuthToken()) {
+      this.store.fetchCounterparty();
     }
   },
   methods: {
+    hasAuthToken() {
+      return !!localStorage.getItem('auth-token');
+    },
     handleClick(e) {
-      if (!this.hasApiKey) {
+      if (!this.hasAuthToken()) {
         e.preventDefault();
-        this.$emit('missing-api-key'); // trigger parent handler
+        this.$emit('missing-jwt');
       }
     },
-    async loadCounterparty() {
-      const response = await fetchCounterpartyInfo();
-      this.counterparty = await response.json();
-      // Set global values
-      if (this.counterparty?.networks) {
-        globalState.chainId = this.counterparty.networks[0].chainId;
-        globalState.explorerUrl = this.counterparty.networks[0].explorerUrl;
-      }
+    logout() {
+      localStorage.removeItem("auth-token");
+      resetAllStores();
+      this.$router.push("/login");
     }
   },
-  emits: ['missing-api-key'],
+  emits: ['missing-jwt'],
 }
 </script>
 
@@ -45,11 +45,11 @@ export default {
       <h4>BlockControl</h4>
       <div>
         <router-link v-show="false" to="/">Dashboard</router-link>
-        <router-link :to="hasApiKey ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
-        <router-link :to="hasApiKey ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
-        <router-link :to="hasApiKey ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
-        <router-link :to="hasApiKey ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
-        <router-link to="/settings">Settings</router-link>
+        <router-link :to="hasAuthToken() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
+        <router-link :to="hasAuthToken() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
+        <router-link :to="hasAuthToken() ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
+        <router-link :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
+        <router-link v-show="false" to="/settings">Settings</router-link>
       </div>
     </nav>
 
@@ -60,6 +60,9 @@ export default {
 
       <div v-if="counterparty" class="counterparty-item">
         <div class="counterparty-header mb-2">
+          <button v-if="counterparty.name" class="btn text-info p-1" title="Logout" @click="logout">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
           <h5 v-if="counterparty.name" class="counterparty-name">{{ counterparty.name }}</h5>
           <h5 v-else class="text-danger">{{ 'Login Error' }}</h5>
           <span class="status-badge">

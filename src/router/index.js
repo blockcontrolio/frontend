@@ -6,6 +6,8 @@ import Tokens from '../pages/Tokens.vue'
 import Transactions from '../pages/Transactions.vue'
 import Settings from '../pages/Settings.vue'
 import AccountDetails from "../pages/AccountDetails.vue";
+import LoginView from "../pages/auth/LoginView.vue";
+import RegisterView from "../pages/auth/RegisterView.vue";
 
 const routes = [
     {
@@ -40,7 +42,14 @@ const routes = [
         component: () => import('../pages/AccountTransfers.vue'),
         props: true
     },
-    {path: '/settings', component: Settings}
+    {
+        path: '/login',
+        component: LoginView
+    },
+    {
+        path: '/register',
+        component: RegisterView
+    }
 ]
 
 export default createRouter({

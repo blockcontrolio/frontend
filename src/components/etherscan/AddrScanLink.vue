@@ -1,10 +1,18 @@
 <script>
-import {tokenLink, walletLink} from "../../js/utils.js";
+import {useExplorerUtils} from "../../js/composables/explorerUtils.js";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
 
 export default {
   name: "AddrScanLink",
   props: ['type', 'address'],
+  setup() {
+    const {tokenLink, walletLink} = useExplorerUtils();
+
+    return {
+      tokenLink,
+      walletLink
+    };
+  },
   methods: {
     isClipboardSupported,
     copyAddress(address) {
@@ -17,10 +25,10 @@ export default {
     buildLink() {
       switch (this.type) {
         case 'token' : {
-          return tokenLink(this.address);
+          return this.tokenLink(this.address);
         }
         case 'account' : {
-          return walletLink(this.address);
+          return this.walletLink(this.address);
         }
       }
     }

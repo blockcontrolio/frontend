@@ -4,12 +4,16 @@ function loadApiKey() {
     return localStorage.getItem('x-api-key') || '';
 }
 
+function loadAuthToken() {
+    return localStorage.getItem('auth-token') || '';
+}
+
 export async function importToken(payload) {
     return await fetch(`${apiBaseUrl}/tokens/import`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -20,7 +24,7 @@ export async function mintToken(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -31,7 +35,7 @@ export async function burnToken(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -42,7 +46,7 @@ export async function pause(tokenId, pauserAccountId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify({pauserAccountId})
     });
@@ -53,7 +57,7 @@ export async function unpause(tokenId, pauserAccountId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify({pauserAccountId})
     });
@@ -64,7 +68,7 @@ export async function freeze(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -75,7 +79,7 @@ export async function block(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -86,7 +90,7 @@ export async function unblock(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -97,7 +101,7 @@ export async function grantRole(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -108,7 +112,7 @@ export async function revokeRole(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': loadApiKey()
+            'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(payload)
     });
