@@ -1,7 +1,7 @@
-const apiBaseUrl = import.meta.env.VITE_AUTH_BASE || `${window.location.origin}`;
+const authBaseUrl = import.meta.env.VITE_AUTH_BASE || `${window.location.origin}/auth`;
 
 export async function login(credentials) {
-    return await fetch(`${apiBaseUrl}/login`, {
+    return await fetch(`${authBaseUrl}/login`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(credentials),
@@ -9,7 +9,7 @@ export async function login(credentials) {
 }
 
 export async function register(form) {
-    return await fetch(`${apiBaseUrl}/register`, {
+    return await fetch(`${authBaseUrl}/register`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(form),
