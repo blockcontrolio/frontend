@@ -1,21 +1,24 @@
 <script>
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
+import {useNetworkStore} from "../js/stores/networkStore.js";
 import {resetAllStores} from "../js/stores/resetStores.js";
 
 export default {
   name: "NavBar",
   setup() {
-    const store = useCounterpartyStore();
-    return {store};
+    const networkStore = useNetworkStore();
+    const counterpartyStore = useCounterpartyStore();
+    return {networkStore, counterpartyStore};
   },
   computed: {
     counterparty() {
-      return this.store.counterparty;
+      return this.counterpartyStore.counterparty;
     },
   },
   created() {
     if (this.hasAuthToken()) {
-      this.store.fetchCounterparty();
+      this.counterpartyStore.fetchCounterparty();
+      this.networkStore.setNetwork(this.counterpartyStore.counterparty.networks[0]) // select network globally on refresh
     }
   },
   methods: {
