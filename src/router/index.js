@@ -8,6 +8,7 @@ import Settings from '../pages/Settings.vue'
 import AccountDetails from "../pages/AccountDetails.vue";
 import LoginView from "../pages/auth/LoginView.vue";
 import RegisterView from "../pages/auth/RegisterView.vue";
+import Partnership from "../pages/Partnership.vue";
 
 const routes = [
     {
@@ -41,6 +42,10 @@ const routes = [
         name: 'Transfers',
         component: () => import('../pages/AccountTransfers.vue'),
         props: true
+    },
+    {
+        path: '/partnership',
+        component: Partnership
     },
     {
         path: '/login',
