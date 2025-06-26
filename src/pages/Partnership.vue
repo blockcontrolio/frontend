@@ -22,6 +22,16 @@ export default {
   },
   methods: {
     formatDate,
+    statusColor(status) {
+      switch (status) {
+        case 'ACCEPTED':
+          return 'text-success';
+        case 'REJECTED':
+          return 'text-danger';
+        default:
+          return 'text-light';
+      }
+    },
     async fetchPartnership(networkId) {
       const res = await fetchPartnership(networkId);
       const partnershipsRaw = await res.json();
@@ -95,7 +105,9 @@ export default {
 
             <!-- Status -->
             <div class="col-2 text-center">
-              <span v-if="p.status" class="text-light">{{ p.status }}</span>
+              <span v-if="p.status" :class="statusColor(p.status)">
+                {{ p.status }}
+              </span>
             </div>
 
             <!-- Requested At -->
@@ -117,7 +129,7 @@ export default {
 
               <button
                   v-else-if="p.ownPendingRequest"
-                  class="btn btn-outline-warning btn-sm"
+                  class="btn btn-outline-light btn-sm"
                   @click="declinePartnership(p.targetCounterpartyId)"
               >
                 Decline Request
