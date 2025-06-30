@@ -5,7 +5,7 @@ function loadAuthToken() {
 }
 
 export async function fetchPartnership(networkId) {
-    return await fetch(`${apiBaseUrl}/partnership?networkId=${networkId}`, {
+    return await fetch(`${apiBaseUrl}/partnerships?networkId=${networkId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -16,7 +16,7 @@ export async function fetchPartnership(networkId) {
 }
 
 export async function requestPartnership(targetCounterpartyId) {
-    return await fetch(`${apiBaseUrl}/partnership/requests`, {
+    return await fetch(`${apiBaseUrl}/partnerships`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -26,35 +26,32 @@ export async function requestPartnership(targetCounterpartyId) {
     });
 }
 
-export async function declinePartnership(targetCounterpartyId) {
-    return await fetch(`${apiBaseUrl}/partnership/requests`, {
+export async function declinePartnership(relationId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${relationId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
-        body: JSON.stringify({targetCounterpartyId})
     });
 }
 
 export async function acceptRequest(relationId) {
-    return await fetch(`${apiBaseUrl}/partnership/accept`, {
+    return await fetch(`${apiBaseUrl}/partnerships/${relationId}/accept`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
-        body: JSON.stringify({relationId})
     });
 }
 
 export async function rejectRequest(relationId) {
-    return await fetch(`${apiBaseUrl}/partnership/reject`, {
+    return await fetch(`${apiBaseUrl}/partnerships/${relationId}/reject`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
-        body: JSON.stringify({relationId})
     });
 }

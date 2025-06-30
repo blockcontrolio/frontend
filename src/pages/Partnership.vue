@@ -5,7 +5,8 @@ import {
   fetchPartnership,
   requestPartnership,
   acceptRequest,
-  rejectRequest, declinePartnership
+  rejectRequest,
+  declinePartnership
 } from "../services/partnership.js";
 import {formatDate} from "../js/utils.js";
 
@@ -35,46 +36,61 @@ export default {
     async fetchPartnership(networkId) {
       const res = await fetchPartnership(networkId);
       const partnershipsRaw = await res.json();
-      const sourceCounterpartyId = useCounterpartyStore().counterparty.internalId;
+      const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
       this.partnerships = partnershipsRaw.map(p => ({
         ...p,
-        hasNoRelation: !!!p.status,
-        ownPendingRequest: p.sourceCounterpartyId === sourceCounterpartyId && p.status === 'PENDING',
-        actionRequired: p.relationId && p.status === 'PENDING'
+        hasNoRelation: !!!p.relationId,
+        ownPendingRequest: p.sourceCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING',
+        actionRequired: p.targetCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING'
       }));
     },
     async sendRequest(targetCounterpartyId) {
       const response = await requestPartnership(targetCounterpartyId);
       // mark as own request
       if (response.ok) {
+        const partnershipRaw = await response.json();
         const item = this.partnerships.find(p => p.targetCounterpartyId === targetCounterpartyId);
         if (item) {
+          item.relationId = partnershipRaw.relationId;
+          item.status = partnershipRaw.status;
+          item.requestedAt = partnershipRaw.requestedAt;
           item.ownPendingRequest = true;
           item.hasNoRelation = false;
         }
       }
     },
-    async declinePartnership(targetCounterpartyId) {
-      const response = await declinePartnership(targetCounterpartyId);
+    async declinePartnership(relationId) {
+      const response = await declinePartnership(relationId);
       // mark as own request
       if (response.ok) {
-        const item = this.partnerships.find(p => p.targetCounterpartyId === targetCounterpartyId);
+        const item = this.partnerships.find(p => p.relationId === relationId);
         if (item) {
+          item.relationId = null;
+          item.status = null;
+          item.requestedAt = null;
           item.ownPendingRequest = false;
           item.hasNoRelation = true;
         }
       }
     },
-    async acceptRequest(requestId) {
-      const response = await acceptRequest(requestId);
+    async acceptRequest(relationId) {
+      const response = await acceptRequest(relationId);
       if (response.ok) {
-        this.pendingRequests = this.pendingRequests.filter(r => r.internalId !== requestId);
+        const item = this.partnerships.find(p => p.relationId === relationId);
+        if (item) {
+          item.status = 'ACCEPTED';
+          item.actionRequired = false;
+        }
       }
     },
-    async rejectRequest(requestId) {
-      const response = await rejectRequest(requestId);
+    async rejectRequest(relationId) {
+      const response = await rejectRequest(relationId);
       if (response.ok) {
-        this.pendingRequests = this.pendingRequests.filter(r => r.internalId !== requestId);
+        const item = this.partnerships.find(p => p.relationId === relationId);
+        if (item) {
+          item.status = 'REJECTED';
+          item.actionRequired = false;
+        }
       }
     }
   },
@@ -112,9 +128,16 @@ export default {
 
             <!-- Requested At -->
             <div class="col-3 text-center">
-              <span v-if="p.requestedAt" class="text-light">
+              <span v-if="p.status === 'PENDING'" class="text-light">
                 Requested: {{ formatDate(p.requestedAt) }}
               </span>
+              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="text-light">
+                Accepted: {{ formatDate(p.resolvedAt) }}
+              </span>
+              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="text-light">
+                Rejected: {{ formatDate(p.resolvedAt) }}
+              </span>
+
             </div>
 
             <!-- Action Buttons -->
@@ -130,7 +153,7 @@ export default {
               <button
                   v-else-if="p.ownPendingRequest"
                   class="btn btn-outline-light btn-sm"
-                  @click="declinePartnership(p.targetCounterpartyId)"
+                  @click="declinePartnership(p.relationId)"
               >
                 Decline Request
               </button>
