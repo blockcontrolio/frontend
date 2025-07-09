@@ -39,7 +39,7 @@ export default {
       const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
       this.partnerships = partnershipsRaw.map(p => ({
         ...p,
-        hasNoRelation: !!!p.relationId,
+        hasRelation: p.relationId !== null,
         ownPendingRequest: p.sourceCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING',
         actionRequired: p.targetCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING'
       }));
@@ -55,7 +55,7 @@ export default {
           item.status = partnershipRaw.status;
           item.requestedAt = partnershipRaw.requestedAt;
           item.ownPendingRequest = true;
-          item.hasNoRelation = false;
+          item.hasRelation = true;
         }
       }
     },
@@ -69,7 +69,7 @@ export default {
           item.status = null;
           item.requestedAt = null;
           item.ownPendingRequest = false;
-          item.hasNoRelation = true;
+          item.hasRelation = false;
         }
       }
     },
@@ -143,7 +143,7 @@ export default {
             <!-- Action Buttons -->
             <div class="col-4 text-end">
               <button
-                  v-if="p.hasNoRelation"
+                  v-if="p.hasRelation === false"
                   class="btn btn-outline-info btn-sm"
                   @click="sendRequest(p.targetCounterpartyId)"
               >
