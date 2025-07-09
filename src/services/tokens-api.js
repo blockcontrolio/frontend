@@ -1,9 +1,5 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
 
-function loadApiKey() {
-    return localStorage.getItem('x-api-key') || '';
-}
-
 function loadAuthToken() {
     return localStorage.getItem('auth-token') || '';
 }

@@ -15,12 +15,19 @@ export async function fetchNetworks() {
 }
 
 export async function fetchCounterpartyInfo() {
-    return await fetch(`${apiBaseUrl}/counterparties`, {
+    const response = fetch(`${apiBaseUrl}/counterparties`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         }
-    }).catch(err => {
+    });
+    // Global 403 handling
+    if (response.status === 403) {
+        localStorage.removeItem('auth-token');
+        window.location.href = '/login';
+        throw new Error('Session expired. Redirecting to login.');
+    }
+    return await response.catch(err => {
         console.error('Failed to load counterparties info', err);
     });
 }
