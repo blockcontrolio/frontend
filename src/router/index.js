@@ -4,7 +4,6 @@ import Transfer from '../pages/Transfer.vue'
 import Accounts from '../pages/Accounts.vue'
 import Tokens from '../pages/Tokens.vue'
 import Transactions from '../pages/Transactions.vue'
-import Settings from '../pages/Settings.vue'
 import AccountDetails from "../pages/AccountDetails.vue";
 import LoginView from "../pages/auth/LoginView.vue";
 import RegisterView from "../pages/auth/RegisterView.vue";
