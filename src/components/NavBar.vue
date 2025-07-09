@@ -50,8 +50,8 @@ export default {
         <router-link v-show="false" to="/">Dashboard</router-link>
         <router-link :to="hasAuthToken() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
         <router-link :to="hasAuthToken() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
-        <router-link :to="hasAuthToken() ? '/partnership' : ''" @click.prevent="handleClick">Partnership</router-link>
         <router-link :to="hasAuthToken() ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
+        <router-link :to="hasAuthToken() ? '/partnership' : ''" @click.prevent="handleClick">Partnership</router-link>
         <router-link :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
         <router-link v-show="false" to="/settings">Settings</router-link>
       </div>

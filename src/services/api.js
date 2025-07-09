@@ -25,17 +25,6 @@ export async function fetchCounterpartyInfo() {
     });
 }
 
-export async function fetchOtherCounterparties(networkId) {
-    return await fetch(`${apiBaseUrl}/partnerships/counterparties?networkId=${networkId}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
-        }
-    }).catch(err => {
-        console.error('Failed to load other counterparties for partnership', err);
-    });
-}
-
 export async function fetchAccounts() {
     return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
