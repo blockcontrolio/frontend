@@ -23,7 +23,7 @@ export default {
   methods: {
     formatAmount,
     async fetchBalances(accountId) {
-      let res = await fetchBalances(accountId);
+      let res = await fetchBalances(accountId, this.tokenId);
       let allBalances = await res.json();
       this.accountBalance = allBalances.find(balance => {
         return balance.id === this.tokenId;

@@ -89,8 +89,8 @@ export async function updateAccount(id, accountInfo) {
     });
 }
 
-export async function fetchBalances(accountId) {
-    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances`, {
+export async function fetchBalances(accountId, tokenId) {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances?tokenId=${tokenId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
