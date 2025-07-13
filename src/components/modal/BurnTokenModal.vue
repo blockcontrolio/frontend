@@ -1,5 +1,7 @@
 <script>
 import {validateAmount} from "../../js/validations.js";
+import {formatAmount} from "../../js/utils.js";
+import {fetchAssetBalance} from "../../services/api.js";
 
 export default {
   props: {
@@ -12,12 +14,18 @@ export default {
         redemptionAccountId: '',
         amount: 0
       },
+      accountBalance: null,
       errors: {
         amount: ''
       },
     };
   },
   methods: {
+    formatAmount,
+    async fetchBalance(accountId) {
+      let res = await fetchAssetBalance(accountId, this.tokenId);
+      this.accountBalance = await res.json();
+    },
     validateAmount() {
       this.errors.amount = validateAmount(this.form.amount)
     },
@@ -54,12 +62,17 @@ export default {
           <!-- Redemption Account -->
           <div class="mb-3">
             <label class="form-label">Redemption Account</label>
-            <select v-model="form.redemptionAccountId" class="form-select bg-dark border-danger" required>
+            <select v-model="form.redemptionAccountId" class="form-select bg-dark border-danger" required
+                    v-on:change="this.fetchBalance(form.redemptionAccountId)">
               <option disabled value="">-- select account --</option>
               <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
               </option>
             </select>
+            <!-- acc balance preview -->
+            <div v-if="form.redemptionAccountId && accountBalance" class="mt-1 balance">
+              <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(accountBalance.amount) }} {{ accountBalance.symbol }}</span>
+            </div>
           </div>
 
           <!-- Amount -->

@@ -1,6 +1,6 @@
 <script>
 import {formatAmount, formatDate} from "../js/utils.js";
-import {fetchAccount, fetchBalances, updateAccount} from "../services/api.js";
+import {fetchAccount, fetchAssetBalances, updateAccount} from "../services/api.js";
 
 export default {
   data() {
@@ -26,7 +26,7 @@ export default {
       this.account = await res.json();
     },
     async fetchBalances(id) {
-      let res = await fetchBalances(id);
+      let res = await fetchAssetBalances(id);
       this.balances = await res.json();
     },
     async updateAccount() {
