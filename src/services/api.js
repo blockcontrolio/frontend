@@ -89,8 +89,19 @@ export async function updateAccount(id, accountInfo) {
     });
 }
 
-export async function fetchBalances(accountId, tokenId) {
-    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances?tokenId=${tokenId}`, {
+export async function fetchAssetBalances(accountId) {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/asset-balances`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+    }).catch(err => {
+        console.error('Failed to load account asset balances', err);
+    });
+}
+
+export async function fetchAssetBalance(accountId, assetId) {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/asset-balances/${assetId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`

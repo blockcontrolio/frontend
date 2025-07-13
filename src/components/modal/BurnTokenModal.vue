@@ -1,7 +1,7 @@
 <script>
 import {validateAmount} from "../../js/validations.js";
 import {formatAmount} from "../../js/utils.js";
-import {fetchBalances} from "../../services/api.js";
+import {fetchAssetBalance} from "../../services/api.js";
 
 export default {
   props: {
@@ -22,12 +22,9 @@ export default {
   },
   methods: {
     formatAmount,
-    async fetchBalances(accountId) {
-      let res = await fetchBalances(accountId, this.tokenId);
-      let allBalances = await res.json();
-      this.accountBalance = allBalances.find(balance => {
-        return balance.id === this.tokenId;
-      });
+    async fetchBalance(accountId) {
+      let res = await fetchAssetBalance(accountId, this.tokenId);
+      this.accountBalance = await res.json();
     },
     validateAmount() {
       this.errors.amount = validateAmount(this.form.amount)
@@ -66,7 +63,7 @@ export default {
           <div class="mb-3">
             <label class="form-label">Redemption Account</label>
             <select v-model="form.redemptionAccountId" class="form-select bg-dark border-danger" required
-                    v-on:change="this.fetchBalances(form.redemptionAccountId)">
+                    v-on:change="this.fetchBalance(form.redemptionAccountId)">
               <option disabled value="">-- select account --</option>
               <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}

@@ -1,7 +1,7 @@
 <script>
 import {
   fetchAccounts,
-  fetchBalances,
+  fetchAssetBalances,
   fetchTokens,
   sendExternalWithdrawal,
   sendInternalTransfer
@@ -67,7 +67,7 @@ export default {
       this.accounts = await res.json();
     },
     async fetchBalances(accountId) {
-      let res = await fetchBalances(accountId);
+      let res = await fetchAssetBalances(accountId);
       this.accountBalances = await res.json();
     },
     showBalance(assetId) {
