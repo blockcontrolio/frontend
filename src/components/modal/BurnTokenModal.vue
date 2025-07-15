@@ -53,7 +53,7 @@ export default {
 <template>
   <div class="modal fade show d-block" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
-      <form class="modal-content bg-dark text-white border border-danger" @submit.prevent="submit">
+      <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">Burn Token</h5>
           <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
@@ -62,7 +62,7 @@ export default {
           <!-- Redemption Account -->
           <div class="mb-3">
             <label class="form-label">Redemption Account</label>
-            <select v-model="form.redemptionAccountId" class="form-select bg-dark border-danger" required
+            <select v-model="form.redemptionAccountId" class="form-select" required
                     v-on:change="this.fetchBalance(form.redemptionAccountId)">
               <option disabled value="">-- select account --</option>
               <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
@@ -71,14 +71,14 @@ export default {
             </select>
             <!-- acc balance preview -->
             <div v-if="form.redemptionAccountId && accountBalance" class="mt-1 balance">
-              <span class="text-info small label">Balance:</span> <span class="value">{{ formatAmount(accountBalance.amount) }} {{ accountBalance.symbol }}</span>
+              <span class="small label">Balance:</span> <span class="value">{{ formatAmount(accountBalance.amount) }} {{ accountBalance.symbol }}</span>
             </div>
           </div>
 
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount</label>
-            <input type="number" class="form-control bg-dark border-danger no-spinner text-white"
+            <input type="number" class="form-control no-spinner"
                    v-model.number="form.amount"
                    inputmode="numeric"
                    pattern="\d*"
@@ -91,8 +91,8 @@ export default {
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary px-4" @click="$emit('close')">Cancel</button>
-          <button class="btn btn-outline-danger px-4" type="submit">Burn</button>
+          <button class="btn btn-outline-secondary btn-sm px-4" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-outline-danger btn-sm px-4" type="submit">Burn</button>
         </div>
       </form>
     </div>
@@ -101,8 +101,5 @@ export default {
 </template>
 
 <style scoped>
-input::placeholder,
-select {
-  color: #ccc;
-}
+
 </style>

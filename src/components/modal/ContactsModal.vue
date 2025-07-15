@@ -20,9 +20,9 @@ export default {
   <div
       class="modal-backdrop d-flex align-items-center justify-content-center"
       v-if="visible">
-    <div class="modal-content-custom text-white border border-info p-3">
-      <div class="modal-header border-bottom border-info">
-        <h5 class="modal-title text-info">Demo Credentials Required</h5>
+    <div class="modal-content-custom border p-3">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title">Demo Credentials Required</h5>
       </div>
       <div class="modal-body">
         <p class="my-3">
@@ -37,19 +37,19 @@ export default {
         <ul class="list-unstyled">
           <li>
             <strong class="me-1">Email:</strong>
-            <a href="mailto:blockcontrolio@gmail.com" class="text-info">blockcontrolio@gmail.com</a>
+            <a href="mailto:blockcontrolio@gmail.com" class="">blockcontrolio@gmail.com</a>
           </li>
           <li>
             <strong class="me-1">Telegram:</strong>
-            <a href="https://t.me/web3yurii" target="_blank" class="text-info">@web3yurii</a>
+            <a href="https://t.me/web3yurii" target="_blank" class="">@web3yurii</a>
           </li>
         </ul>
       </div>
-      <div class="modal-footer border-top border-info pt-3 gap-3">
-        <button class="btn btn-outline-info" @click="proceedOnboarding">
+      <div class="modal-footer border-top pt-3 gap-3">
+        <button class="btn btn-outline-primary btn-sm" @click="proceedOnboarding">
           Onboarding
         </button>
-        <button class="btn btn-outline-info" @click="goToLogin">
+        <button class="btn btn-outline-primary btn-sm" @click="goToLogin">
           Go to Login
         </button>
       </div>
@@ -65,12 +65,12 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom right, #000000ee, #0a0a0aee);
+  background: var(--color-bg-body);
   backdrop-filter: blur(4px);
 }
 
 .modal-content-custom {
-  background-color: #111;
+  background: var(--color-bg-body);
   border-radius: 8px;
   width: 90%;
   max-width: 600px;

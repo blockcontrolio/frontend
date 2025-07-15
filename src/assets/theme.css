@@ -1,56 +1,69 @@
+:root {
+    /* Core brand colors */
+    --color-primary: #0d6efd;
+    --color-primary-hover: #0b5ed7;
+
+    /* Backgrounds */
+    --color-bg-body: #f8f9fb;
+    --color-bg-sidebar: #ffffff;
+    --color-bg-card: #ffffff;
+    --color-bg-table-header: #e9ecef;
+    --color-bg-table: #ffffff;
+
+    /* Borders */
+    --color-border: #dee2e6;
+
+    /* Text */
+    --color-text-main: #212529;
+    --color-text-light: #495057;
+
+    /* Shadows */
+    --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
 body {
-    background: linear-gradient(to bottom, #0a0f1a, #000);
-    color: #e0f8ff;
-    font-family: 'Orbitron', sans-serif;
+    height: 100vh;
+    background: var(--color-bg-body);
+    color: var(--color-text-main);
+    font-family: 'Inter', sans-serif;
 }
 
 .sidebar {
-    background-color: #111;
-    border-right: 1px solid #2af2ff33;
+    background-color: var(--color-bg-sidebar);
+    border-right: 1px solid var(--color-border);
     height: 100vh;
+    width: 245px;
     padding: 1rem;
-    box-shadow: 0 0 20px #2af2ff33;
+    box-shadow: var(--shadow-light);
 }
 
 .sidebar a {
-    color: #2af2ff;
+    color: var(--color-primary);
     display: block;
     margin: 1rem 0;
     text-decoration: none;
+    font-weight: 500;
 }
 
-.card-glow {
-    background-color: #111;
-    border: 1px solid #2af2ff22;
-    color: white;
+.sidebar a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
 }
 
 .table-glow thead {
-    background-color: #111a2b; /* solid dark navy */
-    color: #ffffff; /* pure white text */
-    border: 2px solid #2af2ff66;
-}
-
-.table-glow thead th {
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    border-color: #2af2ff33;
+    background-color: var(--color-bg-table-header);
+    color: var(--color-text-main);
+    border-bottom: 2px solid var(--color-border);
 }
 
 .table-glow {
-    border: 1px solid #2af2ff33;
-    box-shadow: 0 0 12px #2af2ff55;
-    background-color: #0a0f1a !important;
-    color: #e0f8ff;
+    background-color: var(--color-bg-table);
+    color: var(--color-text-main);
 }
 
-.table-glow thead {
-    background-color: #2af2ff11;
-    color: #2af2ff;
-}
-
-.table-glow th, .table-glow td {
-    border-color: #2af2ff22 !important;
+.table-glow th,
+.table-glow td {
+    border-color: var(--color-border) !important;
 }
 
 .mono {
@@ -68,4 +81,19 @@ input[type=number].no-spinner::-webkit-outer-spin-button,
 input[type=number].no-spinner::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+input::placeholder,
+select {
+    color: var(--color-text-light);
+}
+
+input.form-control {
+    color: var(--color-text-main);
+    border-color: var(--color-border);
+}
+
+input.form-control:focus {
+    border-color: var(--color-border);
+    box-shadow: 0 0 0 0.2rem var(--shadow-light);
 }

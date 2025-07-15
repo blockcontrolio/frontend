@@ -45,7 +45,7 @@ export default {
       style="z-index: 1055"
       v-if="visible">
     <div
-        class="align-items-center text-white"
+        class="align-items-center"
         style="min-width: fit-content; max-width: none; white-space: nowrap;">
       <div class="alert custom-error-alert d-flex justify-content-between align-items-center m-0">
         <!-- ❌ Error -->

@@ -24,10 +24,11 @@ export default {
 </script>
 
 <template>
-  <div class="container py-4">
-    <h3 class="text-info mb-4">Recent Transaction</h3>
 
-    <div v-if="transactions.length === 0" class="text-white text-center">
+  <h3 class="bold p-2 pt-3">Recent Transaction</h3>
+
+  <div class="p-2 mt-3">
+    <div v-if="transactions.length === 0" class="text-center">
       No transactions yet.
     </div>
 
@@ -81,11 +82,11 @@ export default {
 }
 
 .transaction-item {
-  background: rgba(0, 255, 255, 0.05);
-  border: 1px solid #00ffff55;
+  background: var(--color-bg-body);;
+  border: 1px solid var(--color-border);;
   border-radius: 6px;
   padding: 12px 16px;
-  color: #b0fdfd;
+  color: var(--color-text-main);
 }
 
 .tx-line {
@@ -95,12 +96,10 @@ export default {
 }
 
 .label {
-  color: white;
   font-weight: bold;
 }
 
 .value {
-  color: #ffffff;
   text-align: right;
   margin-left: 1rem;
 }

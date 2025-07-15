@@ -64,7 +64,7 @@ export default {
 
       <div v-if="counterparty" class="counterparty-item">
         <div class="counterparty-header mb-2">
-          <button v-if="counterparty.name" class="btn text-info p-1" title="Logout" @click="logout">
+          <button v-if="counterparty.name" class="btn p-1" title="Logout" @click="logout">
             <i class="bi bi-box-arrow-right"></i>
           </button>
           <h5 v-if="counterparty.name" class="counterparty-name">{{ counterparty.name }}</h5>
@@ -96,8 +96,7 @@ export default {
 <style scoped>
 
 .counterparty-item {
-  background-color: #1c1c1e;
-  color: #e5e5e5;
+  background: var(--color-bg-body);
   padding: 1rem;
   border-radius: 10px;
 }
@@ -108,12 +107,7 @@ export default {
 }
 
 .status-badge i {
-  color: #00ffff;
   animation: pulse 2s infinite;
-}
-
-.network-info a {
-  color: #00ffff;
 }
 
 .sidebar-divider {

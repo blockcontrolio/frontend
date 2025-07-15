@@ -42,7 +42,7 @@ export default {
        rel="noopener noreferrer">
       {{ this.address }}
     </a>
-    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
+    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer"
        @click="copyAddress(this.address)"
        title="Copy to clipboard">
     </i>

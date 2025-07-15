@@ -30,7 +30,7 @@ export default {
     <a class="ether-scan-link" :href="etherScanLink(this.hash)" target="_blank" rel="noopener noreferrer">
       <code>{{ this.hash }}</code>
     </a>
-    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer text-info"
+    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer"
        @click="copyHash(this.hash)"
        title="Copy to clipboard">
     </i>

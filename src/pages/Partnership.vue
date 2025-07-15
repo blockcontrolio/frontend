@@ -30,7 +30,7 @@ export default {
         case 'REJECTED':
           return 'text-danger';
         default:
-          return 'text-light';
+          return 'text-warning';
       }
     },
     async fetchPartnership(networkId) {
@@ -102,8 +102,8 @@ export default {
 </script>
 
 <template>
-  <h3 class="p-2">Partnership Management</h3>
-  <div class="container">
+  <h3 class="p-2 pt-3">Partnership Management</h3>
+  <div class="container mt-3">
 
     <div class="row g-3">
       <div
@@ -111,7 +111,7 @@ export default {
           :key="p.targetCounterpartyId"
           class="col-12"
       >
-        <div class="card bg-dark text-white border border-info shadow-sm p-3">
+        <div class="card border shadow-sm p-3">
           <div class="row align-items-center">
 
             <!-- Counterparty Name -->
@@ -128,13 +128,13 @@ export default {
 
             <!-- Requested At -->
             <div class="col-3 text-center">
-              <span v-if="p.status === 'PENDING'" class="text-light">
+              <span v-if="p.status === 'PENDING'" class="">
                 Requested: {{ formatDate(p.requestedAt) }}
               </span>
-              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="text-light">
+              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
                 Accepted: {{ formatDate(p.resolvedAt) }}
               </span>
-              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="text-light">
+              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
                 Rejected: {{ formatDate(p.resolvedAt) }}
               </span>
 
@@ -144,7 +144,7 @@ export default {
             <div class="col-4 text-end">
               <button
                   v-if="p.hasRelation === false"
-                  class="btn btn-outline-info btn-sm"
+                  class="btn btn-outline-primary btn-sm"
                   @click="sendRequest(p.targetCounterpartyId)"
               >
                 Request Partnership
@@ -152,7 +152,7 @@ export default {
 
               <button
                   v-else-if="p.ownPendingRequest"
-                  class="btn btn-outline-light btn-sm"
+                  class="btn btn-outline-danger btn-sm"
                   @click="declinePartnership(p.relationId)"
               >
                 Decline Request

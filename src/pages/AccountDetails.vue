@@ -44,12 +44,12 @@ export default {
 </script>
 
 <template>
+  <h5 class="bold p-2">Account details: {{ account?.id }}</h5>
 
-  <div class="container-fluid px-4">
-    <h5 class="">Account details: {{ account?.id }}</h5>
+  <div class="container">
     <!-- return to accounts list button -->
     <button
-        class="btn btn-outline-secondary my-5"
+        class="btn btn-dark btn-sm my-3"
         @click="goBack"
     >
       Return to List
@@ -65,7 +65,7 @@ export default {
         <div class="col-4"><strong>Name:</strong></div>
         <div class="col-8">
           <input v-model="account.name"
-                 class="form-control bg-dark text-white border-info mb-2"/>
+                 class="form-control mb-2" disabled/>
         </div>
       </div>
 
@@ -76,10 +76,10 @@ export default {
             <div
                 v-for="token in this.balances"
                 :key="token.id"
-                class="d-flex justify-content-between align-items-center border-bottom border-info py-1"
+                class="d-flex justify-content-between align-items-center border-bottom py-1"
             >
-              <span class="text-white">{{ token.name }} ({{ token.symbol }})</span>
-              <span class="text-info mono">{{ formatAmount(token.amount) }}</span>
+              <span class="">{{ token.name }} ({{ token.symbol }})</span>
+              <span class="mono">{{ formatAmount(token.amount) }}</span>
             </div>
           </div>
           <div v-else class="text-muted">No token balances</div>
@@ -92,7 +92,7 @@ export default {
 
       <div class="d-flex justify-content-end mt-4">
         <button
-            class="btn btn-primary"
+            class="btn btn-outline-primary btn-sm"
             :disabled="true"
             @click="updateAccount"
         >
