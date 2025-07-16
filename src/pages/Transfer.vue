@@ -204,7 +204,7 @@ export default {
   </div>
 
   <div v-if="selectedForm === 'internal'" class="d-flex justify-content-center mt-5">
-    <form @submit.prevent="submitInternalTransfer" class="transfer-form p-4 rounded shadow">
+    <form @submit.prevent="submitInternalTransfer" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Transfer between Accounts</h3>
 
       <!-- Source Account -->
@@ -284,7 +284,7 @@ export default {
   </div>
 
   <div v-else-if="selectedForm === 'external'" class="d-flex justify-content-center mt-5">
-    <form @submit.prevent="submitExternalWithdrawal" class="transfer-form p-4 rounded shadow">
+    <form @submit.prevent="submitExternalWithdrawal" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Withdraw to external Address</h3>
 
       <div class="mb-3">

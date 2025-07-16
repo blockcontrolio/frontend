@@ -308,7 +308,7 @@ export default {
     <!-- Token Cards -->
     <div v-if="tokens && tokens.length > 0" class="row mt-4 g-3">
       <div v-for="token in tokens" :key="token.id">
-        <div v-if="token.symbol !== 'ETH'" class="card border shadow-sm p-3">
+        <div v-if="token.symbol !== 'ETH'" class="card border p-3">
           <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex flex-column">
               <div class="mb-1">

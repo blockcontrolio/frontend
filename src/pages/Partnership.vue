@@ -111,7 +111,7 @@ export default {
           :key="p.targetCounterpartyId"
           class="col-12"
       >
-        <div class="card border shadow-sm p-3">
+        <div class="card border p-3">
           <div class="row align-items-center">
 
             <!-- Counterparty Name -->

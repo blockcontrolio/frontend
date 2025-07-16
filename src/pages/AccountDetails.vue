@@ -54,7 +54,7 @@ export default {
     >
       Return to List
     </button>
-    <div v-if="account" class="card card-glow p-3 mt-3">
+    <div v-if="account" class="card p-3 mt-3">
       <div class="row mb-2">
         <div class="col-4"><strong>Ref:</strong></div>
         <div class="col-8">{{ account.ref }}</div>

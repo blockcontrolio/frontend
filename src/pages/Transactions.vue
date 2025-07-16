@@ -33,7 +33,7 @@ export default {
     </div>
 
     <ul class="transaction-list">
-      <li v-for="tx in transactions" :key="tx.internalId" class="transaction-item">
+      <li v-for="tx in transactions" :key="tx.internalId" class="card border p-3">
         <div class="tx-line">
           <span class="label">Type:</span>
           <span class="value">
@@ -79,14 +79,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.transaction-item {
-  background: var(--color-bg-body);;
-  border: 1px solid var(--color-border);;
-  border-radius: 6px;
-  padding: 12px 16px;
-  color: var(--color-text-main);
 }
 
 .tx-line {
