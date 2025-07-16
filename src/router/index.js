@@ -12,7 +12,7 @@ import Partnership from "../pages/Partnership.vue";
 const routes = [
     {
         path: '/',
-        redirect: '/accounts' // default route
+        redirect: '/tokens' // default route
     },
     {
         path: '/transfer',

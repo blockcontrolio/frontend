@@ -48,9 +48,9 @@ export default {
       <h4>BlockControl</h4>
       <div>
         <router-link v-if="false" to="/">Dashboard</router-link>
-        <router-link class="nav-link" :to="hasAuthToken() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
-        <router-link class="nav-link" :to="hasAuthToken() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
+        <router-link class="nav-link" :to="hasAuthToken() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
+        <router-link class="nav-link" :to="hasAuthToken() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/partnership' : ''" @click.prevent="handleClick">Partnership</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
         <router-link v-if="false" to="/settings">Settings</router-link>
