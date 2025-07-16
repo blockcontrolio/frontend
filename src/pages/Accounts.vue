@@ -135,7 +135,7 @@ export default {
     </div>
 
     <div v-if="accounts && accounts.length > 0" class="pt-3">
-      <table class="table table-hover table-bordered table-glow">
+      <table class="table table-bordered">
         <thead>
         <tr>
           <th scope="col">Account ID</th>
@@ -143,7 +143,7 @@ export default {
           <th scope="col">Ref</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
-          <th scope="col">Created</th>
+          <th scope="col">Create Time</th>
           <th scope="col" class="text-center">Status</th>
           <th scope="col" style="width: 100px;">Recent Transfers</th>
         </tr>

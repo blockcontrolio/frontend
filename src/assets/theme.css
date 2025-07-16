@@ -14,6 +14,11 @@
     --color-text-light: #555555;
 
     --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+    --text-color: #333;
+
+    --table-bg: #ffffff;
+    --table-border-color: #dfe3e8;
 }
 
 body {
@@ -110,4 +115,34 @@ input.form-control {
 input.form-control:focus {
     border-color: var(--color-border);
     box-shadow: 0 0 0 0.2rem var(--shadow-light);
+}
+
+/* global table style overrides */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+table thead {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+table thead th {
+    padding: 0.75rem;
+    border-bottom: 2px solid var(--table-border-color);
+}
+
+table tbody td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--table-border-color);
+}
+
+table tr:last-child td {
+    border-bottom: none;
 }

@@ -45,14 +45,14 @@ export default {
     >
       Return to List
     </button>
-    <table class="table table-hover table-bordered table-glow mt-4">
-      <thead class="" style="background-color: #1a1f2b;">
+    <table class="table table-bordered mt-4">
+      <thead class="">
       <tr>
         <th scope="col">To</th>
         <th scope="col">Amount</th>
         <th scope="col" class="text-center">Status</th>
         <th scope="col">Tx Hash</th>
-        <th scope="col">Created</th>
+        <th scope="col">Create Time</th>
       </tr>
       </thead>
       <tbody>
