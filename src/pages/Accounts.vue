@@ -61,6 +61,10 @@ export default {
     },
     resetError() {
       this.errors.ref = null;
+    },
+    findMasterAccName(paymasterId) {
+      return this.accounts.find(acc => acc.id === paymasterId)
+          ?.name;
     }
   },
   mounted() {
@@ -181,11 +185,9 @@ export default {
         <tr>
           <th scope="col">Account ID</th>
           <th scope="col">Name</th>
-          <th scope="col">Ref</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
-          <th scope="col">Create Time</th>
-          <th scope="col" class="text-center">Status</th>
+          <th scope="col">Wallet Type</th>
           <th scope="col" style="width: 100px;">Recent Transfers</th>
         </tr>
         </thead>
@@ -198,14 +200,13 @@ export default {
             </router-link>
           </td>
           <td>{{ acc.name || '(Unnamed)' }}</td>
-          <td>{{ acc.ref }}</td>
           <td>{{ acc.type }}</td>
           <td>
             <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
           </td>
-          <td>{{ formatDate(acc.createTime) }}</td>
-          <td class="text-center">
-            <span class="badge bg-success">Active</span>
+          <td>
+            {{ acc.walletType }}
+            <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>
           <td>
             <router-link :to="{ name: 'Transfers', params: { accountId: acc.id } }"
