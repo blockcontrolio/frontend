@@ -20,6 +20,9 @@ if (token && isJwtExpired(token)) {
     window.location.href = '/login';
 }
 
-await initStores(); // initialize network, auth, etc
-
-app.mount('#app')
+// Wrap await in async function
+// Fixes older browser support. ERROR: Top-level await is not available
+(async () => {
+    await initStores(); // initialize counterparty, selected network, etc
+    app.mount('#app');
+})();
