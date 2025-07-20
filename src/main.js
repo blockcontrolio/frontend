@@ -4,6 +4,7 @@ import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './assets/theme.css'
 import router from './router'
+import {initStores} from './js/stores/initStores.js';
 import {isJwtExpired} from "./services/auth.js";
 
 const app = createApp(App);
@@ -18,5 +19,7 @@ if (token && isJwtExpired(token)) {
     localStorage.removeItem('auth-token');
     window.location.href = '/login';
 }
+
+await initStores(); // initialize network, auth, etc
 
 app.mount('#app')

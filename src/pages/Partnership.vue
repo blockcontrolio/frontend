@@ -2,7 +2,7 @@
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 import {
-  fetchPartnership,
+  fetchPartnerships,
   requestPartnership,
   acceptRequest,
   rejectRequest,
@@ -33,8 +33,8 @@ export default {
           return 'text-warning';
       }
     },
-    async fetchPartnership(networkId) {
-      const res = await fetchPartnership(networkId);
+    async fetchPartnerships(networkId) {
+      const res = await fetchPartnerships(networkId);
       const partnershipsRaw = await res.json();
       const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
       this.partnerships = partnershipsRaw.map(p => ({
@@ -95,8 +95,8 @@ export default {
     }
   },
   mounted() {
-    let selectedNetwork = useNetworkStore().selectedNetwork || useCounterpartyStore().counterparty.networks[0];
-    this.fetchPartnership(selectedNetwork?.id);
+    let selectedNetwork = useNetworkStore().selectedNetwork;
+    this.fetchPartnerships(selectedNetwork?.id);
   }
 }
 </script>

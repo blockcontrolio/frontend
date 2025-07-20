@@ -2,6 +2,7 @@
 import {login} from "../../services/auth.js";
 import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
 import {useNetworkStore} from "../../js/stores/networkStore.js";
+import {initStores} from "../../js/stores/initStores.js";
 
 export default {
   name: "LoginView",
@@ -34,8 +35,7 @@ export default {
 
         if (data?.token) {
           localStorage.setItem("auth-token", data.token);
-          await this.counterpartyStore.fetchCounterparty();
-          this.networkStore.setNetwork(this.counterpartyStore.counterparty.networks[0]) // select network globally
+          await initStores();
           this.$router.push('/');
         } else {
           this.error = "Token not received from server.";

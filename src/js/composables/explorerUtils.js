@@ -5,17 +5,17 @@ export function useExplorerUtils() {
 
     function etherScanLink(txHash) {
         let explorerUrl = networkStore.selectedNetwork?.explorerUrl;
-        return `${explorerUrl}/tx/${txHash}`;
+        return explorerUrl ? `${explorerUrl}/tx/${txHash}` : '';
     }
 
     function tokenLink(address) {
         let explorerUrl = networkStore.selectedNetwork?.explorerUrl;
-        return `${explorerUrl}/token/${address}`;
+        return explorerUrl ? `${explorerUrl}/token/${address}` : '';
     }
 
     function walletLink(address) {
         let explorerUrl = networkStore.selectedNetwork?.explorerUrl;
-        return `${explorerUrl}/address/${address}`;
+        return explorerUrl ? `${explorerUrl}/address/${address}` : '';
     }
 
     return {

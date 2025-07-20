@@ -4,7 +4,7 @@ function loadAuthToken() {
     return localStorage.getItem('auth-token') || '';
 }
 
-export async function fetchPartnership(networkId) {
+export async function fetchPartnerships(networkId) {
     return await fetch(`${apiBaseUrl}/partnerships?networkId=${networkId}`, {
         headers: {
             'Content-Type': 'application/json',

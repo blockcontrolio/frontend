@@ -16,14 +16,11 @@ export default {
     },
   },
   created() {
-    if (this.hasAuthToken()) {
-      this.counterpartyStore.fetchCounterparty();
-      this.networkStore.setNetwork(this.counterpartyStore.counterparty.networks[0]) // select network globally on refresh
-    }
+
   },
   methods: {
     hasAuthToken() {
-      return !!localStorage.getItem('auth-token');
+      return localStorage.getItem('auth-token');
     },
     handleClick(e) {
       if (!this.hasAuthToken()) {
@@ -79,7 +76,7 @@ export default {
           <div v-for="(network, index) in counterparty.networks" :key="index" class="network-info mb-2">
             <strong>{{ network.name }}</strong><br/>
             Chain ID: {{ network.chainId }}<br/>
-            <a :href="network.explorerUrl" target="_blank" class="text-decoration-underline small">
+            <a v-if="network.explorerUrl" :href="network.explorerUrl" target="_blank" class="text-decoration-underline small">
               Open Explorer
             </a>
           </div>
