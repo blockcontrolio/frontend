@@ -41,7 +41,7 @@ export default {
 <template>
   <div class="modal fade show d-block" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
-      <form class="modal-content bg-dark text-white border border-warning" @submit.prevent="submit">
+      <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">{{ name }} Role</h5>
           <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
@@ -50,7 +50,7 @@ export default {
           <!-- Admin Account -->
           <div class="mb-3">
             <label class="form-label">Admin Account</label>
-            <select v-model="form.adminAccountId" class="form-select bg-dark border-warning" required>
+            <select v-model="form.adminAccountId" class="form-select" required>
               <option disabled value="">-- select admin --</option>
               <option v-for="acc in adminAccounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
@@ -60,7 +60,7 @@ export default {
           <!-- User Account -->
           <div class="mb-3">
             <label class="form-label">User Account</label>
-            <select v-model="form.userAccountId" class="form-select bg-dark border-warning" required>
+            <select v-model="form.userAccountId" class="form-select" required>
               <option disabled value="">-- select user --</option>
               <option v-for="acc in userAccounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
@@ -70,7 +70,7 @@ export default {
           <!-- Roles -->
           <div class="mb-3">
             <label class="form-label">Role</label>
-            <select v-model="form.role" class="form-select bg-dark border-warning" required>
+            <select v-model="form.role" class="form-select" required>
               <option disabled value="">-- select role --</option>
               <option v-for="role in this.roles" :key="role" :value="role">
                 {{ role }}
@@ -79,8 +79,8 @@ export default {
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary px-4" @click="$emit('close')">Cancel</button>
-          <button class="btn btn-outline-primary px-4" type="submit">{{ name }}</button>
+          <button class="btn btn-outline-secondary btn-sm px-4" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-outline-primary btn-sm px-4" type="submit">{{ name }}</button>
         </div>
       </form>
     </div>
@@ -89,8 +89,5 @@ export default {
 </template>
 
 <style scoped>
-input::placeholder,
-select {
-  color: #ccc;
-}
+
 </style>

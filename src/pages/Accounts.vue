@@ -80,22 +80,22 @@ export default {
 </script>
 
 <template>
-  <div>
-    <h3 class="mb-3">Accounts</h3>
+  <h3 class="bold p-2 pt-3">Accounts</h3>
+  <div class="p-2 mt-3">
     <div v-if="!showCreateForm" class="d-flex d-flex flex-column align-items-end mb-3">
-      <button class="btn btn-outline-primary" @click="showCreateForm = !showCreateForm">
+      <button class="btn btn-outline-primary btn-sm" @click="showCreateForm = !showCreateForm">
         Create Account
       </button>
     </div>
     <form v-else @submit.prevent="createAccount" class="mb-4">
       <input
           v-model="newAccount.name"
-          class="form-control bg-dark text-white border-info mb-2"
+          class="form-control mb-2"
           placeholder="Account Name"
       />
       <select
           v-model="newAccount.type"
-          class="form-select bg-dark border-info mb-2 w-25"
+          class="form-select mb-2 w-25"
           required
       >
         <option disabled value="">-- source account --</option>
@@ -105,21 +105,21 @@ export default {
       </select>
       <input
           v-model="newAccount.ref"
-          class="form-control bg-dark text-white border-info mb-2"
+          class="form-control mb-2"
           placeholder="Reference"
           @input="validateRef"
           required
       />
-      <div v-if="errors.ref" class="form-text text-light">{{ errors.ref }}</div>
+      <div v-if="errors.ref" class="form-text">{{ errors.ref }}</div>
       <div class="d-flex justify-content-end gap-2">
         <button
-            class="btn btn-outline-danger"
+            class="btn btn-outline-danger btn-sm"
             type="button"
             @click="showCreateForm = false"
         >
           Cancel
         </button>
-        <button class="btn btn-outline-primary" type="submit" :disabled="hasErrors">
+        <button class="btn btn-outline-primary btn-sm" type="submit" :disabled="hasErrors">
           Save Account
         </button>
       </div>
@@ -128,14 +128,14 @@ export default {
     <div class="my-3">
       <input
           type="text"
-          class="form-control text-white bg-dark border-info"
+          class="form-control"
           v-model="searchQuery"
           placeholder="Search by name, ref or ID..."
       />
     </div>
 
     <div v-if="accounts && accounts.length > 0" class="pt-3">
-      <table class="table table-dark table-hover table-bordered table-glow">
+      <table class="table table-bordered">
         <thead>
         <tr>
           <th scope="col">Account ID</th>
@@ -143,7 +143,7 @@ export default {
           <th scope="col">Ref</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
-          <th scope="col">Created</th>
+          <th scope="col">Create Time</th>
           <th scope="col" class="text-center">Status</th>
           <th scope="col" style="width: 100px;">Recent Transfers</th>
         </tr>
@@ -152,7 +152,7 @@ export default {
         <tr v-for="acc in filteredAccounts" :key="acc.ref">
           <td>
             <router-link :to="{ name: 'account-details', params: { id: acc.id } }"
-                         class="text-info">
+                         class="">
               {{ acc.id.substring(0, 6) }}…{{ acc.id.substring(acc.id.length - 4) }}
             </router-link>
           </td>
@@ -168,7 +168,7 @@ export default {
           </td>
           <td>
             <router-link :to="{ name: 'Transfers', params: { accountId: acc.id } }"
-                         class="text-info">
+                         class="">
               Transfers
             </router-link>
           </td>
@@ -181,18 +181,5 @@ export default {
 </template>
 
 <style scoped>
-input::placeholder,
-select {
-  color: #ccc;
-}
 
-input.form-control.bg-dark.text-white {
-  color: #ffffff;
-  border-color: #2af2ff;
-}
-
-input.form-control.bg-dark.text-white:focus {
-  border-color: #2af2ff;
-  box-shadow: 0 0 0 0.2rem rgba(42, 242, 255, 0.25);
-}
 </style>

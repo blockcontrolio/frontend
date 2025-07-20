@@ -46,7 +46,7 @@ export default {
 <template>
   <div class="modal fade show d-block" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
-      <form class="modal-content bg-dark text-white border border-info" @submit.prevent="submit">
+      <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">Mint Token</h5>
           <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
@@ -55,7 +55,7 @@ export default {
           <!-- Issuer Account -->
           <div class="mb-3">
             <label class="form-label">Issuer Account</label>
-            <select v-model="form.issuerAccountId" class="form-select bg-dark border-info" required>
+            <select v-model="form.issuerAccountId" class="form-select" required>
               <option disabled value="">-- select issuer --</option>
               <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
@@ -65,7 +65,7 @@ export default {
           <!-- Recipient Account -->
           <div class="mb-3">
             <label class="form-label">Recipient Account</label>
-            <select v-model="form.recipientAccountId" class="form-select bg-dark border-info" required>
+            <select v-model="form.recipientAccountId" class="form-select" required>
               <option disabled value="">-- select recipient --</option>
               <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
@@ -75,7 +75,7 @@ export default {
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount</label>
-            <input type="number" class="form-control bg-dark border-info no-spinner text-white"
+            <input type="number" class="form-control no-spinner"
                    v-model.number="form.amount"
                    inputmode="numeric"
                    pattern="\d*"
@@ -88,8 +88,8 @@ export default {
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary px-4" @click="$emit('close')">Cancel</button>
-          <button class="btn btn-outline-primary px-4" type="submit">Mint</button>
+          <button class="btn btn-outline-secondary btn-sm px-4" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-outline-primary btn-sm px-4" type="submit">Mint</button>
         </div>
       </form>
     </div>
@@ -98,8 +98,5 @@ export default {
 </template>
 
 <style scoped>
-input::placeholder,
-select {
-  color: #ccc;
-}
+
 </style>

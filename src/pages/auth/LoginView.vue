@@ -51,20 +51,20 @@ export default {
 <template>
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="w-50" style="max-width: 500px;">
-      <div class="card bg-dark text-light border-info p-4">
-        <h4 class="text-center text-info mb-4">Sign In</h4>
+      <div class="card p-4">
+        <h4 class="bold text-center mb-4">Sign In</h4>
         <form @submit.prevent="login">
           <div class="mb-3">
-            <label for="email" class="form-label text-info">Email</label>
-            <input v-model="credentials.email" type="email" class="form-control bg-black text-white border-info"
+            <label for="email" class="form-label">Email</label>
+            <input v-model="credentials.email" type="email" class="form-control"
                    required>
           </div>
           <div class="mb-3">
-            <label for="password" class="form-label text-info">Password</label>
-            <input v-model="credentials.password" type="password" class="form-control bg-black text-white border-info"
+            <label for="password" class="form-label">Password</label>
+            <input v-model="credentials.password" type="password" class="form-control"
                    required>
           </div>
-          <button type="submit" class="btn btn-outline-primary w-100">Log In</button>
+          <button type="submit" class="btn btn-outline-primary btn-sm w-100">Log In</button>
         </form>
         <div v-if="error" class="text-danger mt-3">{{ error }}</div>
 

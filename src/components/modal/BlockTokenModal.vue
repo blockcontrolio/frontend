@@ -51,7 +51,7 @@ export default {
 <template>
   <div class="modal fade show d-block" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
-      <form class="modal-content bg-dark text-white border border-warning" @submit.prevent="submit">
+      <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">{{ name }} User</h5>
           <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
@@ -60,7 +60,7 @@ export default {
           <!-- Limiter Account -->
           <div class="mb-3">
             <label class="form-label">Limiter Account</label>
-            <select v-model="this.form.limiterAccountId" class="form-select bg-dark border-warning" required>
+            <select v-model="this.form.limiterAccountId" class="form-select" required>
               <option disabled value="">-- select limiter --</option>
               <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
                 {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
@@ -73,7 +73,7 @@ export default {
             <label class="form-label">User</label>
             <input
                 v-model="this.form.user"
-                class="form-control bg-dark border-warning text-white"
+                class="form-control "
                 placeholder="User hex address 0x..."
                 pattern="^0x[a-fA-F0-9]{40}$"
                 @input="validateUser"
@@ -84,8 +84,8 @@ export default {
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary px-4" @click="$emit('close')">Cancel</button>
-          <button class="btn btn-outline-warning px-4" type="submit">{{ name }}</button>
+          <button class="btn btn-outline-secondary btn-sm px-4" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-outline-warning btn-sm px-4" type="submit">{{ name }}</button>
         </div>
       </form>
     </div>
@@ -94,8 +94,5 @@ export default {
 </template>
 
 <style scoped>
-input::placeholder,
-select {
-  color: #ccc;
-}
+
 </style>
