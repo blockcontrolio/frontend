@@ -13,9 +13,16 @@ export default {
   data() {
     return {
       accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
+      walletTypes: [
+        {
+          code: 'EOA', desc: 'Externally Owned Account'
+        },
+        {
+          code: 'SMART', desc: 'Smart Contract Account'
+        }],
       searchQuery: '',
       accounts: [],
-      newAccount: {name: '', ref: '', type: null},
+      form: {name: '', ref: '', type: '', walletType: '', paymasterId: ''},
       showCreateForm: false,
       errors: {
         ref: ""
@@ -32,18 +39,21 @@ export default {
       this.resetError();
       this.validateRef();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
-      const res = await createAccount(this.newAccount);
+      const res = await createAccount(this.form);
       if (res.ok) {
         const added = await res.json();
         this.accounts.push({...added, show: false});
-        this.newAccount = {ref: '', name: '', type: null}; // clear inputs
+        this.clearForm();
         this.showCreateForm = false; // hide form
       } else {
         alert('Failed to create account');
       }
     },
+    clearForm() {
+      this.form = {ref: '', name: '', type: '', walletType: '', paymasterId: ''}; // clear inputs
+    },
     validateRef() {
-      if (this.newAccount.ref.length < 4) {
+      if (this.form.ref.length < 4) {
         this.errors.ref = 'Ref must be unique and contain at least 4 letters or numbers';
       } else {
         this.errors.ref = '';
@@ -51,6 +61,10 @@ export default {
     },
     resetError() {
       this.errors.ref = null;
+    },
+    findMasterAccName(paymasterId) {
+      return this.accounts.find(acc => acc.id === paymasterId)
+          ?.name;
     }
   },
   mounted() {
@@ -62,6 +76,15 @@ export default {
         return ['ADMIN'];
       }
       return this.accountTypes;
+    },
+    availableWalletTypes() {
+      if (this.accounts.length === 0) {
+        return [
+          {
+            code: 'EOA', desc: 'Externally Owned Account'
+          }];
+      }
+      return this.walletTypes;
     },
     filteredAccounts() {
       const query = this.searchQuery.toLowerCase().trim();
@@ -89,38 +112,60 @@ export default {
     </div>
     <form v-else @submit.prevent="createAccount" class="mb-4">
       <input
-          v-model="newAccount.name"
+          v-model="form.name"
           class="form-control mb-2"
           placeholder="Account Name"
       />
       <select
-          v-model="newAccount.type"
+          v-model="form.type"
           class="form-select mb-2 w-25"
           required
       >
-        <option disabled value="">-- source account --</option>
-        <option v-for="type in availableAccountTypes" :key="type" :value="type">
-          {{ type }}
+        <option disabled value="">-- account type --</option>
+        <option v-for="accountType in availableAccountTypes" :key="accountType" :value="accountType">
+          {{ accountType }}
         </option>
       </select>
       <input
-          v-model="newAccount.ref"
+          v-model="form.ref"
           class="form-control mb-2"
           placeholder="Reference"
           @input="validateRef"
           required
       />
-      <div v-if="errors.ref" class="form-text">{{ errors.ref }}</div>
+      <div v-if="errors.ref" class="form-text mb-2">{{ errors.ref }}</div>
+
+      <select
+          v-model="form.walletType"
+          class="form-select mb-2 w-25"
+          required
+      >
+        <option disabled value="">-- wallet type --</option>
+        <option v-for="walletType in availableWalletTypes" :key="walletType.code" :value="walletType.code">
+          {{ walletType.desc }}
+        </option>
+      </select>
+      <!-- paymaster account -->
+      <div class="mb-3" v-if="form.walletType === 'SMART'">
+        <label class="form-label">Paymaster Account</label>
+        <select v-model="form.paymasterId" class="form-select" required>
+          <option disabled value="">-- select paymaster --</option>
+          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
+            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          </option>
+        </select>
+      </div>
+
       <div class="d-flex justify-content-end gap-2">
         <button
             class="btn btn-outline-danger btn-sm"
             type="button"
-            @click="showCreateForm = false"
+            @click="showCreateForm = false; clearForm()"
         >
           Cancel
         </button>
         <button class="btn btn-outline-primary btn-sm" type="submit" :disabled="hasErrors">
-          Save Account
+          Create Account
         </button>
       </div>
     </form>
@@ -140,11 +185,9 @@ export default {
         <tr>
           <th scope="col">Account ID</th>
           <th scope="col">Name</th>
-          <th scope="col">Ref</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
-          <th scope="col">Create Time</th>
-          <th scope="col" class="text-center">Status</th>
+          <th scope="col">Wallet Type</th>
           <th scope="col" style="width: 100px;">Recent Transfers</th>
         </tr>
         </thead>
@@ -157,14 +200,13 @@ export default {
             </router-link>
           </td>
           <td>{{ acc.name || '(Unnamed)' }}</td>
-          <td>{{ acc.ref }}</td>
           <td>{{ acc.type }}</td>
           <td>
             <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
           </td>
-          <td>{{ formatDate(acc.createTime) }}</td>
-          <td class="text-center">
-            <span class="badge bg-success">Active</span>
+          <td>
+            {{ acc.walletType }}
+            <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>
           <td>
             <router-link :to="{ name: 'Transfers', params: { accountId: acc.id } }"
