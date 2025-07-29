@@ -9,9 +9,15 @@ import {
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
+import FromAccountSelector from "../components/transfer/FromAccountSelector.vue";
+import AmountInput from "../components/transfer/AmountInput.vue";
+import {fetchPartnerships} from "../services/partnership.js";
+import {useNetworkStore} from "../js/stores/networkStore.js";
 
 export default {
   components: {
+    AmountInput,
+    FromAccountSelector,
     TxToast,
     ErrorToast
   },
@@ -19,6 +25,7 @@ export default {
     return {
       selectedForm: 'internal', // or 'internal'
       accounts: [], // should be populated externally
+      partnerships: [],
       internal: {
         from: "",
         tokenId: "",
@@ -40,7 +47,9 @@ export default {
       transferError: null,
       accountBalances: [],
       selectedAsset: null,
-      selectedTokenInfo: null
+      selectedTokenInfo: null,
+      selectedPartnership: {},
+      availableTokensCp: []
     };
   },
   computed: {
@@ -70,6 +79,36 @@ export default {
       let res = await fetchAssetBalances(accountId);
       this.accountBalances = await res.json();
     },
+    async fetchAcceptedPartnerships() {
+      let selectedNetwork = useNetworkStore().selectedNetwork;
+      let networkId = selectedNetwork?.id;
+      if ([networkId].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('Network Id undefined or empty.');
+      }
+      const res = await fetchPartnerships(networkId);
+      const partnershipsRaw = await res.json();
+      this.partnerships = partnershipsRaw.filter(p => {
+        return p.status === 'ACCEPTED' && this.hasTokensImported(p);
+      });
+    },
+    hasTokensImported(partnership) {
+      return this.tokens.some(t => {
+        if (t.own) {
+          return false; // take care only about imported
+        }
+        let tokenOwnerId = t.counterparty.internalId;
+        return tokenOwnerId === partnership.sourceCounterpartyId || tokenOwnerId === partnership.targetCounterpartyId
+      })
+    },
+    showAvailableTokens() {
+      this.availableTokensCp = this.tokens.filter(t => {
+        if (t.own) {
+          return false; // take care only about imported
+        }
+        let tokenOwnerId = t.counterparty.internalId;
+        return tokenOwnerId === this.selectedPartnership.sourceCounterpartyId || tokenOwnerId === this.selectedPartnership.targetCounterpartyId
+      })
+    },
     showBalance(assetId) {
       this.selectedAsset = this.accountBalances
           .find(b => b.id === assetId)
@@ -97,7 +136,7 @@ export default {
       let amountStr;
       if (this.selectedForm === 'internal') {
         amountStr = this.internal.amount?.toString();
-      } else if (this.selectedForm === 'external') {
+      } else if (this.selectedForm === 'external' || this.selectedForm === 'cross_partnership') {
         amountStr = this.transfer.amount?.toString();
       }
       if (!amountStr || parseFloat(amountStr) <= 0) {
@@ -154,6 +193,8 @@ export default {
       this.selectedTokenInfo = null;
       this.selectedAsset = null;
       this.accountBalances = [];
+      this.internal = {from: '', to: '', amount: null}
+      this.transfer = {accountId: '', to: '', amount: null}
     },
     resetError() {
       this.transferSuccess = null;
@@ -186,7 +227,7 @@ export default {
 <template>
   <h3 class="bold p-2 pt-3">Asset Transfer</h3>
 
-  <div class="d-flex justify-content-center mt-3">
+  <div class="d-flex justify-content-around p-3">
     <div class="type-selector">
       <div class="form-check form-check-inline">
         <input class="form-check-input border-primary" type="radio" id="internalRadio" value="internal"
@@ -200,6 +241,12 @@ export default {
                v-model="selectedForm"/>
         <label class="form-check-label fw-bold" for="externalRadio">External Withdrawal</label>
       </div>
+      <div class="form-check form-check-inline me-3">
+        <input class="form-check-input border-primary" type="radio" id="cpRadio" value="cross_partnership"
+               v-on:change="this.resetSelection(); this.resetError(); this.fetchAcceptedPartnerships()"
+               v-model="selectedForm"/>
+        <label class="form-check-label fw-bold" for="cpRadio">Cross Partnership</label>
+      </div>
     </div>
   </div>
 
@@ -208,20 +255,12 @@ export default {
       <h3 class="mb-4 text-center">Transfer between Accounts</h3>
 
       <!-- Source Account -->
-      <div class="mb-3">
-        <label class="form-label">From Account</label>
-        <select v-model="internal.from" class="form-select" required
-                v-on:change="this.resetSelection(); this.fetchBalances(internal.from); this.internal.tokenId = '';">
-          <option disabled value="">-- source account --</option>
-          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
-          </option>
-        </select>
-        <!-- acc balance preview -->
-        <div v-if="internal.from && selectedAsset" class="mt-1 balance">
-          <span class="small label">Balance:</span> <span class="value">{{ formatAmount(this.selectedAsset.amount) }} {{this.selectedAsset.symbol}}</span>
-        </div>
-      </div>
+      <FromAccountSelector
+          v-model="internal.from"
+          :accounts="accounts"
+          :selected-asset="selectedAsset"
+          @change="val => { resetSelection(); fetchBalances(val); internal.tokenId = '' }"
+      />
 
       <!-- Token Selection -->
       <div class="mb-3">
@@ -260,22 +299,12 @@ export default {
         </select>
       </div>
 
-      <!-- Amount -->
-      <div class="mb-3">
-        <label class="form-label">Amount</label>
-        <input
-            v-model="internal.amount"
-            type="number"
-            step="0.000000000000000001"
-            class="form-control no-spinner"
-            placeholder="Amount to send"
-            @input="validateAmount"
-        />
-        <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
-        <div v-if="internal.amount && parseFloat(internal.amount) > parseFloat(selectedAsset?.amount)"
-             class="form-text text-warning">Amount exceeds account balance!
-        </div>
-      </div>
+      <AmountInput
+          v-model="internal.amount"
+          :selected-asset="selectedAsset"
+          :validate="validateAmount"
+          :error-message="errors.amount"
+      />
 
       <div class="d-flex justify-content-end">
         <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
@@ -287,20 +316,12 @@ export default {
     <form @submit.prevent="submitExternalWithdrawal" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Withdraw to external Address</h3>
 
-      <div class="mb-3">
-        <label class="form-label">From Account</label>
-        <select v-model="transfer.accountId" class="form-select" required
-                v-on:change="this.resetSelection(); this.fetchBalances(transfer.accountId); this.transfer.tokenId = '';">
-          <option disabled value="">-- choose account --</option>
-          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
-          </option>
-        </select>
-        <!-- acc balance preview -->
-        <div v-if="transfer.accountId && selectedAsset" class="mt-1 balance">
-          <span class="small label">Balance:</span> <span class="value">{{ formatAmount(this.selectedAsset.amount) }} {{this.selectedAsset.symbol}}</span>
-        </div>
-      </div>
+      <FromAccountSelector
+          v-model="transfer.accountId"
+          :accounts="accounts"
+          :selected-asset="selectedAsset"
+          @change="val => { resetSelection(); fetchBalances(val); transfer.tokenId = '' }"
+      />
 
       <!-- Token Selection -->
       <div class="mb-3">
@@ -339,21 +360,64 @@ export default {
         <div v-if="errors.to" class="form-text text-danger">{{ errors.to }}</div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Amount</label>
-        <input
-            v-model="transfer.amount"
-            type="number"
-            step="0.000000000000000001"
-            class="form-control no-spinner"
-            placeholder="Amount to send"
-            @input="validateAmount"
-        />
-        <div v-if="errors.amount" class="form-text text-danger">{{ errors.amount }}</div>
-        <div v-if="transfer.amount && parseFloat(transfer.amount) > parseFloat(selectedAsset?.amount)"
-             class="form-text text-warning">Amount exceeds account balance!
-        </div>
+      <AmountInput
+          v-model="transfer.amount"
+          :selected-asset="selectedAsset"
+          :validate="validateAmount"
+          :error-message="errors.amount"
+      />
+
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
       </div>
+    </form>
+  </div>
+
+  <div v-else-if="selectedForm === 'cross_partnership'" class="d-flex justify-content-center mt-5">
+    <form @submit.prevent="submitCrossPartnership" class="transfer-form card p-3 border rounded">
+      <h3 class="mb-4 text-center">Cross-Partnership Transfer</h3>
+
+      <FromAccountSelector
+          v-model="transfer.accountId"
+          :accounts="accounts"
+          :selected-asset="selectedAsset"
+          @change="val => { resetSelection(); fetchBalances(val); transfer.tokenId = '' }"
+      />
+
+      <!-- Partnership Selection -->
+      <div class="mb-3">
+        <label class="form-label">Select Counterparty</label>
+
+        <select v-if="partnerships"
+                v-model="selectedPartnership"
+                class="form-select" required
+                v-on:change="showAvailableTokens()"
+        >
+          <option disabled value="">-- select counterparty --</option>
+          <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
+            {{ cp.counterpartyName }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <select v-if="availableTokensCp"
+                v-model="transfer.tokenId"
+                class="form-select" required
+        >
+          <option disabled value="">-- select token --</option>
+          <option v-for="token in availableTokensCp" :key="token.id" :value="token.address">
+            {{ token.name }} ({{ token.symbol }})
+          </option>
+        </select>
+      </div>
+
+      <AmountInput
+          v-model="transfer.amount"
+          :selected-asset="selectedAsset"
+          :validate="validateAmount"
+          :error-message="errors.amount"
+      />
 
       <div class="d-flex justify-content-end">
         <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
@@ -374,8 +438,7 @@ export default {
 
 </template>
 
-<style scoped>
-.type-selector,
+<style>
 .transfer-form {
   width: 100%;
   max-width: 500px;
