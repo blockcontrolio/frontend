@@ -327,7 +327,7 @@ export default {
           </option>
         </select>
 
-        <select v-if="importForm.selectedCP?.relationId"
+        <select v-if="importForm.rel === 'PS' && importForm.selectedCP?.availableTokens"
             v-model="importForm.address"
             class="form-select mb-2 w-25"
             required
