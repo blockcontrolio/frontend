@@ -3,8 +3,9 @@ import {
   fetchAccounts,
   fetchAssetBalances,
   fetchTokens,
+  sendInternalTransfer,
   sendExternalWithdrawal,
-  sendInternalTransfer
+  sendCrossCounterparty
 } from '../services/api'
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
@@ -36,6 +37,12 @@ export default {
         accountId: "",
         tokenId: "",
         to: "",
+        amount: null
+      },
+      crossCp: {
+        fromAccountId: "",
+        toCounterpartyId: "",
+        tokenId: "",
         amount: null
       },
       tokens: [], // fetched from API
@@ -163,8 +170,7 @@ export default {
         } else {
           await this.handleSuccess(response);
           // reset form
-          this.transfer = {accountId: '', to: '', amount: null}
-          this.selectedTokenInfo = null
+          this.resetSelection();
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -182,8 +188,26 @@ export default {
         } else {
           await this.handleSuccess(response);
           // reset form
-          this.internal = {from: '', to: '', amount: null}
-          this.selectedTokenInfo = null
+          this.resetSelection();
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
+    async submitCrossCounterparty() {
+      this.resetError();
+      this.validateAmount();
+      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      try {
+        this.crossCp.toCounterpartyId = this.selectedPartnership.targetCounterpartyId;
+        const response = await sendCrossCounterparty(this.crossCp)
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleTransferError(err);
+        } else {
+          await this.handleSuccess(response);
+          // reset form
+          this.resetSelection();
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -193,8 +217,9 @@ export default {
       this.selectedTokenInfo = null;
       this.selectedAsset = null;
       this.accountBalances = [];
-      this.internal = {from: '', to: '', amount: null}
-      this.transfer = {accountId: '', to: '', amount: null}
+      this.internal = {from: '', tokenId: '', to: '', amount: null}
+      this.transfer = {accountId: '', tokenId: '', to: '', amount: null}
+      this.crossCp = {fromAccountId: '', tokenId: '', toCounterpartyId: '', amount: null}
     },
     resetError() {
       this.transferSuccess = null;
@@ -374,14 +399,14 @@ export default {
   </div>
 
   <div v-else-if="selectedForm === 'cross_partnership'" class="d-flex justify-content-center mt-5">
-    <form @submit.prevent="submitCrossPartnership" class="transfer-form card p-3 border rounded">
+    <form @submit.prevent="submitCrossCounterparty" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Cross-Partnership Transfer</h3>
 
       <FromAccountSelector
-          v-model="transfer.accountId"
+          v-model="crossCp.fromAccountId"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { resetSelection(); fetchBalances(val); transfer.tokenId = '' }"
+          @change="val => { resetSelection(); fetchBalances(val); crossCp.tokenId = '' }"
       />
 
       <!-- Partnership Selection -->
@@ -402,18 +427,19 @@ export default {
 
       <div class="mb-3">
         <select v-if="availableTokensCp"
-                v-model="transfer.tokenId"
+                v-model="crossCp.tokenId"
                 class="form-select" required
+                v-on:change="showBalance(crossCp.tokenId)"
         >
           <option disabled value="">-- select token --</option>
-          <option v-for="token in availableTokensCp" :key="token.id" :value="token.address">
+          <option v-for="token in availableTokensCp" :key="token.id" :value="token.id">
             {{ token.name }} ({{ token.symbol }})
           </option>
         </select>
       </div>
 
       <AmountInput
-          v-model="transfer.amount"
+          v-model="crossCp.amount"
           :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
