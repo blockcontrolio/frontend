@@ -1,4 +1,6 @@
 <script>
+import {formatAmount} from "../../js/utils.js";
+
 export default {
   name: 'FromAccountSelector',
   props: {
@@ -24,9 +26,7 @@ export default {
       this.$emit('update:modelValue', newVal);
       this.$emit('change', newVal);
     },
-    formatAmount(val) {
-      return parseFloat(val).toLocaleString(undefined, {maximumFractionDigits: 6});
-    }
+    formatAmount,
   }
 };
 </script>

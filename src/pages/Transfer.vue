@@ -287,7 +287,7 @@ export default {
           v-model="internal.from"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { resetSelection(); fetchBalances(val); internal.tokenId = '' }"
+          @change="val => { fetchBalances(val); internal.tokenId = '' }"
       />
 
       <!-- Token Selection -->
@@ -348,7 +348,7 @@ export default {
           v-model="transfer.accountId"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { resetSelection(); fetchBalances(val); transfer.tokenId = '' }"
+          @change="val => { fetchBalances(val); transfer.tokenId = '' }"
       />
 
       <!-- Token Selection -->
@@ -409,7 +409,7 @@ export default {
           v-model="crossCp.fromAccountId"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { resetSelection(); fetchBalances(val); crossCp.tokenId = '' }"
+          @change="val => { fetchBalances(val); crossCp.tokenId = '' }"
       />
 
       <!-- Partnership Selection -->
