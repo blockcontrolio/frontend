@@ -25,85 +25,65 @@ export default {
 
 <template>
 
-  <h3 class="bold p-2 pt-3">Recent Transaction</h3>
+  <h3 class="bold p-2 pt-3">Recent Transactions</h3>
 
   <div class="p-2 mt-3">
     <div v-if="transactions.length === 0" class="text-center">
-      No transactions yet.
+      No transactions detected yet.
     </div>
 
-    <ul class="transaction-list">
-      <li v-for="tx in transactions" :key="tx.internalId" class="card border p-3">
-        <div class="tx-line">
-          <span class="label">Type:</span>
-          <span class="value">
-            <span v-if="tx.type === 'NATIVE'" class="me-2" title="Native Transfer">🪙</span>
-            {{ tx.type }}
-          </span>
-        </div>
-        <div class="tx-line">
-          <span class="label">From:</span>
-          <span class="value mono">{{ tx.from }}</span>
-        </div>
-        <div class="tx-line">
-          <span class="label">To:</span>
-          <span class="value mono">{{ tx.to }}</span>
-        </div>
-        <div class="tx-line">
-          <span class="label">Value:</span>
-          <span class="value mono">{{ tx.value }}</span>
-        </div>
-        <div class="tx-line">
-          <span class="label">Status:</span>
-          <span class="status" :class="['badge', tx.status === 'CONFIRMED' ? 'bg-success' : 'bg-secondary']">
+    <div v-if="transactions && transactions.length > 0" class="pt-3">
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th scope="col">Internal ID</th>
+          <th scope="col">Type</th>
+          <th scope="col">From</th>
+          <th scope="col">Status</th>
+          <th scope="col">Value</th>
+          <th scope="col">Create Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="tx in transactions" :key="tx.internalId">
+          <td>
+            <router-link :to="{ name: 'transaction-details', params: { id: tx.internalId } }">
+              {{ tx.internalId.substring(0, 6) }}…{{ tx.internalId.substring(tx.internalId.length - 4) }}
+            </router-link>
+          </td>
+          <td>
+            <span>
+              <span v-if="tx.type === 'NATIVE'" class="me-2" title="Native Transfer">🪙</span>
+              {{ tx.type }}
+            </span>
+          </td>
+          <td>
+            <span class="mono">{{ tx.from }}</span>
+          </td>
+          <td>
+            <span class="status" :class="[tx.status === 'CONFIRMED' ? 'text-success' : 'text-secondary']">
             {{ tx.status }}
           </span>
-        </div>
-        <div class="tx-line">
-          <span class="label">Created:</span>
-          <span class="value mono">{{ formatDate(tx.createTime) }}</span>
-        </div>
-        <div class="tx-line">
-          <span class="label">Hash:</span>
-          <tx-scan-link :hash="tx.hash"></tx-scan-link>
-        </div>
-      </li>
-    </ul>
+          </td>
+          <td>
+            <span class="mono">{{ tx.value }}</span>
+          </td>
+          <td>
+            <span class="mono">{{ formatDate(tx.createTime) }}</span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.transaction-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.tx-line {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.label {
-  font-weight: bold;
-}
-
-.value {
-  text-align: right;
-  margin-left: 1rem;
-}
-
 .status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.35rem 0.75rem;
   font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 0.5rem;
   min-height: 1.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;

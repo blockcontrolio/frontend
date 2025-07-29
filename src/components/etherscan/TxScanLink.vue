@@ -39,7 +39,6 @@ export default {
 
 <style scoped>
 .ether-scan-link {
-  font-size: 1em;
   color: #d63384; /* same as default <code> in Bootstrap */
   border-radius: 0.25rem;
   text-decoration: none;

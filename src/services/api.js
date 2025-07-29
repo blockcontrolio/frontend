@@ -168,3 +168,14 @@ export async function fetchTransactions() {
     });
 
 }
+
+export async function fetchTransaction(internalId) {
+    return await fetch(`${apiBaseUrl}/transactions/${internalId}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to fetch transactions', err);
+    });
+}

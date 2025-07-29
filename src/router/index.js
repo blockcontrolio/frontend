@@ -8,6 +8,7 @@ import AccountDetails from "../pages/AccountDetails.vue";
 import LoginView from "../pages/auth/LoginView.vue";
 import RegisterView from "../pages/auth/RegisterView.vue";
 import Partnership from "../pages/Partnership.vue";
+import TransactionDetails from "../pages/TransactionDetails.vue";
 
 const routes = [
     {
@@ -35,6 +36,11 @@ const routes = [
     {
         path: '/transactions',
         component: Transactions
+    },
+    {
+        path: '/transactions/:id',
+        name: 'transaction-details',
+        component: TransactionDetails
     },
     {
         path: '/transfers/:accountId',
