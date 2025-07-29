@@ -140,12 +140,15 @@ export default {
       }
     },
     validateAmount() {
-      let amountStr;
+      let amount;
       if (this.selectedForm === 'internal') {
-        amountStr = this.internal.amount?.toString();
-      } else if (this.selectedForm === 'external' || this.selectedForm === 'cross_partnership') {
-        amountStr = this.transfer.amount?.toString();
+        amount = this.internal.amount;
+      } else if (this.selectedForm === 'external') {
+        amount = this.transfer.amount;
+      } else if (this.selectedForm === 'cross_partnership') {
+        amount = this.crossCp.amount;
       }
+      let amountStr = amount?.toString();
       if (!amountStr || parseFloat(amountStr) <= 0) {
         this.errors.amount = 'Amount must be greater than zero';
         return;
