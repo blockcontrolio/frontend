@@ -127,7 +127,7 @@ export default {
           .find(t => t.id === assetId);
       console.log("Selected token info: ", this.selectedTokenInfo.id)
     },
-    validateTo() {
+    validateToAddress() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
       if (!this.transfer.to) {
         this.errors.to = 'Address is required';
@@ -145,7 +145,7 @@ export default {
         amount = this.internal.amount;
       } else if (this.selectedForm === 'external') {
         amount = this.transfer.amount;
-      } else if (this.selectedForm === 'cross_partnership') {
+      } else if (this.selectedForm === 'cross_counterparty') {
         amount = this.crossCp.amount;
       }
       let amountStr = amount?.toString();
@@ -162,7 +162,7 @@ export default {
     },
     async submitExternalWithdrawal() {
       this.resetError();
-      this.validateTo();
+      this.validateToAddress();
       this.validateAmount();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       try {
@@ -270,7 +270,7 @@ export default {
         <label class="form-check-label fw-bold" for="externalRadio">External Withdrawal</label>
       </div>
       <div class="form-check form-check-inline me-3">
-        <input class="form-check-input border-primary" type="radio" id="cpRadio" value="cross_partnership"
+        <input class="form-check-input border-primary" type="radio" id="cpRadio" value="cross_counterparty"
                v-on:change="this.resetSelection(); this.resetError(); this.fetchAcceptedPartnerships()"
                v-model="selectedForm"/>
         <label class="form-check-label fw-bold" for="cpRadio">Cross Partnership</label>
@@ -383,7 +383,7 @@ export default {
             class="form-control"
             placeholder="Recipient hex address 0x..."
             pattern="^0x[a-fA-F0-9]{40}$"
-            @input="validateTo"
+            @input="validateToAddress"
         />
         <div v-if="errors.to" class="form-text text-danger">{{ errors.to }}</div>
       </div>
@@ -401,9 +401,9 @@ export default {
     </form>
   </div>
 
-  <div v-else-if="selectedForm === 'cross_partnership'" class="d-flex justify-content-center mt-5">
+  <div v-else-if="selectedForm === 'cross_counterparty'" class="d-flex justify-content-center mt-5">
     <form @submit.prevent="submitCrossCounterparty" class="transfer-form card p-3 border rounded">
-      <h3 class="mb-4 text-center">Cross-Partnership Transfer</h3>
+      <h3 class="mb-4 text-center">Cross-Counterparty Transfer</h3>
 
       <FromAccountSelector
           v-model="crossCp.fromAccountId"
