@@ -1,5 +1,6 @@
 <script>
 import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
+import {fetchPartnerships} from "../services/partnership.js"
 import {
   mintToken,
   burnToken,
@@ -9,7 +10,8 @@ import {
   freeze,
   block,
   unblock,
-  grantRole, revokeRole
+  grantRole,
+  revokeRole
 } from "../services/tokens-api.js";
 import {formatAmount} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
@@ -21,6 +23,7 @@ import BlockTokenModal from "../components/modal/BlockTokenModal.vue";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import RolesModal from "../components/modal/RolesModal.vue";
+import {useNetworkStore} from "../js/stores/networkStore.js";
 
 export default {
   name: 'Tokens',
@@ -35,12 +38,28 @@ export default {
     TxToast,
     ErrorToast
   },
+  setup() {
+    const networkStore = useNetworkStore();
+    return {networkStore};
+  },
   data() {
     return {
       tokens: [],
       accounts: [],
+      partnerships: [],
       showTokenForm: '', // import, create
-      importTokenAddress: '',
+      importOptions: [
+        {
+          rel: 'EA', desc: 'External Address'
+        },
+        {
+          rel: 'PS', desc: 'Partnerships'
+        }],
+      importForm: {
+        rel: '',
+        selectedCP: {},
+        address: ''
+      },
       newToken: {
         name: '',
         symbol: '',
@@ -57,9 +76,21 @@ export default {
   mounted() {
     this.fetchTokens();
     this.fetchAccounts();
+    let selectedNetwork = useNetworkStore().selectedNetwork;
+    this.fetchAcceptedPartnerships(selectedNetwork?.id);
   },
   methods: {
     formatAmount,
+    prepareImportForm() {
+      this.showTokenForm = 'import';
+    },
+    async fetchAcceptedPartnerships(networkId) {
+      const res = await fetchPartnerships(networkId);
+      const partnershipsRaw = await res.json();
+      this.partnerships = partnershipsRaw.filter(p => {
+        return p.status === 'ACCEPTED'
+      });
+    },
     async fetchTokens() {
       const res = await fetchTokens();
       this.tokens = await res.json();
@@ -69,7 +100,7 @@ export default {
       this.accounts = await res.json();
     },
     async importToken() {
-      let address = this.importTokenAddress;
+      let address = this.importForm.address;
       if (address === undefined || address === null || address === '') {
         throw new Error('All parameters (address) must be defined and non-empty.');
       }
@@ -77,7 +108,7 @@ export default {
         return importToken({address});
       }, () => {
         this.showTokenForm = null;
-        this.importTokenAddress = '';
+        this.clearImportForm();
         return `Token has been imported`;
       });
     },
@@ -227,7 +258,22 @@ export default {
         error: 'Network Error',
         message: err.message
       };
+    },
+    clearImportForm() {
+      this.importForm.rel = '';
+      this.importForm.selectedCP = {}
+      this.importForm.address = '';
     }
+  },
+  computed: {
+    availableImportOptions() {
+      if (this.partnerships.length === 0) {
+        return [{
+            rel: 'EA', desc: 'External Address'
+          }];
+      }
+      return this.importOptions;
+    },
   }
 };
 </script>
@@ -239,7 +285,7 @@ export default {
     <!-- Toggle Import/Create Form -->
     <div v-if="!this.showTokenForm" class="d-flex justify-content-end mb-3 gap-2">
       <button class="btn btn-outline-warning btn-sm px-4" type="button"
-              @click="this.showTokenForm = 'import'">
+              @click="prepareImportForm()">
         Import
       </button>
       <button class="btn btn-outline-primary btn-sm px-4" type="button"
@@ -251,19 +297,53 @@ export default {
     <!-- Import Token Form -->
     <form v-if="this.showTokenForm === 'import'" @submit.prevent="importToken" class="mb-4">
       <div class="mb-3">
-        <input
-            v-model="importTokenAddress"
+        <select
+            v-model="importForm.rel"
+            class="form-select mb-2 w-25"
+            required
+        >
+          <option disabled value="">-- import option --</option>
+          <option v-for="importOption in availableImportOptions" :key="importOption.rel" :value="importOption.rel">
+            {{ importOption.desc }}
+          </option>
+        </select>
+
+        <input v-if="importForm.rel === 'EA'"
+            v-model="importForm.address"
             class="form-control"
             placeholder="Token hex address 0x..."
             pattern="^0x[a-fA-F0-9]{40}$"
             @input=""
         />
+
+        <select v-if="importForm.rel === 'PS' && partnerships"
+            v-model="importForm.selectedCP"
+            class="form-select mb-2 w-25"
+            required
+        >
+          <option disabled value="">-- select counterparty --</option>
+          <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
+            {{ cp.counterpartyName }}
+          </option>
+        </select>
+
+        <select v-if="importForm.rel === 'PS' && importForm.selectedCP?.availableTokens"
+            v-model="importForm.address"
+            class="form-select mb-2 w-25"
+            required
+        >
+          <option disabled value="">-- select token --</option>
+          <option v-for="token in importForm.selectedCP?.availableTokens" :key="token.id" :value="token.address">
+            {{ token.name }} ({{ token.symbol }})
+          </option>
+        </select>
+
       </div>
       <div class="d-flex justify-content-end gap-2">
         <button
             class="btn btn-outline-danger btn-sm"
             type="button"
-            @click="this.showTokenForm = null; this.importTokenAddress = ''"
+            @click="this.showTokenForm = null; clearImportForm()"
         >
           Cancel
         </button>
