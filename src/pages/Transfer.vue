@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      selectedForm: 'internal', // or 'internal'
+      selectedForm: "internal", // or 'internal'
       accounts: [], // should be populated externally
       partnerships: [],
       internal: {
@@ -43,6 +43,7 @@ export default {
         fromAccountId: "",
         toCounterpartyId: "",
         tokenId: "",
+        to: "",
         amount: null
       },
       tokens: [], // fetched from API
@@ -126,23 +127,23 @@ export default {
     },
     validateAmount() {
       let amount;
-      if (this.selectedForm === 'internal') {
+      if (this.selectedForm === "internal") {
         amount = this.internal.amount;
-      } else if (this.selectedForm === 'external') {
+      } else if (this.selectedForm === "external") {
         amount = this.transfer.amount;
-      } else if (this.selectedForm === 'cross_counterparty') {
+      } else if (this.selectedForm === "cross_counterparty") {
         amount = this.crossCp.amount;
       }
       let amountStr = amount?.toString();
       if (!amountStr || parseFloat(amountStr) <= 0) {
-        this.errors.amount = 'Amount must be greater than zero';
+        this.errors.amount = "Amount must be greater than zero";
         return;
       }
-      const decimalPart = amountStr.split('.')[1];
+      const decimalPart = amountStr.split(".")[1];
       if (decimalPart && decimalPart.length > 18) {
-        this.errors.amount = 'Amount must have at most 18 decimal places';
+        this.errors.amount = "Amount must have at most 18 decimal places";
       } else {
-        this.errors.amount = '';
+        this.errors.amount = "";
       }
     },
     async submitExternalWithdrawal() {
@@ -205,15 +206,15 @@ export default {
       this.selectedTokenInfo = null;
       this.selectedAsset = null;
       this.accountBalances = [];
-      this.internal = {from: '', tokenId: '', to: '', amount: null}
-      this.transfer = {accountId: '', tokenId: '', to: '', amount: null}
-      this.crossCp = {fromAccountId: '', tokenId: '', toCounterpartyId: '', amount: null}
+      this.internal = {from: "", tokenId: "", to: "", amount: null}
+      this.transfer = {accountId: "", tokenId: "", to: "", amount: null}
+      this.crossCp = {fromAccountId: "", tokenId: "", toCounterpartyId: "", amount: null, to: ""}
     },
     resetError() {
       this.transferSuccess = null;
       this.transferError = null;
-      this.errors.to = '';
-      this.errors.amount = '';
+      this.errors.to = "";
+      this.errors.amount = "";
     },
     async handleSuccess(response) {
       let txData = await response.json();
@@ -412,7 +413,21 @@ export default {
         </select>
       </div>
 
-      <div class="mb-3">
+      <!-- Target Account -->
+      <div class="mb-3" v-if="selectedPartnership.targetAccounts">
+        <label class="form-label">To Operational Account</label>
+        <select v-model="crossCp.to"
+                class="form-select"
+                required>
+          <option disabled value="">-- target account --</option>
+          <option v-for="acc in selectedPartnership.targetAccounts" :key="acc.id + '-to'" :value="acc.id">
+            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3" v-if="selectedPartnership.targetAccounts">
+        <label class="form-label">Select cross-used token</label>
         <select v-if="selectedPartnership"
                 v-model="crossCp.tokenId"
                 class="form-select" required
