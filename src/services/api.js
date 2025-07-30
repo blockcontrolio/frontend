@@ -157,6 +157,17 @@ export async function sendExternalWithdrawal(data) {
     })
 }
 
+export async function sendCrossCounterparty(data) {
+    return await fetch(`${apiBaseUrl}/transfers/cross-counterparty`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify(data)
+    })
+}
+
 export async function fetchTransactions() {
     return await fetch(`${apiBaseUrl}/transactions`, {
         headers: {
