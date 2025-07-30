@@ -95,26 +95,11 @@ export default {
       const res = await fetchPartnerships(networkId);
       const partnershipsRaw = await res.json();
       this.partnerships = partnershipsRaw.filter(p => {
-        return p.status === 'ACCEPTED' && this.hasTokensImported(p);
+        return p.status === 'ACCEPTED' && this.hasCrossUsedTokens(p);
       });
     },
-    hasTokensImported(partnership) {
-      return this.tokens.some(t => {
-        if (t.own) {
-          return false; // take care only about imported
-        }
-        let tokenOwnerId = t.counterparty.internalId;
-        return tokenOwnerId === partnership.sourceCounterpartyId || tokenOwnerId === partnership.targetCounterpartyId
-      })
-    },
-    showAvailableTokens() {
-      this.availableTokensCp = this.tokens.filter(t => {
-        if (t.own) {
-          return false; // take care only about imported
-        }
-        let tokenOwnerId = t.counterparty.internalId;
-        return tokenOwnerId === this.selectedPartnership.sourceCounterpartyId || tokenOwnerId === this.selectedPartnership.targetCounterpartyId
-      })
+    hasCrossUsedTokens(partnership) {
+      return partnership.crossUsedTokens?.length > 0;
     },
     showBalance(assetId) {
       this.selectedAsset = this.accountBalances
@@ -419,7 +404,6 @@ export default {
         <select v-if="partnerships"
                 v-model="selectedPartnership"
                 class="form-select" required
-                v-on:change="showAvailableTokens()"
         >
           <option disabled value="">-- select counterparty --</option>
           <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
@@ -429,13 +413,13 @@ export default {
       </div>
 
       <div class="mb-3">
-        <select v-if="availableTokensCp"
+        <select v-if="selectedPartnership"
                 v-model="crossCp.tokenId"
                 class="form-select" required
                 v-on:change="showBalance(crossCp.tokenId)"
         >
           <option disabled value="">-- select token --</option>
-          <option v-for="token in availableTokensCp" :key="token.id" :value="token.id">
+          <option v-for="token in selectedPartnership.crossUsedTokens" :key="token.id" :value="token.id">
             {{ token.name }} ({{ token.symbol }})
           </option>
         </select>
