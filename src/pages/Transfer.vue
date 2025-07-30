@@ -28,22 +28,22 @@ export default {
       accounts: [], // should be populated externally
       partnerships: [],
       internal: {
-        from: "",
-        tokenId: "",
-        to: "",
+        fromAccountId: "",
+        assetId: "",
+        toAccountId: "",
         amount: null
       },
       transfer: {
-        accountId: "",
-        tokenId: "",
-        to: "",
+        fromAccountId: "",
+        assetId: "",
+        toAddress: "",
         amount: null
       },
       crossCp: {
         fromAccountId: "",
         toCounterpartyId: "",
         assetId: "",
-        to: "",
+        toAccountId: "",
         amount: null
       },
       tokens: [], // fetched from API
@@ -62,8 +62,8 @@ export default {
   },
   computed: {
     availableTargetAccounts() {
-      if (!this.internal.from) return this.accounts;
-      return this.accounts.filter(acc => acc.id !== this.internal.from);
+      if (!this.internal.fromAccountId) return this.accounts;
+      return this.accounts.filter(acc => acc.id !== this.internal.fromAccountId);
     },
     hasErrors() {
       return !!this.errors.to || !!this.errors.amount;
@@ -115,11 +115,11 @@ export default {
     },
     validateToAddress() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
-      if (!this.transfer.to) {
+      if (!this.transfer.toAddress) {
         this.errors.to = 'Address is required';
-      } else if (this.transfer.to.length !== 42) {
+      } else if (this.transfer.toAddress.length !== 42) {
         this.errors.to = 'Hex string has invalid length';
-      } else if (!hexRegex.test(this.transfer.to)) {
+      } else if (!hexRegex.test(this.transfer.toAddress)) {
         this.errors.to = 'Must be a valid hex string (e.g., 0x123abc...)';
       } else {
         this.errors.to = '';
@@ -206,8 +206,8 @@ export default {
       this.selectedTokenInfo = null;
       this.selectedAsset = null;
       this.accountBalances = [];
-      this.internal = {from: "", tokenId: "", to: "", amount: null}
-      this.transfer = {accountId: "", tokenId: "", to: "", amount: null}
+      this.internal = {from: "", assetId: "", to: "", amount: null}
+      this.transfer = {fromAccountId: "", assetId: "", to: "", amount: null}
       this.crossCp = {fromAccountId: "", assetId: "", toCounterpartyId: "", amount: null, to: ""}
     },
     resetError() {
@@ -270,19 +270,19 @@ export default {
 
       <!-- Source Account -->
       <FromAccountSelector
-          v-model="internal.from"
+          v-model="internal.fromAccountId"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { fetchBalances(val); internal.tokenId = '' }"
+          @change="val => { fetchBalances(val); internal.assetId = '' }"
       />
 
       <!-- Token Selection -->
       <div class="mb-3">
         <label class="form-label">Select Asset</label>
         <select
-            v-model="internal.tokenId"
+            v-model="internal.assetId"
             class="form-select" required
-            v-on:change="showBalance(internal.tokenId)"
+            v-on:change="showBalance(internal.assetId)"
         >
           <option disabled value="">-- select asset --</option>
           <option
@@ -303,7 +303,7 @@ export default {
       <!-- Target Account -->
       <div class="mb-3">
         <label class="form-label">To Account</label>
-        <select v-model="internal.to"
+        <select v-model="internal.toAccountId"
                 class="form-select"
                 required>
           <option disabled value="">-- target account --</option>
@@ -331,19 +331,19 @@ export default {
       <h3 class="mb-4 text-center">Withdraw to external Address</h3>
 
       <FromAccountSelector
-          v-model="transfer.accountId"
+          v-model="transfer.fromAccountId"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { fetchBalances(val); transfer.tokenId = '' }"
+          @change="val => { fetchBalances(val); transfer.assetId = '' }"
       />
 
       <!-- Token Selection -->
       <div class="mb-3">
         <label class="form-label">Select Asset</label>
         <select
-            v-model="transfer.tokenId"
+            v-model="transfer.assetId"
             class="form-select" required
-            v-on:change="showBalance(transfer.tokenId)"
+            v-on:change="showBalance(transfer.assetId)"
         >
           <option disabled value="">-- select asset --</option>
           <option
@@ -365,7 +365,7 @@ export default {
       <div class="mb-3">
         <label class="form-label">To Address</label>
         <input
-            v-model="transfer.to"
+            v-model="transfer.toAddress"
             class="form-control"
             placeholder="Recipient hex address 0x..."
             pattern="^0x[a-fA-F0-9]{40}$"
@@ -416,7 +416,7 @@ export default {
       <!-- Target Account -->
       <div class="mb-3" v-if="selectedPartnership.targetAccounts">
         <label class="form-label">To Operational Account</label>
-        <select v-model="crossCp.to"
+        <select v-model="crossCp.toAccountId"
                 class="form-select"
                 required>
           <option disabled value="">-- target account --</option>
