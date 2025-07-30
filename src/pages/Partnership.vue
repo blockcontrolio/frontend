@@ -115,33 +115,32 @@ export default {
           <div class="row align-items-center">
 
             <!-- Counterparty Name -->
-            <div class="col-3">
-              <span class="h6 mb-0">{{ p.counterpartyName }}</span>
+            <div class="col-4 text-start">
+              <strong class="text-secondary">{{ p.counterpartyName }}</strong>
             </div>
 
-            <!-- Status -->
-            <div class="col-2 text-center">
-              <span v-if="p.status" :class="statusColor(p.status)">
-                {{ p.status }}
-              </span>
-            </div>
-
-            <!-- Requested At -->
-            <div class="col-3 text-center">
+            <!-- Mid column -->
+            <div class="col-5 text-start">
+              <div v-if="p.status === 'ACCEPTED'" class="small">
+                <div class="label me-2">Accepted tokens:</div>
+                <div class="value text-secondary-emphasis">
+                  <strong>
+                    {{ p.acceptedTokens.map(t => t.symbol).join(', ') }}
+                  </strong>
+                </div>
+              </div>
+              <div v-if="p.status === 'PENDING'" class="small">
               <span v-if="p.status === 'PENDING'" class="">
-                Requested: {{ formatDate(p.requestedAt) }}
+                <span :class="statusColor(p.status)" class="me-2">Requested:</span>{{ formatDate(p.requestedAt) }}
               </span>
-              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
-                Accepted: {{ formatDate(p.resolvedAt) }}
-              </span>
-              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
-                Rejected: {{ formatDate(p.resolvedAt) }}
-              </span>
-
+              </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="col-4 text-end">
+            <!-- Actions column -->
+            <div class="col-3 text-end">
+
+            <!-- action buttons -->
+            <div v-if="!p.status || p.status === 'PENDING'" class="">
               <button
                   v-if="p.hasRelation === false"
                   class="btn btn-outline-primary btn-sm"
@@ -175,6 +174,25 @@ export default {
                   Accept
                 </button>
               </div>
+            </div>
+
+            <!-- when status final -->
+            <div v-else class="small">
+              <div v-if="p.status === 'ACCEPTED'" class="label">
+                Target Operational Accounts:
+                <span class="value me-1">
+                  {{ p.targetAccounts.length }}
+                </span>
+                <i v-if="p.targetAccounts" class="bi bi-check2-circle text-success bold"></i>
+                <i v-else class="bi bi-ban text-danger bold"></i>
+              </div>
+              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
+                <span :class="statusColor(p.status)" class="me-2">Accepted:</span>{{ formatDate(p.resolvedAt) }}
+              </span>
+              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
+                <span :class="statusColor(p.status)" class="me-2">Rejected:</span>{{ formatDate(p.resolvedAt) }}
+              </span>
+            </div>
             </div>
 
           </div>
