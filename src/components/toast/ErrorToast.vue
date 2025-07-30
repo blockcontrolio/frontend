@@ -56,7 +56,7 @@ export default {
         <div class="d-flex align-items-center justify-content-center">
           <button
               type="button"
-              class="btn-close btn-close-white mx-2"
+              class="btn-close mx-2"
               @click="hideToast"
               aria-label="Close">
           </button>
@@ -68,9 +68,9 @@ export default {
 
 <style scoped>
 .custom-error-alert {
-  background-color: #1f1f2e; /* deep space dark */
-  border-color: #ff4c4c; /* electric red/orange */
-  color: #ffcccc; /* light red text for readability */
+  background-color: var(--color-bg-card);
+  border-color: var(--color-border);
+  color: var(--color-text-main);
   border-radius: 0.375rem;
 }
 </style>
