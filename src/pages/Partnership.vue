@@ -122,7 +122,7 @@ export default {
             <!-- Mid column -->
             <div class="col-5 text-start">
               <div v-if="p.status === 'ACCEPTED'" class="small">
-                <div class="label me-2">Accepted tokens:</div>
+                <div class="label me-2">Transferable tokens:</div>
                 <div class="value text-secondary-emphasis">
                   <strong>
                     {{ p.acceptedTokens.map(t => t.symbol).join(', ') }}
@@ -179,11 +179,11 @@ export default {
             <!-- when status final -->
             <div v-else class="small">
               <div v-if="p.status === 'ACCEPTED'" class="label">
-                Target Operational Accounts:
+                Operational Accounts Availability:
                 <span class="value me-1">
                   {{ p.targetAccounts.length }}
                 </span>
-                <i v-if="p.targetAccounts" class="bi bi-check2-circle text-success bold"></i>
+                <i v-if="p.targetAccounts?.length > 0" class="bi bi-check2-circle text-success bold"></i>
                 <i v-else class="bi bi-ban text-danger bold"></i>
               </div>
               <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
