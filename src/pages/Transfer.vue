@@ -100,7 +100,7 @@ export default {
       });
     },
     hasCrossUsedTokens(partnership) {
-      return partnership.crossUsedTokens?.length > 0;
+      return partnership.acceptedTokens?.length > 0;
     },
     showBalance(assetId) {
       this.selectedAsset = this.accountBalances
@@ -434,7 +434,7 @@ export default {
                 v-on:change="showBalance(crossCp.tokenId)"
         >
           <option disabled value="">-- select token --</option>
-          <option v-for="token in selectedPartnership.crossUsedTokens" :key="token.id" :value="token.id">
+          <option v-for="token in selectedPartnership.acceptedTokens" :key="token.id" :value="token.id">
             {{ token.name }} ({{ token.symbol }})
           </option>
         </select>
