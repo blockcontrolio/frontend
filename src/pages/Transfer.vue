@@ -42,7 +42,7 @@ export default {
       crossCp: {
         fromAccountId: "",
         toCounterpartyId: "",
-        tokenId: "",
+        assetId: "",
         to: "",
         amount: null
       },
@@ -208,7 +208,7 @@ export default {
       this.accountBalances = [];
       this.internal = {from: "", tokenId: "", to: "", amount: null}
       this.transfer = {accountId: "", tokenId: "", to: "", amount: null}
-      this.crossCp = {fromAccountId: "", tokenId: "", toCounterpartyId: "", amount: null, to: ""}
+      this.crossCp = {fromAccountId: "", assetId: "", toCounterpartyId: "", amount: null, to: ""}
     },
     resetError() {
       this.transferSuccess = null;
@@ -395,7 +395,7 @@ export default {
           v-model="crossCp.fromAccountId"
           :accounts="accounts"
           :selected-asset="selectedAsset"
-          @change="val => { fetchBalances(val); crossCp.tokenId = '' }"
+          @change="val => { fetchBalances(val); crossCp.assetId = '' }"
       />
 
       <!-- Partnership Selection -->
@@ -429,9 +429,9 @@ export default {
       <div class="mb-3" v-if="selectedPartnership.targetAccounts">
         <label class="form-label">Select cross-used token</label>
         <select v-if="selectedPartnership"
-                v-model="crossCp.tokenId"
+                v-model="crossCp.assetId"
                 class="form-select" required
-                v-on:change="showBalance(crossCp.tokenId)"
+                v-on:change="showBalance(crossCp.assetId)"
         >
           <option disabled value="">-- select token --</option>
           <option v-for="token in selectedPartnership.acceptedTokens" :key="token.id" :value="token.id">
