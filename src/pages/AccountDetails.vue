@@ -5,7 +5,12 @@ import {fetchAccount, fetchAssetBalances, updateAccount} from "../services/api.j
 export default {
   data() {
     return {
-      account: null,
+      account: {
+        ref: "",
+        name: "",
+        type: ""
+      },
+      originalAccount: {},
       balances: []
     };
   },
@@ -23,7 +28,9 @@ export default {
     formatDate,
     async fetchAccount(id) {
       let res = await fetchAccount(id);
-      this.account = await res.json();
+      let account = await res.json();
+      this.account = {...account};
+      this.originalAccount = {...account}; // deep clone
     },
     async fetchBalances(id) {
       let res = await fetchAssetBalances(id);
@@ -31,14 +38,34 @@ export default {
     },
     async updateAccount() {
       const id = this.$route.params.id;
-      let newModel = {
-        name: this.account.name
+      const patch = this.buildPatch(this.account, this.originalAccount);
+      if (Object.keys(patch).length === 0) {
+        console.log("No changes to send.");
+        return;
       }
-      await updateAccount(id, newModel);
+      await updateAccount(id, patch);
     },
     goBack() {
       this.$router.push('/accounts');
     },
+    buildPatch(newModel, originalModel) {
+      const patch = {};
+      for (const key in newModel) {
+        if (newModel[key] !== originalModel[key]) {
+          patch[key] = newModel[key];
+        }
+      }
+      return patch;
+    }
+  },
+  computed: {
+    hasChanges() {
+      if (!this.originalAccount) return false;
+
+      return Object.keys(this.account).some(key => {
+        return this.account[key] !== this.originalAccount[key];
+      });
+    }
   },
 };
 </script>
@@ -65,7 +92,7 @@ export default {
         <div class="col-4"><strong>Name:</strong></div>
         <div class="col-8">
           <input v-model="account.name"
-                 class="form-control mb-2" disabled/>
+                 class="form-control mb-2"/>
         </div>
       </div>
 
@@ -93,7 +120,7 @@ export default {
       <div class="d-flex justify-content-end mt-4">
         <button
             class="btn btn-outline-primary btn-sm"
-            :disabled="true"
+            :disabled="!hasChanges"
             @click="updateAccount"
         >
           Save Changes

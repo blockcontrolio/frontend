@@ -78,7 +78,7 @@ export async function fetchAccount(id) {
 
 export async function updateAccount(id, accountInfo) {
     await fetch(`${apiBaseUrl}/accounts/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -111,14 +111,14 @@ export async function fetchAssetBalance(accountId, assetId) {
     });
 }
 
-export async function createAccount(newAccount) {
+export async function createAccount(accountInfo) {
     return await fetch(`${apiBaseUrl}/accounts`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
-        body: JSON.stringify(newAccount)
+        body: JSON.stringify(accountInfo)
     });
 }
 

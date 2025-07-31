@@ -20,9 +20,9 @@ export default {
         {
           code: 'SMART', desc: 'Smart Contract Account'
         }],
-      searchQuery: '',
+      searchQuery: "",
       accounts: [],
-      form: {name: '', ref: '', type: '', walletType: '', paymasterId: ''},
+      form: {name: "", ref: "", type: "", walletType: "", paymasterId: ""},
       showCreateForm: false,
       errors: {
         ref: ""
@@ -50,13 +50,13 @@ export default {
       }
     },
     clearForm() {
-      this.form = {ref: '', name: '', type: '', walletType: '', paymasterId: ''}; // clear inputs
+      this.form = {ref: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
     },
     validateRef() {
       if (this.form.ref.length < 4) {
         this.errors.ref = 'Ref must be unique and contain at least 4 letters or numbers';
       } else {
-        this.errors.ref = '';
+        this.errors.ref = "";
       }
     },
     resetError() {
