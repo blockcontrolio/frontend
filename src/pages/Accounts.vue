@@ -3,9 +3,10 @@ import {useRouter} from "vue-router";
 import {createAccount, fetchAccounts} from '../services/api'
 import {formatDate} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
+import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 
 export default {
-  components: {AddrScanLink},
+  components: {AccountTypeSelect, AddrScanLink},
   setup() {
     let router = useRouter();
     return {router}
@@ -116,16 +117,10 @@ export default {
           class="form-control mb-2"
           placeholder="Account Name"
       />
-      <select
+      <AccountTypeSelect
           v-model="form.type"
-          class="form-select mb-2 w-25"
-          required
-      >
-        <option disabled value="">-- account type --</option>
-        <option v-for="accountType in availableAccountTypes" :key="accountType" :value="accountType">
-          {{ accountType }}
-        </option>
-      </select>
+          :account-types="availableAccountTypes"
+      />
       <input
           v-model="form.ref"
           class="form-control mb-2"
