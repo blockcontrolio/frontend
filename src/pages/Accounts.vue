@@ -194,12 +194,12 @@ export default {
               {{ acc.id.substring(0, 6) }}…{{ acc.id.substring(acc.id.length - 4) }}
             </router-link>
           </td>
-          <td>{{ acc.name || '(Unnamed)' }}</td>
-          <td>{{ acc.type }}</td>
+          <td class="mono">{{ acc.name || '(Unnamed)' }}</td>
+          <td class="mono">{{ acc.type }}</td>
           <td>
             <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
           </td>
-          <td>
+          <td class="mono">
             {{ acc.walletType }}
             <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>

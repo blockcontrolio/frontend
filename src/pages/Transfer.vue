@@ -420,7 +420,7 @@ export default {
                 required>
           <option disabled value="">-- target account --</option>
           <option v-for="acc in selectedPartnership.targetAccounts" :key="acc.id + '-to'" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+            {{ acc.name || '(Unnamed)' }}
           </option>
         </select>
       </div>
@@ -433,8 +433,8 @@ export default {
                 v-on:change="showBalance(crossCp.assetId)"
         >
           <option disabled value="">-- select asset --</option>
-          <option v-for="token in selectedPartnership.partneredAssets" :key="token.id" :value="token.id">
-            {{ token.name }} ({{ token.symbol }})
+          <option v-for="asset in selectedPartnership.partneredAssets" :key="asset.id" :value="asset.id">
+            {{ asset.name }} ({{ asset.symbol }})
           </option>
         </select>
       </div>
