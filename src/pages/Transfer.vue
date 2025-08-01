@@ -56,8 +56,7 @@ export default {
       accountBalances: [],
       selectedAsset: null,
       selectedTokenInfo: null,
-      selectedPartnership: {},
-      availableTokensCp: []
+      selectedPartnership: {}
     };
   },
   computed: {
@@ -100,7 +99,7 @@ export default {
       });
     },
     hasCrossUsedTokens(partnership) {
-      return partnership.acceptedTokens?.length > 0;
+      return partnership.partneredAssets?.length > 0;
     },
     showBalance(assetId) {
       this.selectedAsset = this.accountBalances
@@ -276,7 +275,7 @@ export default {
           @change="val => { fetchBalances(val); internal.assetId = '' }"
       />
 
-      <!-- Token Selection -->
+      <!-- Asset Selection -->
       <div class="mb-3">
         <label class="form-label">Select Asset</label>
         <select
@@ -427,14 +426,14 @@ export default {
       </div>
 
       <div class="mb-3" v-if="selectedPartnership.targetAccounts">
-        <label class="form-label">Select cross-used token</label>
+        <label class="form-label">Select asset</label>
         <select v-if="selectedPartnership"
                 v-model="crossCp.assetId"
                 class="form-select" required
                 v-on:change="showBalance(crossCp.assetId)"
         >
-          <option disabled value="">-- select token --</option>
-          <option v-for="token in selectedPartnership.acceptedTokens" :key="token.id" :value="token.id">
+          <option disabled value="">-- select asset --</option>
+          <option v-for="token in selectedPartnership.partneredAssets" :key="token.id" :value="token.id">
             {{ token.name }} ({{ token.symbol }})
           </option>
         </select>

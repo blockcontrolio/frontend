@@ -122,10 +122,10 @@ export default {
             <!-- Mid column -->
             <div class="col-5 text-start">
               <div v-if="p.status === 'ACCEPTED'" class="small">
-                <div class="label me-2">Transferable tokens:</div>
+                <div class="label me-2">Transferable assets:</div>
                 <div class="value text-secondary-emphasis">
                   <strong>
-                    {{ p.acceptedTokens.map(t => t.symbol).join(', ') }}
+                    {{ p.partneredAssets.map(t => t.symbol).join(', ') }}
                   </strong>
                 </div>
               </div>

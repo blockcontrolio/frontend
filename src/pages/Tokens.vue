@@ -327,13 +327,13 @@ export default {
           </option>
         </select>
 
-        <select v-if="importForm.rel === 'PS' && importForm.selectedCP?.availableTokens"
+        <select v-if="importForm.rel === 'PS' && importForm.selectedCP?.availableAssets"
             v-model="importForm.address"
             class="form-select mb-2 w-25"
             required
         >
           <option disabled value="">-- select token --</option>
-          <option v-for="token in importForm.selectedCP?.availableTokens" :key="token.id" :value="token.address">
+          <option v-for="token in importForm.selectedCP?.availableAssets" :key="token.id" :value="token.address">
             {{ token.name }} ({{ token.symbol }})
           </option>
         </select>
