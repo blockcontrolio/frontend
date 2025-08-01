@@ -1,10 +1,13 @@
 <script>
 import {formatAmount, formatDate} from "../js/utils.js";
 import {fetchAccount, fetchAssetBalances, updateAccount} from "../services/api.js";
+import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 
 export default {
+  components: {AccountTypeSelect},
   data() {
     return {
+      accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
       account: {
         ref: "",
         name: "",
@@ -59,6 +62,12 @@ export default {
     }
   },
   computed: {
+    availableAccountTypes() {
+      if (this.account.type === 'ADMIN') {
+        return ['ADMIN'];
+      }
+      return this.accountTypes;
+    },
     hasChanges() {
       if (!this.originalAccount) return false;
 
@@ -93,6 +102,15 @@ export default {
         <div class="col-8">
           <input v-model="account.name"
                  class="form-control mb-2"/>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-4"><strong>Type:</strong></div>
+        <div class="col-8">
+          <AccountTypeSelect
+              v-model="account.type"
+              :account-types="availableAccountTypes"
+          />
         </div>
       </div>
 
