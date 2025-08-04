@@ -49,31 +49,31 @@ export default {
       <thead class="">
       <tr>
         <th scope="col">To</th>
-        <th scope="col">Amount</th>
+        <th scope="col">Asset</th>
         <th scope="col" class="text-center">Status</th>
         <th scope="col">Tx Hash</th>
         <th scope="col">Create Time</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="tx in transfers" :key="tx.txHash">
-        <td>{{ tx.to }}</td>
-        <td>{{ formatAmount(tx.amount) }}</td>
+      <tr v-for="transfer in transfers" :key="transfer.txHash">
+        <td class="mono">{{ transfer.to }}</td>
+        <td class="mono">{{ formatAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
         <td class="text-center">
           <span class="badge"
-              :class="{ 'bg-success': tx.status === 'SUCCESS', 'bg-warning': tx.status === 'PENDING', 'bg-danger': tx.status === 'FAILED' }">
-            {{ tx.status }}
+              :class="{ 'bg-success': transfer.status === 'SUCCESS', 'bg-warning': transfer.status === 'PENDING', 'bg-danger': transfer.status === 'FAILED' }">
+            {{ transfer.status }}
           </span>
         </td>
         <td>
-          <a class="ether-scan-link" :href="etherScanLink(tx.txHash)" target="_blank" rel="noopener noreferrer">
+          <a class="ether-scan-link" :href="etherScanLink(transfer.txHash)" target="_blank" rel="noopener noreferrer">
             <code>
-              {{ tx.txHash.slice(0, 10) }}...
+              {{ transfer.txHash.slice(0, 10) }}...
             </code>
           </a>
         </td>
-        <td>
-          {{ formatDate(tx.createTime) }}
+        <td class="mono">
+          {{ formatDate(transfer.createTime) }}
         </td>
       </tr>
       </tbody>
