@@ -49,6 +49,7 @@ export default {
       <thead class="">
       <tr>
         <th v-if="!accountId" scope="col">From Account</th>
+        <th scope="col">Destination</th>
         <th scope="col">To</th>
         <th scope="col">Asset</th>
         <th scope="col" class="text-center">Status</th>
@@ -64,7 +65,17 @@ export default {
             {{ transfer.accountFrom?.name || '(Unnamed)' }}
           </router-link>
         </td>
-        <td class="mono">{{ transfer.to }}</td>
+        <td class="mono">{{ transfer.transferType }}</td>
+        <td v-if="transfer.transferType === 'INTERNAL'" class="mono">
+          <router-link :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }"
+                       class="">
+            {{ transfer.accountTo?.name || '(Unnamed)' }}
+          </router-link>
+        </td>
+        <td v-else-if="transfer.transferType === 'CROSS'" class="mono">
+          {{ transfer.counterpartyTo?.name }} :: {{ transfer.accountTo?.name || '(Unnamed Account)' }}
+        </td>
+        <td v-else class="mono">{{ transfer.to }}</td>
         <td class="mono">{{ formatAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
         <td class="text-center">
           <span class="badge"
