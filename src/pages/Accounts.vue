@@ -178,8 +178,8 @@ export default {
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th scope="col">Account ID</th>
-          <th scope="col">Name</th>
+          <th scope="col">Account Name</th>
+          <th scope="col">Ref</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
           <th scope="col">Wallet Type</th>
@@ -191,10 +191,10 @@ export default {
           <td>
             <router-link :to="{ name: 'account-details', params: { id: acc.id } }"
                          class="">
-              {{ acc.id.substring(0, 6) }}…{{ acc.id.substring(acc.id.length - 4) }}
+              {{ acc.name || '(Unnamed)' }}
             </router-link>
           </td>
-          <td class="mono">{{ acc.name || '(Unnamed)' }}</td>
+          <td class="mono">{{ acc.ref }}</td>
           <td class="mono">{{ acc.type }}</td>
           <td>
             <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
@@ -204,7 +204,7 @@ export default {
             <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>
           <td>
-            <router-link :to="{ name: 'Transfers', params: { accountId: acc.id } }"
+            <router-link :to="{ name: 'account-transfers', params: { accountId: acc.id } }"
                          class="">
               Transfers
             </router-link>

@@ -48,6 +48,7 @@ export default {
     <table class="table table-bordered mt-4">
       <thead class="">
       <tr>
+        <th v-if="!accountId" scope="col">From Account</th>
         <th scope="col">To</th>
         <th scope="col">Asset</th>
         <th scope="col" class="text-center">Status</th>
@@ -56,7 +57,13 @@ export default {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="transfer in transfers" :key="transfer.txHash">
+      <tr v-for="transfer in transfers" :key="transfer.internalId">
+        <td v-if="!accountId" class="mono">
+          <router-link :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }"
+                       class="">
+            {{ transfer.accountFrom?.name || '(Unnamed)' }}
+          </router-link>
+        </td>
         <td class="mono">{{ transfer.to }}</td>
         <td class="mono">{{ formatAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
         <td class="text-center">

@@ -123,14 +123,18 @@ export async function createAccount(accountInfo) {
 }
 
 export async function fetchTransfers(accountId) {
-    return await fetch(`${apiBaseUrl}/transfers?accountId=${accountId}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${loadAuthToken()}`
-            }
+    const url = new URL(`${apiBaseUrl}/transfers`);
+
+    if (accountId !== undefined) {
+        url.searchParams.set('accountId', accountId);
+    }
+
+    return await fetch(url, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
         }
-    ).catch(err => {
+    }).catch(err => {
         console.error('Failed to load account transfers', err);
     });
 }

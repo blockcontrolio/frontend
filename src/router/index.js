@@ -34,6 +34,12 @@ const routes = [
         component: AccountDetails
     },
     {
+        path: '/accounts/:accountId/transfers',
+        name: 'account-transfers',
+        component: () => import('../pages/AccountTransfers.vue'),
+        props: true
+    },
+    {
         path: '/transactions',
         component: Transactions
     },
@@ -43,8 +49,8 @@ const routes = [
         component: TransactionDetails
     },
     {
-        path: '/transfers/:accountId',
-        name: 'Transfers',
+        path: '/transfers',
+        name: 'counterparty-transfers',
         component: () => import('../pages/AccountTransfers.vue'),
         props: true
     },
