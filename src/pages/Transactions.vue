@@ -36,7 +36,7 @@ export default {
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th scope="col">Internal ID</th>
+          <th scope="col">ID</th>
           <th scope="col">Type</th>
           <th scope="col">From</th>
           <th scope="col">Status</th>

@@ -36,7 +36,7 @@ export default {
 </script>
 
 <template>
-  <h3 class="bold p-2">Recent Transfers</h3>
+  <h3 class="bold p-2">Recent Asset Transfers</h3>
   <div class="px-2 mt-3">
     <!-- return to accounts list button -->
     <button
@@ -48,10 +48,10 @@ export default {
     <table class="table table-bordered mt-4">
       <thead class="">
       <tr>
-        <th v-if="!accountId" scope="col">From Account</th>
-        <th scope="col">Destination</th>
+        <th v-if="!accountId" scope="col">From</th>
+        <th scope="col">Transfer Type</th>
         <th scope="col">To</th>
-        <th scope="col">Asset</th>
+        <th scope="col">Amount</th>
         <th scope="col" class="text-center">Status</th>
         <th scope="col">Tx Hash</th>
         <th scope="col">Create Time</th>
