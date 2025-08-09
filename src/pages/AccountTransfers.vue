@@ -2,9 +2,11 @@
 import {useExplorerUtils} from "../js/composables/explorerUtils.js";
 import {formatDate, roundAmount} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
+import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
 export default {
   name: 'Transfers',
+  components: {AddrScanLink},
   props: ['accountId'],
   setup() {
     const {etherScanLink} = useExplorerUtils();
@@ -78,7 +80,9 @@ export default {
             {{ transfer.accountTo?.name || '(Unnamed)' }}
           </router-link>
         </td>
-        <td v-else class="mono">{{ transfer.to }}</td>
+        <td v-else class="mono">
+          <addr-scan-link :type="'account'" :address="transfer.to"></addr-scan-link>
+        </td>
         <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
         <td class="text-center">
           <span class="badge"
