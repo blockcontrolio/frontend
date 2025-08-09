@@ -55,6 +55,12 @@ const routes = [
         props: true
     },
     {
+        path: '/transfers/:transferId',
+        name: 'transfer-details',
+        component: () => import('../pages/TransferDetails.vue'),
+        props: true
+    },
+    {
         path: '/partnership',
         component: Partnership
     },
