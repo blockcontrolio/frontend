@@ -54,18 +54,18 @@ export default {
           </span>
       </div>
       <div class="tx-line">
-        <span class="label">From Account:</span>
+        <span class="label">Account From:</span>
         <router-link v-if="transfer.accountFrom && transfer.accountFrom.id"
                      :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }">
           {{ transfer.accountFrom?.name || '(Unnamed)' }}
         </router-link>
       </div>
-      <div class="tx-line mono" v-if="transfer.transferType === 'CROSS'">
-        <span class="label">To Counterparty:</span>
+      <div class="tx-line" v-if="transfer.transferType === 'CROSS'">
+        <span class="label">Counterparty To:</span>
         {{ transfer.counterpartyTo?.name }} :: {{ transfer.accountTo?.name || '(Unnamed Account)' }}
       </div>
       <div class="tx-line" v-if="transfer.transferType === ('INTERNAL' || 'CROSS')">
-        <span class="label">To Account:</span>
+        <span class="label">Account To:</span>
         <router-link v-if="transfer.accountTo && transfer.accountTo.id"
                      :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }">
           {{ transfer.accountTo?.name || '(Unnamed)' }}
