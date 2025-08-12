@@ -178,12 +178,12 @@ export default {
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th scope="col">Account Name</th>
+          <th scope="col">Name</th>
           <th scope="col">Ref</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
           <th scope="col">Wallet Type</th>
-          <th scope="col" style="width: 100px;">Recent Transfers</th>
+          <th scope="col" style="width: 100px;">Transfers</th>
         </tr>
         </thead>
         <tbody>
@@ -204,16 +204,16 @@ export default {
             <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>
           <td>
-            <router-link :to="{ name: 'account-transfers', params: { accountId: acc.id } }"
+            <router-link v-if="acc.transfersTotal" :to="{ name: 'account-transfers', params: { accountId: acc.id } }"
                          class="">
-              Transfers
+              Transfers ({{ acc.transfersTotal }})
             </router-link>
           </td>
         </tr>
         </tbody>
       </table>
     </div>
-    <div v-else class="">No accounts yet.</div>
+    <div v-else class="">No accounts yet. Please create</div>
   </div>
 </template>
 

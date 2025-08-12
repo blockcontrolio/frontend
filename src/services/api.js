@@ -139,6 +139,19 @@ export async function fetchTransfers(accountId) {
     });
 }
 
+export async function fetchTransferDetails(transferId) {
+    const url = new URL(`${apiBaseUrl}/transfers/${transferId}`);
+
+    return await fetch(url, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to load account transfers', err);
+    });
+}
+
 export async function sendInternalTransfer(data) {
     return await fetch(`${apiBaseUrl}/transfers/internal`, {
         method: 'POST',

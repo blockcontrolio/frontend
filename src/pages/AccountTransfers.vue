@@ -1,10 +1,12 @@
 <script>
 import {useExplorerUtils} from "../js/composables/explorerUtils.js";
-import {formatAmount, formatDate} from "../js/utils.js";
+import {formatDate, roundAmount} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
+import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
 export default {
   name: 'Transfers',
+  components: {AddrScanLink},
   props: ['accountId'],
   setup() {
     const {etherScanLink} = useExplorerUtils();
@@ -22,7 +24,7 @@ export default {
     this.loadTransfers();
   },
   methods: {
-    formatAmount,
+    roundAmount,
     formatDate,
     async loadTransfers() {
       const res = await fetchTransfers(this.accountId);
@@ -36,7 +38,7 @@ export default {
 </script>
 
 <template>
-  <h3 class="bold p-2">Recent Transfers</h3>
+  <h3 class="bold p-2">Recent Asset Transfers</h3>
   <div class="px-2 mt-3">
     <!-- return to accounts list button -->
     <button
@@ -48,9 +50,11 @@ export default {
     <table class="table table-bordered mt-4">
       <thead class="">
       <tr>
-        <th v-if="!accountId" scope="col">From Account</th>
+        <th scope="col">ID</th>
+        <th scope="col">Transfer</th>
+        <th v-if="!accountId" scope="col">From</th>
         <th scope="col">To</th>
-        <th scope="col">Asset</th>
+        <th scope="col">Amount</th>
         <th scope="col" class="text-center">Status</th>
         <th scope="col">Tx Hash</th>
         <th scope="col">Create Time</th>
@@ -58,14 +62,28 @@ export default {
       </thead>
       <tbody>
       <tr v-for="transfer in transfers" :key="transfer.internalId">
+        <td>
+          <router-link :to="{ name: 'transfer-details', params: { transferId: transfer.internalId } }">
+            {{ transfer.internalId.substring(0, 6) }}…{{ transfer.internalId.substring(transfer.internalId.length - 4) }}
+          </router-link>
+        </td>
+        <td class="mono">{{ transfer.transferType }}</td>
         <td v-if="!accountId" class="mono">
           <router-link :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }"
                        class="">
             {{ transfer.accountFrom?.name || '(Unnamed)' }}
           </router-link>
         </td>
-        <td class="mono">{{ transfer.to }}</td>
-        <td class="mono">{{ formatAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
+        <td v-if="transfer.transferType === 'INTERNAL'" class="mono">
+          <router-link :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }"
+                       class="">
+            {{ transfer.accountTo?.name || '(Unnamed)' }}
+          </router-link>
+        </td>
+        <td v-else class="mono">
+          <addr-scan-link :type="'account'" :address="transfer.to"></addr-scan-link>
+        </td>
+        <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
         <td class="text-center">
           <span class="badge"
               :class="{ 'bg-success': transfer.status === 'SUCCESS', 'bg-warning': transfer.status === 'PENDING', 'bg-danger': transfer.status === 'FAILED' }">
