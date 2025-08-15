@@ -51,7 +51,6 @@ export default {
         <router-link class="nav-link" :to="hasAuthToken() ? '/transfers' : ''" @click.prevent="handleClick">Transfers</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/partnership' : ''" @click.prevent="handleClick">Partnership</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
-        <router-link v-if="false" to="/settings">Settings</router-link>
       </div>
     </nav>
 
@@ -61,7 +60,7 @@ export default {
       <hr class="sidebar-divider"/>
 
       <div v-if="counterparty" class="counterparty-item">
-        <div class="counterparty-header mb-2">
+        <div class="mb-2">
           <button v-if="counterparty.name" class="btn p-1" title="Logout" @click="logout">
             <i class="bi bi-box-arrow-right"></i>
           </button>

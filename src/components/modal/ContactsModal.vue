@@ -37,7 +37,7 @@ export default {
         <ul class="list-unstyled">
           <li>
             <strong class="me-1">Email:</strong>
-            <a href="mailto:blockcontrolio@gmail.com" class="">blockcontrolio@gmail.com</a>
+            <a href="mailto:yurii@blockcontrol.io" class="">yurii@blockcontrol.io</a>
           </li>
           <li>
             <strong class="me-1">Telegram:</strong>
