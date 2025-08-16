@@ -30,6 +30,7 @@ export default {
     },
     logout() {
       localStorage.removeItem("auth-token");
+      window.dispatchEvent(new Event('auth-changed'));
       resetAllStores();
       this.$router.push("/login");
     }

@@ -56,6 +56,7 @@ export default {
         // Save JWT and select network
         if (data.token) {
           localStorage.setItem("auth-token", data.token);
+          window.dispatchEvent(new Event('auth-changed'));
           await initStores();
           this.$router.push('/');
         }
