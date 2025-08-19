@@ -30,6 +30,7 @@ export default {
     },
     logout() {
       localStorage.removeItem("auth-token");
+      window.dispatchEvent(new Event('auth-changed'));
       resetAllStores();
       this.$router.push("/login");
     }
@@ -42,16 +43,33 @@ export default {
   <aside class="sidebar d-flex flex-column justify-content-between">
     <!-- navigation menu -->
     <nav class="nav flex-column nav-pills">
-      <h4>BlockControl</h4>
+      <h4 class="mt-2 bold">BlockControl</h4>
       <div>
-        <router-link v-if="false" to="/">Dashboard</router-link>
+        <router-link v-if="false" class="nav-link" :to="hasAuthToken() ? '/' : ''" @click.prevent="handleClick">Dashboard</router-link>
+        <hr class="sidebar-divider"/>
+        <router-link
+            class="nav-link d-flex align-items-center gap-2"
+            :to="hasAuthToken() ? '/transfer' : ''"
+            @click.prevent="handleClick"
+        >
+          Send
+          <i class="bi bi-send-plus"></i>
+        </router-link>
+
+        <router-link
+            class="nav-link d-flex align-items-center gap-2"
+            :to="hasAuthToken() ? '/receive' : ''"
+            @click.prevent="handleClick"
+        >
+          Receive
+          <i class="bi bi-download"></i>
+        </router-link>
+        <router-link class="nav-link" :to="hasAuthToken() ? '/transfers' : ''" @click.prevent="handleClick">History</router-link>
+        <hr class="sidebar-divider"/>
         <router-link class="nav-link" :to="hasAuthToken() ? '/tokens' : ''" @click.prevent="handleClick">Tokens</router-link>
-        <router-link class="nav-link" :to="hasAuthToken() ? '/transfer' : ''" @click.prevent="handleClick">Asset Transfer</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/accounts' : ''" @click.prevent="handleClick">Accounts</router-link>
-        <router-link class="nav-link" :to="hasAuthToken() ? '/transfers' : ''" @click.prevent="handleClick">Transfers</router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/partnership' : ''" @click.prevent="handleClick">Partnership</router-link>
-        <router-link class="nav-link" :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Transactions</router-link>
-        <router-link v-if="false" to="/settings">Settings</router-link>
+        <router-link class="nav-link" :to="hasAuthToken() ? '/transactions' : ''" @click.prevent="handleClick">Operations</router-link>
       </div>
     </nav>
 
@@ -61,7 +79,7 @@ export default {
       <hr class="sidebar-divider"/>
 
       <div v-if="counterparty" class="counterparty-item">
-        <div class="counterparty-header mb-2">
+        <div class="mb-2">
           <button v-if="counterparty.name" class="btn p-1" title="Logout" @click="logout">
             <i class="bi bi-box-arrow-right"></i>
           </button>

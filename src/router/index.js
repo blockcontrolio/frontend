@@ -74,7 +74,22 @@ const routes = [
     }
 ]
 
-export default createRouter({
+const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
+router.beforeEach((to, from, next) => {
+    const authToken = localStorage.getItem('auth-token');
+    const isAuthenticated = !!authToken;
+
+    if (!isAuthenticated && to.path !== '/login' && to.path !== '/register') {
+        next('/login');
+    } else if (isAuthenticated && (to.path === '/login' || to.path === '/register')) {
+        next('/register'); // redirect logged-in users away from login/register
+    } else {
+        next();
+    }
+});
+
+export default router;
