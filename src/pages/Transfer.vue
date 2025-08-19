@@ -138,6 +138,11 @@ export default {
         this.errors.amount = "Amount must be greater than zero";
         return;
       }
+      const balance = parseFloat(this.selectedAsset?.amount);
+      if (amount > balance) {
+        this.errors.amount = "Amount exceeds account balance!";
+        return;
+      }
       const decimalPart = amountStr.split(".")[1];
       if (decimalPart && decimalPart.length > 18) {
         this.errors.amount = "Amount must have at most 18 decimal places";

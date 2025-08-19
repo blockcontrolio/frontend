@@ -16,13 +16,6 @@ export default {
     errorMessage: String
   },
   emits: ['update:modelValue'],
-  computed: {
-    showBalanceWarning() {
-      const amount = parseFloat(this.modelValue);
-      const balance = parseFloat(this.selectedAsset?.amount);
-      return this.modelValue && amount > balance;
-    }
-  },
   methods: {
     onInput(value) {
       this.$emit('update:modelValue', value);
@@ -45,10 +38,7 @@ export default {
         :placeholder="placeholder"
         @input="onInput($event.target.value)"
     />
-    <div v-if="showBalanceWarning" class="form-text text-warning">
-      Amount exceeds account balance!
-    </div>
-    <div v-else-if="errorMessage" class="form-text text-danger">{{ errorMessage }}</div>
+    <div v-if="errorMessage" class="form-text text-danger">{{ errorMessage }}</div>
 
   </div>
 </template>
