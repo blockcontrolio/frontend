@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Dashboard from '../pages/Dashboard.vue'
 import Transfer from '../pages/Transfer.vue'
+import PrepareInvoice from '../pages/invoices/Prepare.vue';
 import Accounts from '../pages/Accounts.vue'
 import Tokens from '../pages/Tokens.vue'
 import Transactions from '../pages/Transactions.vue'
@@ -19,6 +20,11 @@ const routes = [
         path: '/transfer',
         name: 'Transfer',
         component: Transfer
+    },
+    {
+        path: '/receive',
+        name: 'Receive',
+        component: PrepareInvoice
     },
     {
         path: '/accounts',
