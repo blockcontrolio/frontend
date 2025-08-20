@@ -5,7 +5,7 @@ function loadAuthToken() {
 }
 
 export async function prepareCrossCounterpartyInvoice(data) {
-    return await fetch(`${apiBaseUrl}/transfer-links`, {
+    return await fetch(`${apiBaseUrl}/invoices`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -13,4 +13,15 @@ export async function prepareCrossCounterpartyInvoice(data) {
         },
         body: JSON.stringify(data)
     })
+}
+
+export async function fetchInvoice(requestId) {
+    return await fetch(`${apiBaseUrl}/invoices/${requestId}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to get invoice by requestId', err);
+    });
 }

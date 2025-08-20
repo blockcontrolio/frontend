@@ -10,6 +10,7 @@ import LoginView from "../pages/auth/LoginView.vue";
 import RegisterView from "../pages/auth/RegisterView.vue";
 import Partnership from "../pages/Partnership.vue";
 import TransactionDetails from "../pages/TransactionDetails.vue";
+import PayInvoice from "../pages/invoices/PayInvoice.vue";
 
 const routes = [
     {
@@ -25,6 +26,12 @@ const routes = [
         path: '/receive',
         name: 'Receive',
         component: PrepareInvoice
+    },
+    {
+        path: '/invoices/:requestId',
+        name: 'Invoices',
+        component: PayInvoice,
+        props: true
     },
     {
         path: '/accounts',
