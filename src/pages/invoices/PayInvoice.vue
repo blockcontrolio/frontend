@@ -1,11 +1,11 @@
 <script>
-import {fetchAccounts, fetchAssetBalances, fetchTokens} from "../../services/api.js";
+import {fetchAccounts, fetchAssetBalances} from "../../services/api.js";
 import {fetchInvoice} from "../../services/invoices-api.js";
-import FromAccountSelector from "../../components/transfer/FromAccountSelector.vue";
+import AccountSelector from "../../components/transfer/AccountSelector.vue";
 
 export default {
-  name: "InvoiceApproval",
-  components: {FromAccountSelector},
+  name: "PayInvoice",
+  components: {AccountSelector},
   props: ['requestId'],
   data() {
     return {
@@ -75,7 +75,7 @@ export default {
             </div>
 
             <!-- Sender account selection -->
-            <FromAccountSelector
+            <AccountSelector
                 v-model="form.accountFrom"
                 :accounts="accounts"
                 :selected-asset="selectedAsset"
@@ -96,11 +96,11 @@ export default {
             </div>
 
             <!-- action buttons -->
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-sm btn-outline-secondary" @click="cancel">Cancel</button>
+            <div class="d-flex justify-content-end gap-2">
+              <button class="btn btn-sm btn-outline-danger" @click="cancel">Reject</button>
               <button class="btn btn-sm btn-primary"
                       :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount" @click="approveInvoice">
-                Approve & Send
+                Approve
               </button>
             </div>
 

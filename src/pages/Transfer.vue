@@ -10,7 +10,7 @@ import {
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
-import FromAccountSelector from "../components/transfer/FromAccountSelector.vue";
+import FromAccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
 import {fetchPartnerships} from "../services/partnership.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";

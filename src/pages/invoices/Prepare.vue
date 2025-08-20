@@ -6,12 +6,12 @@ import ErrorToast from "../../components/toast/ErrorToast.vue";
 import AmountInput from "../../components/transfer/AmountInput.vue";
 import {fetchPartnerships} from "../../services/partnership.js";
 import {useNetworkStore} from "../../js/stores/networkStore.js";
-import FromAccountSelector from "../../components/transfer/FromAccountSelector.vue";
+import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
 
 export default {
   components: {
-    FromAccountSelector,
+    AccountSelector,
     AmountInput,
     InfoToast,
     ErrorToast
@@ -209,7 +209,7 @@ export default {
       </div>
 
       <!-- Receiving Account -->
-      <FromAccountSelector
+      <AccountSelector
           v-model="invoice.receivingAccountId"
           :accounts="receivingAccounts"
           :selected-asset="selectedAsset"
@@ -241,7 +241,7 @@ export default {
       />
 
       <div class="d-flex justify-content-end">
-        <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Prepare</button>
+        <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
       </div>
     </form>
   </div>
