@@ -21,9 +21,9 @@ export default {
       accounts: [],
       partnerships: [],
       invoice: {
-        toCounterpartyId: "",
+        payerCounterpartyId: "",
+        receiverAccountId: "",
         assetId: "",
-        receivingAccountId: "",
         amount: null
       },
       tokens: [],
@@ -47,7 +47,7 @@ export default {
       return !!this.errors.to || !!this.errors.amount;
     },
     fullLink() {
-      return `${window.location.origin}/invoices/${this.transfer.requestId}`;
+      return `${window.location.origin}/invoices/${this.transfer.invoiceId}`;
     }
   },
   mounted() {
@@ -114,7 +114,7 @@ export default {
       this.validateAmount();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       try {
-        this.invoice.toCounterpartyId = this.selectedPartnership.targetCounterpartyId;
+        this.invoice.payerCounterpartyId = this.selectedPartnership.sourceCounterpartyId;
         const response = await prepareCrossCounterpartyInvoice(this.invoice);
         if (!response.ok) {
           const err = await response.json();
@@ -122,9 +122,9 @@ export default {
         } else {
           await this.handleSuccess(response);
           this.invoice = {
-            toCounterpartyId: "",
+            payerCounterpartyId: "",
+            receiverAccountId: "",
             assetId: "",
-            receivingAccountId: "",
             amount: null
           };
           this.selectedPartnership = {};
@@ -164,7 +164,7 @@ export default {
     },
     obfuscated(fullLink) {
       const index = fullLink.indexOf("invoices");
-      return `${fullLink.substring(0, 13)} … ${fullLink.substring(index - 1)}`;
+      return 'invoice';
     }
   }
 };
@@ -173,9 +173,9 @@ export default {
 <template>
   <h3 class="bold p-2 pt-3">Receive Transfer</h3>
 
-  <div v-if="transfer.requestId" class="d-flex justify-content-center pt-4">
+  <div v-if="transfer.invoiceId" class="d-flex justify-content-center pt-4">
     <div class="text-center gap-2">
-      <span>Your counterparty will see this request in their incoming list. You can also copy and share the link directly:</span><br>
+      <span>Target counterparty will see this request in their incoming list. Copy and share the link directly:</span><br>
       <a :href="fullLink"
          target="_blank"
          rel="noopener noreferrer"
@@ -195,13 +195,13 @@ export default {
 
       <!-- Partnership Selection -->
       <div class="mb-3">
-        <label class="form-label">Select From Counterparty</label>
+        <label class="form-label">Select Payer Counterparty</label>
 
         <select v-if="partnerships"
                 v-model="selectedPartnership"
                 class="form-select" required
         >
-          <option disabled value="">-- select counterparty --</option>
+          <option disabled value="">-- payer counterparty --</option>
           <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
             {{ cp.counterpartyName }}
           </option>
@@ -210,7 +210,7 @@ export default {
 
       <!-- Receiving Account -->
       <AccountSelector
-          v-model="invoice.receivingAccountId"
+          v-model="invoice.receiverAccountId"
           :accounts="receivingAccounts"
           :selected-asset="selectedAsset"
           @change="val => { fetchBalances(val); invoice.assetId = '' }"

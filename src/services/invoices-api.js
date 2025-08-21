@@ -15,13 +15,13 @@ export async function prepareCrossCounterpartyInvoice(data) {
     })
 }
 
-export async function fetchInvoice(requestId) {
-    return await fetch(`${apiBaseUrl}/invoices/${requestId}`, {
+export async function fetchInvoice(invoiceId) {
+    return await fetch(`${apiBaseUrl}/invoices/${invoiceId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         }
     }).catch(err => {
-        console.error('Failed to get invoice by requestId', err);
+        console.error('Failed to get invoice by invoiceId', err);
     });
 }

@@ -6,14 +6,16 @@ import AccountSelector from "../../components/transfer/AccountSelector.vue";
 export default {
   name: "PayInvoice",
   components: {AccountSelector},
-  props: ['requestId'],
+  props: ['invoiceId'],
   data() {
     return {
       invoice: {
-        toCounterparty: {},
+        payerCounterparty: {},
+        receiverCounterparty: {},
+        receiverAccount: {},
         asset: {},
-        receivingAccount: {},
-        amount: null
+        amount: null,
+        isPayer: false
       },
       accounts: [],
       form: {
@@ -28,7 +30,7 @@ export default {
   },
   methods: {
     async getInvoice() {
-      const res = await fetchInvoice(this.requestId)
+      const res = await fetchInvoice(this.invoiceId)
       this.invoice = await res.json();
     },
     async fetchAccounts() {
@@ -50,7 +52,7 @@ export default {
     },
     approveInvoice() {
       console.log("Approving invoice", {
-        requestId: this.requestId,
+        invoiceId: this.invoiceId,
         accountFrom: this.form.accountFrom
       })
       this.$router.push("/transfers")
@@ -60,28 +62,44 @@ export default {
 </script>
 
 <template>
-  <div class="container py-5">
+  <h5 class="bold p-2">Invoice details: {{ this.invoiceId }}</h5>
+
+  <div class="container py-3">
+
     <div class="row justify-content-center">
       <div class="col-md-8 col-lg-6">
 
         <div class="card rounded border-0">
           <div class="card-body p-4">
-            <h4 class="card-title text-center mb-4">Approve Invoice</h4>
-
-            <!-- invoice details -->
-            <div class="mb-3">
-              <label class="form-label">Invoice ID</label>
-              <input type="text" class="form-control" :value="this.requestId" readonly>
-            </div>
+            <h4 v-if="invoice.isPayer" class="card-title text-center mb-4">Approve Invoice</h4>
+            <h4 v-else class="card-title text-center mb-4">Invoice</h4>
 
             <!-- Sender account selection -->
-            <AccountSelector
+            <AccountSelector v-if="invoice.isPayer"
                 v-model="form.accountFrom"
                 :accounts="accounts"
                 :selected-asset="selectedAsset"
                 @change="val => { showBalance(val, invoice.asset.id) }"
                 :label="'Select Your Account'"
             />
+
+            <div v-if="invoice.isPayer" class="mb-3">
+              <label class="form-label">Receiver Counterparty</label>
+              <input type="text" class="form-control" :value="invoice.receiverCounterparty?.name" readonly>
+            </div>
+
+            <div v-if="!invoice.isPayer" class="mb-3">
+              <label class="form-label">Payer Counterparty</label>
+              <input type="text" class="form-control" :value="invoice.payerCounterparty?.name" readonly>
+            </div>
+
+            <!-- Receiving Account -->
+            <div v-if="!invoice.isPayer" class="mb-3">
+              <label class="form-label">To Receiving Account</label>
+              <input type="text" class="form-control"
+                     :value="`${invoice.receiverAccount?.name || 'Unnamed'}`"
+                     readonly>
+            </div>
 
             <div class="mb-3">
               <label class="form-label">Amount</label>
@@ -90,17 +108,12 @@ export default {
                      readonly>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label">Recipient Counterparty</label>
-              <input type="text" class="form-control" :value="invoice.toCounterparty?.name" readonly>
-            </div>
-
             <!-- action buttons -->
-            <div class="d-flex justify-content-end gap-2">
+            <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
               <button class="btn btn-sm btn-outline-danger" @click="cancel">Reject</button>
               <button class="btn btn-sm btn-primary"
                       :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount" @click="approveInvoice">
-                Approve
+                Execute
               </button>
             </div>
 
