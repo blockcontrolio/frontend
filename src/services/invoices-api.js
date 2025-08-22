@@ -25,3 +25,40 @@ export async function fetchInvoice(invoiceId) {
         console.error('Failed to get invoice by invoiceId', err);
     });
 }
+
+export async function cancelInvoice(invoiceId) {
+    return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/cancel`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to cancel invoice by invoiceId', err);
+    });
+}
+
+export async function rejectInvoice(invoiceId) {
+    return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/reject`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to reject invoice by invoiceId', err);
+    });
+}
+
+export async function executeInvoice(invoiceId, payerAccountId) {
+    return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/approve`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify({payerAccountId})
+    }).catch(err => {
+        console.error('Failed to approve invoice by invoiceId', err);
+    });
+}

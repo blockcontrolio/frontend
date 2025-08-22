@@ -1,7 +1,8 @@
 <script>
 import {fetchAccounts, fetchAssetBalances} from "../../services/api.js";
-import {fetchInvoice} from "../../services/invoices-api.js";
+import {fetchInvoice, cancelInvoice, executeInvoice, rejectInvoice} from "../../services/invoices-api.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
+import {formatDate} from "../../js/utils.js";
 
 export default {
   name: "PayInvoice",
@@ -29,6 +30,7 @@ export default {
     this.fetchAccounts();
   },
   methods: {
+    formatDate,
     async getInvoice() {
       const res = await fetchInvoice(this.invoiceId)
       this.invoice = await res.json();
@@ -48,9 +50,15 @@ export default {
       return await res.json();
     },
     cancel() {
+      cancelInvoice(this.invoiceId)
       this.$router.push("/transfers")
     },
-    approveInvoice() {
+    reject() {
+      rejectInvoice(this.invoiceId)
+      this.$router.push("/transfers")
+    },
+    execute() {
+      executeInvoice(this.invoiceId, this.form.accountFrom)
       console.log("Approving invoice", {
         invoiceId: this.invoiceId,
         accountFrom: this.form.accountFrom
@@ -71,16 +79,28 @@ export default {
 
         <div class="card rounded border-0">
           <div class="card-body p-4">
-            <h4 v-if="invoice.isPayer" class="card-title text-center mb-4">Approve Invoice</h4>
-            <h4 v-else class="card-title text-center mb-4">Invoice</h4>
+            <h4 class="card-title text-center mb-4">{{ invoice.isPayer ? 'Approve Invoice' : 'Invoice' }}</h4>
+            <!-- requested date -->
+            <p class="text-muted text-center small mb-4">
+              Requested: {{ formatDate(invoice.requestedAt) }}
+            </p>
+            <!-- status badge -->
+            <p class="text-center m-3"
+               :class="{
+              'text-success': (invoice.status === 'CREATED' || invoice.status === 'APPROVED'),
+              'text-danger': invoice.status === 'REJECTED',
+              'text-warning': invoice.status === 'CANCELLED'
+            }">
+              {{ invoice.status }}
+            </p>
 
-            <!-- Sender account selection -->
-            <AccountSelector v-if="invoice.isPayer"
-                v-model="form.accountFrom"
-                :accounts="accounts"
-                :selected-asset="selectedAsset"
-                @change="val => { showBalance(val, invoice.asset.id) }"
-                :label="'Select Your Account'"
+            <!-- sender account selection -->
+            <AccountSelector v-if="invoice.isPayer && invoice.status === 'CREATED'"
+                             v-model="form.accountFrom"
+                             :accounts="accounts"
+                             :selected-asset="selectedAsset"
+                             @change="val => { showBalance(val, invoice.asset.id) }"
+                             :label="'Select Your Account'"
             />
 
             <div v-if="invoice.isPayer" class="mb-3">
@@ -109,12 +129,18 @@ export default {
             </div>
 
             <!-- action buttons -->
-            <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
-              <button class="btn btn-sm btn-outline-danger" @click="cancel">Reject</button>
-              <button class="btn btn-sm btn-primary"
-                      :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount" @click="approveInvoice">
-                Execute
-              </button>
+            <div v-if="invoice.status === 'CREATED'">
+              <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-outline-danger" @click="reject">Reject</button>
+                <button class="btn btn-sm btn-primary"
+                        :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount"
+                        @click="execute">
+                  Execute
+                </button>
+              </div>
+              <div v-if="!invoice.isPayer" class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-outline-danger" @click="cancel">Cancel</button>
+              </div>
             </div>
 
           </div>
