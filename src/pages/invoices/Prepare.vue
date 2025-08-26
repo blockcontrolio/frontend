@@ -8,6 +8,7 @@ import {fetchPartnerships} from "../../services/partnership.js";
 import {useNetworkStore} from "../../js/stores/networkStore.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
+import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
 
 export default {
   components: {
@@ -84,6 +85,12 @@ export default {
     hasCrossUsedTokens(partnership) {
       return partnership.partneredAssets?.length > 0;
     },
+    selectPayerCounterparty() {
+      const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
+      const {targetCounterpartyId, sourceCounterpartyId} = this.selectedPartnership;
+      this.invoice.payerCounterpartyId = [targetCounterpartyId, sourceCounterpartyId]
+          .find(id => id !== loggedInCounterpartyId);
+    },
     showBalance(assetId) {
       this.selectedAsset = this.accountBalances
           .find(b => b.id === assetId)
@@ -114,7 +121,6 @@ export default {
       this.validateAmount();
       if (this.hasErrors) return; // proceed with sending the transfer request using fetch
       try {
-        this.invoice.payerCounterpartyId = this.selectedPartnership.sourceCounterpartyId;
         const response = await prepareCrossCounterpartyInvoice(this.invoice);
         if (!response.ok) {
           const err = await response.json();
@@ -200,10 +206,11 @@ export default {
         <select v-if="partnerships"
                 v-model="selectedPartnership"
                 class="form-select" required
+                v-on:change="this.selectPayerCounterparty(selectedPartnership)"
         >
           <option disabled value="">-- payer counterparty --</option>
-          <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
-            {{ cp.counterpartyName }}
+          <option v-for="partnership in partnerships" :key="partnership.relationId" :value="partnership">
+            {{ partnership.counterpartyName }}
           </option>
         </select>
       </div>
