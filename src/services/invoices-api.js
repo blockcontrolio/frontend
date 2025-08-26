@@ -63,7 +63,7 @@ export async function rejectInvoice(invoiceId) {
 }
 
 export async function executeInvoice(invoiceId, payerAccountId) {
-    return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/approve`, {
+    return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/execute`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

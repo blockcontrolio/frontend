@@ -54,19 +54,33 @@ export default {
     },
     cancel() {
       cancelInvoice(this.invoiceId)
-      this.$router.push("/transfers")
+          .then(() => {
+            console.log("Cancelling invoice", {
+              invoiceId: this.invoiceId,
+              accountFrom: this.form.accountFrom
+            })
+          })
+      //this.$router.push("/transfers")
     },
     reject() {
       rejectInvoice(this.invoiceId)
-      this.$router.push("/transfers")
+          .then(() => {
+            console.log("Rejecting invoice", {
+              invoiceId: this.invoiceId,
+              accountFrom: this.form.accountFrom
+            })
+          })
+      //this.$router.push("/transfers")
     },
     execute() {
       executeInvoice(this.invoiceId, this.form.accountFrom)
-      console.log("Approving invoice", {
-        invoiceId: this.invoiceId,
-        accountFrom: this.form.accountFrom
-      })
-      this.$router.push("/transfers")
+          .then(() => {
+            console.log("Approving invoice", {
+              invoiceId: this.invoiceId,
+              accountFrom: this.form.accountFrom
+            })
+          })
+      // this.$router.push("/transfers")
     }
   }
 }
