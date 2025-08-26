@@ -15,6 +15,18 @@ export async function prepareCrossCounterpartyInvoice(data) {
     })
 }
 
+export async function fetchInvoicesForPayer() {
+    return await fetch(`${apiBaseUrl}/invoices/payer`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to get pending invoices for payer', err);
+    });
+}
+
+
 export async function fetchInvoice(invoiceId) {
     return await fetch(`${apiBaseUrl}/invoices/${invoiceId}`, {
         headers: {

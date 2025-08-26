@@ -7,16 +7,18 @@ import {
   sendExternalWithdrawal,
   sendCrossCounterparty
 } from '../services/api'
+import {fetchPartnerships} from "../services/partnership.js";
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import FromAccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
-import {fetchPartnerships} from "../services/partnership.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";
+import Pending from "./invoices/Pending.vue";
 
 export default {
   components: {
+    Pending,
     AmountInput,
     FromAccountSelector,
     TxToast,
@@ -265,6 +267,11 @@ export default {
                v-model="selectedForm"/>
         <label class="form-check-label fw-bold" for="cpRadio">Cross Partnership</label>
       </div>
+      <div class="form-check form-check-inline me-3">
+        <input class="form-check-input border-primary" type="radio" id="invoicesRadio" value="invoices"
+               v-model="selectedForm"/>
+        <label class="form-check-label fw-bold" for="invoicesRadio">Invoices</label>
+      </div>
     </div>
   </div>
 
@@ -455,6 +462,10 @@ export default {
         <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
       </div>
     </form>
+  </div>
+
+  <div v-if="selectedForm === 'invoices'" class="d-flex justify-content-center mt-5">
+    <Pending class="transfer-form card p-3 border rounded"></Pending>
   </div>
 
   <TxToast

@@ -31,6 +31,9 @@ export default {
   },
   methods: {
     formatDate,
+    goBack() {
+      this.$router.push('/transfer');
+    },
     async getInvoice() {
       const res = await fetchInvoice(this.invoiceId)
       this.invoice = await res.json();
@@ -74,7 +77,14 @@ export default {
 
   <div class="container py-3">
 
-    <div class="row justify-content-center">
+    <button
+        class="btn btn-dark btn-sm my-3"
+        @click="goBack"
+    >
+      Return
+    </button>
+
+    <div class="row justify-content-center mt-3">
       <div class="col-md-8 col-lg-6">
 
         <div class="card rounded border-0">
