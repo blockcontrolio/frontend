@@ -224,7 +224,7 @@ export default {
     },
     async handleSuccess(response) {
       let txData = await response.json();
-      let message = `You transferred ${txData.amount} ${this.selectedAsset?.name} (${this.selectedAsset?.symbol}) to ${txData.to}`
+      let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
       this.transferSuccess = {hash: txData.txHash, message};
     },
     handleUnknownError(err) {

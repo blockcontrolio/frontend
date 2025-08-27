@@ -3,10 +3,12 @@ import {fetchAccounts, fetchAssetBalances} from "../../services/api.js";
 import {fetchInvoice, cancelInvoice, executeInvoice, rejectInvoice} from "../../services/invoices-api.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {formatDate} from "../../js/utils.js";
+import ErrorToast from "../../components/toast/ErrorToast.vue";
+import TxToast from "../../components/toast/TxToast.vue";
 
 export default {
   name: "PayInvoice",
-  components: {AccountSelector},
+  components: {TxToast, ErrorToast, AccountSelector},
   props: ['invoiceId'],
   data() {
     return {
@@ -23,7 +25,9 @@ export default {
         accountFrom: ""
       },
       selectedAsset: null,
-      success: null
+      disableButtons: null,
+      transferSuccess: null,
+      transferError: null
     }
   },
   mounted() {
@@ -53,38 +57,61 @@ export default {
       let res = await fetchAssetBalances(accountId);
       return await res.json();
     },
-    cancel() {
-      cancelInvoice(this.invoiceId)
-          .then(() => {
-            console.log("Cancelling invoice", {
-              invoiceId: this.invoiceId,
-              accountFrom: this.form.accountFrom
-            })
-            this.success = true;
-          })
-      //this.$router.push("/transfers")
+    async cancel() {
+      this.disableButtons = true;
+      try {
+        const response = await cancelInvoice(this.invoiceId)
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleTransferError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
     },
-    reject() {
-      rejectInvoice(this.invoiceId)
-          .then(() => {
-            console.log("Rejecting invoice", {
-              invoiceId: this.invoiceId,
-              accountFrom: this.form.accountFrom
-            })
-            this.success = true;
-          })
-      //this.$router.push("/transfers")
+    async reject() {
+      this.disableButtons = true;
+      try {
+        const response = await rejectInvoice(this.invoiceId)
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleTransferError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
     },
-    execute() {
-      executeInvoice(this.invoiceId, this.form.accountFrom)
-          .then(() => {
-            console.log("Approving invoice", {
-              invoiceId: this.invoiceId,
-              accountFrom: this.form.accountFrom
-            })
-            this.success = true;
-          })
-      // this.$router.push("/transfers")
+    async execute() {
+      this.disableButtons = true;
+      try {
+        const response = await executeInvoice(this.invoiceId, this.form.accountFrom)
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleTransferError(err);
+        } else {
+          await this.handleSuccess(response);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
+    async handleSuccess(response) {
+      let txData = await response.json();
+      let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
+      this.transferSuccess = {hash: txData.txHash, message};
+    },
+    handleUnknownError(err) {
+      console.error(err)
+      this.transferError = {
+        error: 'Network Error',
+        message: err.message
+      };
+    },
+    handleTransferError(err) {
+      this.transferError = {
+        error: err.error || 'Error',
+        message: err.message || 'Unknown error occurred.'
+      };
     }
   }
 }
@@ -159,15 +186,15 @@ export default {
             <!-- action buttons -->
             <div v-if="invoice.status === 'CREATED'">
               <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
-                <button class="btn btn-sm btn-outline-danger" @click="reject" :disabled="success">Reject</button>
+                <button class="btn btn-sm btn-outline-danger" @click="reject" :disabled="disableButtons">Reject</button>
                 <button class="btn btn-sm btn-primary"
-                        :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount || success"
+                        :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount || disableButtons"
                         @click="execute">
                   Execute
                 </button>
               </div>
               <div v-if="!invoice.isPayer" class="d-flex justify-content-end">
-                <button class="btn btn-sm btn-outline-danger" @click="cancel" :disabled="success">Cancel</button>
+                <button class="btn btn-sm btn-outline-danger" @click="cancel" :disabled="disableButtons">Cancel</button>
               </div>
             </div>
 
@@ -177,5 +204,16 @@ export default {
       </div>
     </div>
   </div>
+
+  <TxToast
+      v-if="transferSuccess"
+      :txData="transferSuccess"
+      @closed="transferSuccess = null;"
+  />
+  <ErrorToast
+      v-if="transferError"
+      :error="transferError"
+      @closed="transferError = null;"
+  />
 
 </template>

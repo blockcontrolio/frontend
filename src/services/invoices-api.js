@@ -26,6 +26,16 @@ export async function fetchInvoicesForPayer() {
     });
 }
 
+export async function fetchInvoicesForReceiver() {
+    return await fetch(`${apiBaseUrl}/invoices/receiver`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to get pending invoices for payer', err);
+    });
+}
 
 export async function fetchInvoice(invoiceId) {
     return await fetch(`${apiBaseUrl}/invoices/${invoiceId}`, {
@@ -45,8 +55,6 @@ export async function cancelInvoice(invoiceId) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         }
-    }).catch(err => {
-        console.error('Failed to cancel invoice by invoiceId', err);
     });
 }
 
@@ -57,8 +65,6 @@ export async function rejectInvoice(invoiceId) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         }
-    }).catch(err => {
-        console.error('Failed to reject invoice by invoiceId', err);
     });
 }
 
@@ -70,7 +76,5 @@ export async function executeInvoice(invoiceId, payerAccountId) {
             'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify({payerAccountId})
-    }).catch(err => {
-        console.error('Failed to approve invoice by invoiceId', err);
     });
 }

@@ -1,5 +1,5 @@
 <script>
-import {formatDate} from "../../js/utils.js";
+import {formatDate, shortenString} from "../../js/utils.js";
 import {fetchInvoicesForPayer} from "../../services/invoices-api.js";
 
 export default {
@@ -12,12 +12,7 @@ export default {
   },
   methods: {
     formatDate,
-    shortenString(value) {
-      if (value && value.length <= 8) {
-        return value;
-      }
-      return value ? value.substring(0, 8) + "…" : "";
-    },
+    shortenString,
     async loadInvoices() {
       try {
         const res = await fetchInvoicesForPayer();
