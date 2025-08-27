@@ -134,7 +134,8 @@ export default {
 
         <div class="card rounded border-0">
           <div class="card-body p-4">
-            <h4 class="card-title text-center mb-4">{{ invoice.isPayer ? 'Approve Invoice' : 'Invoice' }}</h4>
+            <h4 class="card-title text-center mb-4">
+              {{ invoice.isPayer && invoice.status === 'CREATED' ? 'Execute Invoice' : 'Invoice' }}</h4>
             <!-- requested date -->
             <p class="text-muted text-center small mb-4">
               Requested: {{ formatDate(invoice.requestedAt) }}
@@ -142,7 +143,7 @@ export default {
             <!-- status badge -->
             <p class="text-center m-3"
                :class="{
-              'text-success': (invoice.status === 'CREATED' || invoice.status === 'APPROVED'),
+              'text-success': (invoice.status === 'CREATED' || invoice.status === 'EXECUTED'),
               'text-danger': invoice.status === 'REJECTED',
               'text-warning': invoice.status === 'CANCELLED'
             }">
