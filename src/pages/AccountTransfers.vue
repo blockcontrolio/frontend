@@ -97,8 +97,8 @@ export default {
             </code>
           </a>
         </td>
-        <td class="mono">
-          {{ formatDate(transfer.createTime) }}
+        <td>
+          <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>
         </td>
       </tr>
       </tbody>

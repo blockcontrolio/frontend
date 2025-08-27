@@ -465,7 +465,7 @@ export default {
   </div>
 
   <div v-if="selectedForm === 'invoices'" class="d-flex justify-content-center mt-5">
-    <Pending class="transfer-form card p-3 border rounded"></Pending>
+    <Pending class="card p-3 border rounded"></Pending>
   </div>
 
   <TxToast

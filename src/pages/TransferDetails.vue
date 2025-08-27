@@ -87,7 +87,7 @@ export default {
       </div>
       <div class="tx-line">
         <span class="label">Created:</span>
-        <span class="value mono">{{ formatDate(transfer.createTime) }}</span>
+        <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>
       </div>
       <div class="tx-line">
         <span class="label">Hash:</span>

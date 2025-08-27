@@ -13,6 +13,9 @@ export default {
   methods: {
     formatDate,
     shortenString(value) {
+      if (value && value.length <= 8) {
+        return value;
+      }
       return value ? value.substring(0, 8) + "…" : "";
     },
     async loadInvoices() {
@@ -54,8 +57,8 @@ export default {
             <span>{{ shortenString(invoice.invoiceId) }}</span>
           </router-link>
         </td>
-        <td class="d-flex justify-content-between">
-          <span>{{ shortenString(invoice.receiverCounterparty.name) }}</span>
+        <td class="d-flex justify-content-between align-items-center gap-3">
+          <span>{{ shortenString(invoice.receiverCounterparty?.name) }}</span>
           <div>
             <strong>{{ invoice.amount }}</strong>
             {{ invoice.asset?.name }} ({{ invoice.asset?.symbol }})
