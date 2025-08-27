@@ -12,8 +12,8 @@ export default {
   },
   methods: {
     formatDate,
-    shortId(id) {
-      return id ? id.substring(0, 8) + "…" : "";
+    shortenString(value) {
+      return value ? value.substring(0, 8) + "…" : "";
     },
     async loadInvoices() {
       try {
@@ -51,10 +51,11 @@ export default {
               class="text-decoration-none"
               :to="`/invoices/${invoice.invoiceId}`"
           >
-            <span>{{ shortId(invoice.invoiceId) }}</span>
+            <span>{{ shortenString(invoice.invoiceId) }}</span>
           </router-link>
         </td>
         <td class="d-flex justify-content-between">
+          <span>{{ shortenString(invoice.receiverCounterparty.name) }}</span>
           <div>
             <strong>{{ invoice.amount }}</strong>
             {{ invoice.asset?.name }} ({{ invoice.asset?.symbol }})

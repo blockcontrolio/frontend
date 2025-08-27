@@ -22,7 +22,8 @@ export default {
       form: {
         accountFrom: ""
       },
-      selectedAsset: null
+      selectedAsset: null,
+      success: null
     }
   },
   mounted() {
@@ -59,6 +60,7 @@ export default {
               invoiceId: this.invoiceId,
               accountFrom: this.form.accountFrom
             })
+            this.success = true;
           })
       //this.$router.push("/transfers")
     },
@@ -69,6 +71,7 @@ export default {
               invoiceId: this.invoiceId,
               accountFrom: this.form.accountFrom
             })
+            this.success = true;
           })
       //this.$router.push("/transfers")
     },
@@ -79,6 +82,7 @@ export default {
               invoiceId: this.invoiceId,
               accountFrom: this.form.accountFrom
             })
+            this.success = true;
           })
       // this.$router.push("/transfers")
     }
@@ -155,15 +159,15 @@ export default {
             <!-- action buttons -->
             <div v-if="invoice.status === 'CREATED'">
               <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
-                <button class="btn btn-sm btn-outline-danger" @click="reject">Reject</button>
+                <button class="btn btn-sm btn-outline-danger" @click="reject" :disabled="success">Reject</button>
                 <button class="btn btn-sm btn-primary"
-                        :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount"
+                        :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount || success"
                         @click="execute">
                   Execute
                 </button>
               </div>
               <div v-if="!invoice.isPayer" class="d-flex justify-content-end">
-                <button class="btn btn-sm btn-outline-danger" @click="cancel">Cancel</button>
+                <button class="btn btn-sm btn-outline-danger" @click="cancel" :disabled="success">Cancel</button>
               </div>
             </div>
 
