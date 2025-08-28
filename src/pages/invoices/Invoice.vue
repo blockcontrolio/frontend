@@ -21,9 +21,7 @@ export default {
         isPayer: false
       },
       accounts: [],
-      form: {
-        accountFrom: ""
-      },
+      accountFrom: "",
       selectedAsset: null,
       disableButtons: null,
       transferSuccess: null,
@@ -37,7 +35,11 @@ export default {
   methods: {
     formatDate,
     goBack() {
-      this.$router.push('/transfer');
+      if (window.history.length > 1) {
+        this.$router.back();
+      } else {
+        this.$router.push('/');
+      }
     },
     async getInvoice() {
       const res = await fetchInvoice(this.invoiceId)
@@ -84,7 +86,7 @@ export default {
     async execute() {
       this.disableButtons = true;
       try {
-        const response = await executeInvoice(this.invoiceId, this.form.accountFrom)
+        const response = await executeInvoice(this.invoiceId, this.accountFrom)
         if (!response.ok) {
           const err = await response.json();
           this.handleTransferError(err);
@@ -152,7 +154,7 @@ export default {
 
             <!-- sender account selection -->
             <AccountSelector v-if="invoice.isPayer && invoice.status === 'CREATED'"
-                             v-model="form.accountFrom"
+                             v-model="accountFrom"
                              :accounts="accounts"
                              :selected-asset="selectedAsset"
                              @change="val => { showBalance(val, invoice.asset.id) }"
@@ -189,7 +191,7 @@ export default {
               <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
                 <button class="btn btn-sm btn-outline-danger" @click="reject" :disabled="disableButtons">Reject</button>
                 <button class="btn btn-sm btn-primary"
-                        :disabled="!form.accountFrom || invoice.amount > selectedAsset?.amount || disableButtons"
+                        :disabled="!accountFrom || invoice.amount > selectedAsset?.amount || disableButtons"
                         @click="execute">
                   Execute
                 </button>

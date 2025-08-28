@@ -1,6 +1,6 @@
 <script>
 import {formatDate, shortenString} from "../../js/utils.js";
-import {fetchInvoicesForPayer} from "../../services/invoices-api.js";
+import {fetchInvoicesForReceiver} from "../../services/invoices-api.js";
 
 export default {
   data() {
@@ -15,7 +15,7 @@ export default {
     shortenString,
     async loadInvoices() {
       try {
-        const res = await fetchInvoicesForPayer();
+        const res = await fetchInvoicesForReceiver();
         this.invoices = await res.json();
       } catch (err) {
         this.error = "Failed to load invoices";
@@ -34,7 +34,7 @@ export default {
 <template>
 
   <div v-if="invoices.length > 0">
-    <h3 class="mb-4 text-center">Pending Invoices</h3>
+    <h3 class="mb-4 text-center">Sent Invoices</h3>
     <div v-if="loading">Loading…</div>
     <div v-else-if="error" class="text-danger">{{ error }}</div>
     <table v-else class="table-hover align-middle">
@@ -61,6 +61,14 @@ export default {
           <small class="text-muted">
             {{ formatDate(invoice.requestedAt) }}
           </small>
+          <span class=""
+                :class="{
+            'text-success': (invoice.status === 'CREATED' || invoice.status === 'EXECUTED'),
+            'text-danger': invoice.status === 'REJECTED',
+            'text-warning': invoice.status === 'CANCELLED'
+          }">
+            {{ invoice.status }}
+          </span>
         </td>
       </tr>
       </tbody>

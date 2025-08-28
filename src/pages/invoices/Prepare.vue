@@ -9,9 +9,11 @@ import {useNetworkStore} from "../../js/stores/networkStore.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
 import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
+import Sent from "./Sent.vue";
 
 export default {
   components: {
+    Sent,
     AccountSelector,
     AmountInput,
     InfoToast,
@@ -19,6 +21,7 @@ export default {
   },
   data() {
     return {
+      selectedForm: "cross_counterparty",
       accounts: [],
       partnerships: [],
       invoice: {
@@ -167,10 +170,6 @@ export default {
           .then(() => {
             console.log('Link copied!', link);
           });
-    },
-    obfuscated(fullLink) {
-      const index = fullLink.indexOf("invoices");
-      return 'invoice';
     }
   }
 };
@@ -179,14 +178,29 @@ export default {
 <template>
   <h3 class="bold p-2 pt-3">Receive Transfer</h3>
 
+  <div class="d-flex justify-content-around p-3">
+    <div class="type-selector">
+      <div class="form-check form-check-inline me-3">
+        <input class="form-check-input border-primary" type="radio" id="cpRadio" value="cross_counterparty"
+               v-on:change="this.resetError(); this.fetchAcceptedPartnerships()"
+               v-model="selectedForm"/>
+        <label class="form-check-label fw-bold" for="cpRadio">Cross Partnership</label>
+      </div>
+      <div class="form-check form-check-inline me-3">
+        <input class="form-check-input border-primary" type="radio" id="invoicesRadio" value="invoices"
+               v-model="selectedForm"/>
+        <label class="form-check-label fw-bold" for="invoicesRadio">Sent Invoices</label>
+      </div>
+    </div>
+  </div>
+
   <div v-if="transfer.invoiceId" class="d-flex justify-content-center pt-4">
     <div class="text-center gap-2">
       <span>Target counterparty will see this request in their incoming list. Copy and share the link directly:</span><br>
       <a :href="fullLink"
          target="_blank"
          rel="noopener noreferrer"
-         class="mono fw-bold link-primary link-opacity-75 me-2 text-decoration-none">
-        {{ obfuscated(fullLink) }}
+         class="mono fw-bold link-primary link-opacity-75 me-2 text-decoration-none">invoices
       </a>
       <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer"
          @click="copyLink(fullLink)"
@@ -195,7 +209,7 @@ export default {
     </div>
   </div>
 
-  <div class="d-flex justify-content-center mt-5">
+  <div v-if="selectedForm === 'cross_counterparty'" class="d-flex justify-content-center mt-5">
     <form @submit.prevent="submitCrossCounterparty" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Prepare Cross-Counterparty Invoice</h3>
 
@@ -251,6 +265,10 @@ export default {
         <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
       </div>
     </form>
+  </div>
+
+  <div v-if="selectedForm === 'invoices'" class="d-flex justify-content-center mt-5">
+    <Sent class="card p-3 border rounded"></Sent>
   </div>
 
   <InfoToast
