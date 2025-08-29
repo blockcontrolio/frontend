@@ -17,6 +17,7 @@ export default {
   },
   data() {
     return {
+      filterType: "", // bound to the dropdown
       transfers: []
     };
   },
@@ -31,8 +32,22 @@ export default {
       this.transfers = await res.json();
     },
     goBack() {
-      this.$router.push('/accounts');
+      if (window.history.length > 1) {
+        this.$router.back();
+      } else {
+        this.$router.push('/');
+      }
     },
+  },
+  computed: {
+    filteredTransfers() {
+      if (!this.filterType || this.filterType === "") {
+        return this.transfers;
+      }
+      return this.transfers.filter(
+          (transfer) => transfer.transferType === this.filterType
+      );
+    }
   }
 };
 </script>
@@ -47,6 +62,17 @@ export default {
     >
       Return to List
     </button>
+
+    <!-- filter dropdown -->
+    <div class="w-25 my-3">
+      <select v-model="filterType" class="form-select">
+        <option value="">All Types</option>
+        <option value="INTERNAL">INTERNAL</option>
+        <option value="EXTERNAL">EXTERNAL</option>
+        <option value="CROSS">CROSS COUNTERPARTY</option>
+      </select>
+    </div>
+
     <table class="table table-bordered mt-4">
       <thead class="">
       <tr>
@@ -61,7 +87,7 @@ export default {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="transfer in transfers" :key="transfer.internalId">
+      <tr v-for="transfer in filteredTransfers" :key="transfer.internalId">
         <td>
           <router-link :to="{ name: 'transfer-details', params: { transferId: transfer.internalId } }">
             {{ transfer.internalId.substring(0, 6) }}…{{ transfer.internalId.substring(transfer.internalId.length - 4) }}
@@ -83,10 +109,10 @@ export default {
         <td v-else class="mono">
           <addr-scan-link :type="'account'" :address="transfer.to"></addr-scan-link>
         </td>
-        <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</td>
+        <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{ transfer.asset?.symbol }}</td>
         <td class="text-center">
           <span class="badge"
-              :class="{ 'bg-success': transfer.status === 'SUCCESS', 'bg-warning': transfer.status === 'PENDING', 'bg-danger': transfer.status === 'FAILED' }">
+                :class="{ 'bg-success': transfer.status === 'SUCCESS', 'bg-warning': transfer.status === 'PENDING', 'bg-danger': transfer.status === 'FAILED' }">
             {{ transfer.status }}
           </span>
         </td>
@@ -97,8 +123,8 @@ export default {
             </code>
           </a>
         </td>
-        <td class="mono">
-          {{ formatDate(transfer.createTime) }}
+        <td>
+          <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>
         </td>
       </tr>
       </tbody>

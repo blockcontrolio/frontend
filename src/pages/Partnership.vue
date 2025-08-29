@@ -131,7 +131,8 @@ export default {
               </div>
               <div v-if="p.status === 'PENDING'" class="small">
               <span v-if="p.status === 'PENDING'" class="">
-                <span :class="statusColor(p.status)" class="me-2">Requested:</span>{{ formatDate(p.requestedAt) }}
+                <small :class="statusColor(p.status)" class="me-2">Requested:</small>
+                <small class="text-muted">{{ formatDate(p.requestedAt) }}</small>
               </span>
               </div>
             </div>
@@ -187,10 +188,12 @@ export default {
                 <i v-else class="bi bi-ban text-danger bold"></i>
               </div>
               <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
-                <span :class="statusColor(p.status)" class="me-2">Accepted:</span>{{ formatDate(p.resolvedAt) }}
+                <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
+                <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
               </span>
               <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
-                <span :class="statusColor(p.status)" class="me-2">Rejected:</span>{{ formatDate(p.resolvedAt) }}
+                <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
+                <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
               </span>
             </div>
             </div>

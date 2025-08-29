@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Dashboard from '../pages/Dashboard.vue'
 import Transfer from '../pages/Transfer.vue'
+import PrepareInvoice from '../pages/invoices/Prepare.vue';
 import Accounts from '../pages/Accounts.vue'
 import Tokens from '../pages/Tokens.vue'
 import Transactions from '../pages/Transactions.vue'
@@ -9,6 +10,7 @@ import LoginView from "../pages/auth/LoginView.vue";
 import RegisterView from "../pages/auth/RegisterView.vue";
 import Partnership from "../pages/Partnership.vue";
 import TransactionDetails from "../pages/TransactionDetails.vue";
+import InvoiceDetails from "../pages/invoices/Invoice.vue";
 
 const routes = [
     {
@@ -19,6 +21,17 @@ const routes = [
         path: '/transfer',
         name: 'Transfer',
         component: Transfer
+    },
+    {
+        path: '/receive',
+        name: 'Receive',
+        component: PrepareInvoice
+    },
+    {
+        path: '/invoices/:invoiceId',
+        name: 'Invoice',
+        component: InvoiceDetails,
+        props: true
     },
     {
         path: '/accounts',

@@ -7,16 +7,18 @@ import {
   sendExternalWithdrawal,
   sendCrossCounterparty
 } from '../services/api'
+import {fetchPartnerships} from "../services/partnership.js";
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
-import FromAccountSelector from "../components/transfer/FromAccountSelector.vue";
+import FromAccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
-import {fetchPartnerships} from "../services/partnership.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";
+import Pending from "./invoices/Pending.vue";
 
 export default {
   components: {
+    Pending,
     AmountInput,
     FromAccountSelector,
     TxToast,
@@ -24,8 +26,8 @@ export default {
   },
   data() {
     return {
-      selectedForm: "internal", // or 'internal'
-      accounts: [], // should be populated externally
+      selectedForm: "internal",
+      accounts: [],
       partnerships: [],
       internal: {
         fromAccountId: "",
@@ -46,7 +48,7 @@ export default {
         toAccountId: "",
         amount: null
       },
-      tokens: [], // fetched from API
+      tokens: [],
       errors: {
         to: "",
         amount: ""
@@ -138,6 +140,11 @@ export default {
         this.errors.amount = "Amount must be greater than zero";
         return;
       }
+      const balance = parseFloat(this.selectedAsset?.amount);
+      if (amount > balance) {
+        this.errors.amount = "Amount exceeds account balance!";
+        return;
+      }
       const decimalPart = amountStr.split(".")[1];
       if (decimalPart && decimalPart.length > 18) {
         this.errors.amount = "Amount must have at most 18 decimal places";
@@ -149,7 +156,9 @@ export default {
       this.resetError();
       this.validateToAddress();
       this.validateAmount();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      if (this.hasErrors) {
+        return;
+      }
       try {
         const response = await sendExternalWithdrawal(this.transfer)
         if (!response.ok) {
@@ -167,7 +176,9 @@ export default {
     async submitInternalTransfer() {
       this.resetError();
       this.validateAmount();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      if (this.hasErrors) {
+        return;
+      }
       try {
         const response = await sendInternalTransfer(this.internal);
         if (!response.ok) {
@@ -185,7 +196,9 @@ export default {
     async submitCrossCounterparty() {
       this.resetError();
       this.validateAmount();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      if (this.hasErrors) {
+        return;
+      }
       try {
         this.crossCp.toCounterpartyId = this.selectedPartnership.targetCounterpartyId;
         const response = await sendCrossCounterparty(this.crossCp)
@@ -217,7 +230,7 @@ export default {
     },
     async handleSuccess(response) {
       let txData = await response.json();
-      let message = `You transferred ${txData.amount} ${this.selectedAsset?.name} (${this.selectedAsset?.symbol}) to ${txData.to}`
+      let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
       this.transferSuccess = {hash: txData.txHash, message};
     },
     handleUnknownError(err) {
@@ -259,6 +272,11 @@ export default {
                v-on:change="this.resetSelection(); this.resetError(); this.fetchAcceptedPartnerships()"
                v-model="selectedForm"/>
         <label class="form-check-label fw-bold" for="cpRadio">Cross Partnership</label>
+      </div>
+      <div class="form-check form-check-inline me-3">
+        <input class="form-check-input border-primary" type="radio" id="invoicesRadio" value="invoices"
+               v-model="selectedForm"/>
+        <label class="form-check-label fw-bold" for="invoicesRadio">Invoices</label>
       </div>
     </div>
   </div>
@@ -450,6 +468,10 @@ export default {
         <button class="btn btn-outline-primary btn-sm" :disabled="hasErrors">Send</button>
       </div>
     </form>
+  </div>
+
+  <div v-if="selectedForm === 'invoices'" class="d-flex justify-content-center mt-5">
+    <Pending class="card p-3 border rounded"></Pending>
   </div>
 
   <TxToast

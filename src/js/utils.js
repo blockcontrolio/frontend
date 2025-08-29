@@ -22,3 +22,10 @@ export function roundAmount(value) {
     // Convert to string without forcing extra zeros
     return rounded.toString();
 }
+
+export function shortenString(value) {
+    if (value && value.length <= 8) {
+        return value;
+    }
+    return value ? value.substring(0, 8).trim() + "…" : "";
+}

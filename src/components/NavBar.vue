@@ -53,7 +53,7 @@ export default {
             @click.prevent="handleClick"
         >
           Send
-          <i class="bi bi-send-plus"></i>
+          <i class="bi bi-arrow-up-right-circle-fill"></i>
         </router-link>
 
         <router-link
@@ -62,7 +62,7 @@ export default {
             @click.prevent="handleClick"
         >
           Receive
-          <i class="bi bi-download"></i>
+          <i class="bi bi-arrow-down-left-circle-fill"></i>
         </router-link>
         <router-link class="nav-link" :to="hasAuthToken() ? '/transfers' : ''" @click.prevent="handleClick">History</router-link>
         <hr class="sidebar-divider"/>
