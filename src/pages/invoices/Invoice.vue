@@ -5,10 +5,11 @@ import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {formatDate} from "../../js/utils.js";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
 import TxToast from "../../components/toast/TxToast.vue";
+import InfoToast from "../../components/toast/InfoToast.vue";
 
 export default {
   name: "PayInvoice",
-  components: {TxToast, ErrorToast, AccountSelector},
+  components: {InfoToast, TxToast, ErrorToast, AccountSelector},
   props: ['invoiceId'],
   data() {
     return {
@@ -18,14 +19,16 @@ export default {
         receiverAccount: {},
         asset: {},
         amount: null,
-        isPayer: false
+        isPayer: false,
+        status: ''
       },
       accounts: [],
       accountFrom: "",
       selectedAsset: null,
       disableButtons: null,
       transferSuccess: null,
-      transferError: null
+      transferError: null,
+      messageSuccess: ''
     }
   },
   mounted() {
@@ -66,6 +69,9 @@ export default {
         if (!response.ok) {
           const err = await response.json();
           this.handleTransferError(err);
+        } else {
+          this.messageSuccess = 'You have cancelled invoice';
+          this.invoice.status = 'CANCELLED';
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -78,6 +84,9 @@ export default {
         if (!response.ok) {
           const err = await response.json();
           this.handleTransferError(err);
+        } else {
+          this.messageSuccess = 'You have rejected invoice';
+          this.invoice.status = 'REJECTED';
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -92,6 +101,7 @@ export default {
           this.handleTransferError(err);
         } else {
           await this.handleSuccess(response);
+          this.invoice.status = 'EXECUTED';
         }
       } catch (err) {
         this.handleUnknownError(err);
@@ -217,6 +227,11 @@ export default {
       v-if="transferError"
       :error="transferError"
       @closed="transferError = null;"
+  />
+  <InfoToast
+      v-if="messageSuccess"
+      :message="messageSuccess"
+      @closed="messageSuccess = null;"
   />
 
 </template>
