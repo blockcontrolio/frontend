@@ -26,8 +26,8 @@ export default {
   },
   data() {
     return {
-      selectedForm: "internal", // or 'internal'
-      accounts: [], // should be populated externally
+      selectedForm: "internal",
+      accounts: [],
       partnerships: [],
       internal: {
         fromAccountId: "",
@@ -48,7 +48,7 @@ export default {
         toAccountId: "",
         amount: null
       },
-      tokens: [], // fetched from API
+      tokens: [],
       errors: {
         to: "",
         amount: ""
@@ -156,7 +156,9 @@ export default {
       this.resetError();
       this.validateToAddress();
       this.validateAmount();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      if (this.hasErrors) {
+        return;
+      }
       try {
         const response = await sendExternalWithdrawal(this.transfer)
         if (!response.ok) {
@@ -174,7 +176,9 @@ export default {
     async submitInternalTransfer() {
       this.resetError();
       this.validateAmount();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      if (this.hasErrors) {
+        return;
+      }
       try {
         const response = await sendInternalTransfer(this.internal);
         if (!response.ok) {
@@ -192,7 +196,9 @@ export default {
     async submitCrossCounterparty() {
       this.resetError();
       this.validateAmount();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
+      if (this.hasErrors) {
+        return;
+      }
       try {
         this.crossCp.toCounterpartyId = this.selectedPartnership.targetCounterpartyId;
         const response = await sendCrossCounterparty(this.crossCp)
