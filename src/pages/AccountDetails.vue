@@ -7,7 +7,7 @@ export default {
   components: {AccountTypeSelect},
   data() {
     return {
-      accounts: [],
+      eoaAccounts: [],
       accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
       account: {
         ref: "",
@@ -34,7 +34,7 @@ export default {
     formatDate,
     async fetchAccounts() {
       let res = await fetchAccounts();
-      this.accounts = await res.json();
+      return  await res.json();
     },
     async fetchAccount(id) {
       let res = await fetchAccount(id);
@@ -42,7 +42,7 @@ export default {
       this.account = {...account};
       this.originalAccount = {...account}; // deep clone
       if (this.originalAccount.walletType === "SMART") {
-        await this.fetchAccounts()
+        this.eoaAccounts = await this.fetchAccounts()
             .filter(item => item.walletType !== 'SMART'); // only EOA can be paymaster
       }
     },
@@ -125,12 +125,12 @@ export default {
       </div>
 
       <!-- change paymaster account for only SMART -->
-      <div class="row mb-3" v-if="account.walletType === 'EOA'">
+      <div class="row mb-3" v-if="account.walletType === 'SMART'">
         <div class="col-4"><strong>Paymaster Account:</strong></div>
         <div class="col-8">
           <select v-model="account.paymasterId" class="form-select w-50" required>
             <option disabled value="">-- select paymaster --</option>
-            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
+            <option v-for="acc in eoaAccounts" :key="acc.id" :value="acc.id">
               {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
             </option>
           </select>
