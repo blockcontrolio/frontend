@@ -1,17 +1,20 @@
 <script>
 import {formatAmount, formatDate} from "../js/utils.js";
-import {fetchAccount, fetchAssetBalances, updateAccount} from "../services/api.js";
+import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/api.js";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 
 export default {
   components: {AccountTypeSelect},
   data() {
     return {
+      accounts: [],
       accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
       account: {
         ref: "",
         name: "",
-        type: ""
+        type: "",
+        walletType: "",
+        paymasterId: null
       },
       originalAccount: {},
       balances: []
@@ -29,11 +32,19 @@ export default {
   methods: {
     formatAmount,
     formatDate,
+    async fetchAccounts() {
+      let res = await fetchAccounts();
+      this.accounts = await res.json();
+    },
     async fetchAccount(id) {
       let res = await fetchAccount(id);
       let account = await res.json();
       this.account = {...account};
       this.originalAccount = {...account}; // deep clone
+      if (this.originalAccount.walletType === "SMART") {
+        await this.fetchAccounts()
+            .filter(item => item.walletType !== 'SMART'); // only EOA can be paymaster
+      }
     },
     async fetchBalances(id) {
       let res = await fetchAssetBalances(id);
@@ -91,20 +102,19 @@ export default {
       Return to List
     </button>
     <div v-if="account" class="card p-3 mt-3">
-      <div class="row mb-2">
+      <div class="row mb-3">
         <div class="col-4"><strong>Ref:</strong></div>
         <div class="col-8">{{ account.ref }}</div>
       </div>
 
       <!-- inline name field -->
-      <div class="row mb-2 align-items-center">
+      <div class="row mb-3 align-items-center">
         <div class="col-4"><strong>Name:</strong></div>
         <div class="col-8">
-          <input v-model="account.name"
-                 class="form-control mb-2"/>
+          <input v-model="account.name" class="form-control"/>
         </div>
       </div>
-      <div class="row mb-2">
+      <div class="row mb-3">
         <div class="col-4"><strong>Type:</strong></div>
         <div class="col-8">
           <AccountTypeSelect
@@ -114,7 +124,20 @@ export default {
         </div>
       </div>
 
-      <div class="row mb-2">
+      <!-- change paymaster account for only SMART -->
+      <div class="row mb-3" v-if="account.walletType === 'EOA'">
+        <div class="col-4"><strong>Paymaster Account:</strong></div>
+        <div class="col-8">
+          <select v-model="account.paymasterId" class="form-select w-50" required>
+            <option disabled value="">-- select paymaster --</option>
+            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
+              {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
         <div class="col-4"><strong>Token Balances:</strong></div>
         <div class="col-8">
           <div v-if="this.balances && this.balances.length">
