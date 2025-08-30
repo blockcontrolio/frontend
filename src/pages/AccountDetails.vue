@@ -32,9 +32,11 @@ export default {
   methods: {
     formatAmount,
     formatDate,
-    async fetchAccounts() {
+    async fetchEoaAccounts() {
       let res = await fetchAccounts();
-      return  await res.json();
+      let allAccounts = await res.json();
+      this.eoaAccounts = allAccounts
+          .filter(item => item.walletType === 'EOA'); // only EOA can be paymaster
     },
     async fetchAccount(id) {
       let res = await fetchAccount(id);
@@ -42,8 +44,7 @@ export default {
       this.account = {...account};
       this.originalAccount = {...account}; // deep clone
       if (this.originalAccount.walletType === "SMART") {
-        this.eoaAccounts = await this.fetchAccounts()
-            .filter(item => item.walletType !== 'SMART'); // only EOA can be paymaster
+        await this.fetchEoaAccounts();
       }
     },
     async fetchBalances(id) {
