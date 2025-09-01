@@ -77,16 +77,14 @@ export async function fetchAccount(id) {
 }
 
 export async function updateAccount(id, accountInfo) {
-    await fetch(`${apiBaseUrl}/accounts/${id}`, {
+    return await fetch(`${apiBaseUrl}/accounts/${id}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
         body: JSON.stringify(accountInfo),
-    }).catch(err => {
-        console.error('Error updating account:', err);
-    });
+    })
 }
 
 export async function fetchAssetBalances(accountId) {

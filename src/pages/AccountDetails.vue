@@ -2,9 +2,11 @@
 import {formatAmount, formatDate} from "../js/utils.js";
 import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/api.js";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
+import InfoToast from "../components/toast/InfoToast.vue";
+import ErrorToast from "../components/toast/ErrorToast.vue";
 
 export default {
-  components: {AccountTypeSelect},
+  components: {ErrorToast, InfoToast, AccountTypeSelect},
   data() {
     return {
       eoaAccounts: [],
@@ -17,7 +19,9 @@ export default {
         paymasterId: null
       },
       originalAccount: {},
-      balances: []
+      balances: [],
+      messageSuccess: '',
+      messageError: null,
     };
   },
   mounted() {
@@ -58,7 +62,33 @@ export default {
         console.log("No changes to send.");
         return;
       }
-      await updateAccount(id, patch);
+      try {
+        const response = await updateAccount(id, patch);
+        let account = await response.json();
+        this.account = {...account};
+        this.originalAccount = {...account}; // deep clone needed to disable form
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleError(err);
+        } else {
+          this.messageSuccess = 'Account has been updated';
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
+    handleError(err) {
+      this.messageError = {
+        error: err.error || 'Error',
+        message: err.message || 'Unknown error occurred.'
+      };
+    },
+    handleUnknownError(err) {
+      console.error(err)
+      this.messageError = {
+        error: 'Network Error',
+        message: err.message
+      };
     },
     goBack() {
       this.$router.push('/accounts');
@@ -170,6 +200,18 @@ export default {
       </div>
     </div>
   </div>
+
+  <InfoToast
+      v-if="messageSuccess"
+      :message="messageSuccess"
+      @closed="messageSuccess = null;"
+  />
+  <ErrorToast
+      v-if="messageError"
+      :error="messageError"
+      @closed="messageError = null;"
+  />
+
 </template>
 
 <style scoped>
