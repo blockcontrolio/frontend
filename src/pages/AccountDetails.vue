@@ -1,20 +1,27 @@
 <script>
 import {formatAmount, formatDate} from "../js/utils.js";
-import {fetchAccount, fetchAssetBalances, updateAccount} from "../services/api.js";
+import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/api.js";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
+import InfoToast from "../components/toast/InfoToast.vue";
+import ErrorToast from "../components/toast/ErrorToast.vue";
 
 export default {
-  components: {AccountTypeSelect},
+  components: {ErrorToast, InfoToast, AccountTypeSelect},
   data() {
     return {
+      eoaAccounts: [],
       accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
       account: {
         ref: "",
         name: "",
-        type: ""
+        type: "",
+        walletType: "",
+        paymasterId: null
       },
       originalAccount: {},
-      balances: []
+      balances: [],
+      messageSuccess: '',
+      messageError: null,
     };
   },
   mounted() {
@@ -29,11 +36,20 @@ export default {
   methods: {
     formatAmount,
     formatDate,
+    async fetchEoaAccounts() {
+      let res = await fetchAccounts();
+      let allAccounts = await res.json();
+      this.eoaAccounts = allAccounts
+          .filter(item => item.walletType === 'EOA'); // only EOA can be paymaster
+    },
     async fetchAccount(id) {
       let res = await fetchAccount(id);
       let account = await res.json();
       this.account = {...account};
       this.originalAccount = {...account}; // deep clone
+      if (this.originalAccount.walletType === "SMART") {
+        await this.fetchEoaAccounts();
+      }
     },
     async fetchBalances(id) {
       let res = await fetchAssetBalances(id);
@@ -46,7 +62,33 @@ export default {
         console.log("No changes to send.");
         return;
       }
-      await updateAccount(id, patch);
+      try {
+        const response = await updateAccount(id, patch);
+        let account = await response.json();
+        this.account = {...account};
+        this.originalAccount = {...account}; // deep clone needed to disable form
+        if (!response.ok) {
+          const err = await response.json();
+          this.handleError(err);
+        } else {
+          this.messageSuccess = 'Account has been updated';
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
+    handleError(err) {
+      this.messageError = {
+        error: err.error || 'Error',
+        message: err.message || 'Unknown error occurred.'
+      };
+    },
+    handleUnknownError(err) {
+      console.error(err)
+      this.messageError = {
+        error: 'Network Error',
+        message: err.message
+      };
     },
     goBack() {
       this.$router.push('/accounts');
@@ -91,20 +133,19 @@ export default {
       Return to List
     </button>
     <div v-if="account" class="card p-3 mt-3">
-      <div class="row mb-2">
+      <div class="row mb-3">
         <div class="col-4"><strong>Ref:</strong></div>
         <div class="col-8">{{ account.ref }}</div>
       </div>
 
       <!-- inline name field -->
-      <div class="row mb-2 align-items-center">
+      <div class="row mb-3 align-items-center">
         <div class="col-4"><strong>Name:</strong></div>
         <div class="col-8">
-          <input v-model="account.name"
-                 class="form-control mb-2"/>
+          <input v-model="account.name" class="form-control"/>
         </div>
       </div>
-      <div class="row mb-2">
+      <div class="row mb-3">
         <div class="col-4"><strong>Type:</strong></div>
         <div class="col-8">
           <AccountTypeSelect
@@ -114,7 +155,20 @@ export default {
         </div>
       </div>
 
-      <div class="row mb-2">
+      <!-- change paymaster account for only SMART -->
+      <div class="row mb-3" v-if="account.walletType === 'SMART'">
+        <div class="col-4"><strong>Paymaster Account:</strong></div>
+        <div class="col-8">
+          <select v-model="account.paymasterId" class="form-select w-50" required>
+            <option disabled value="">-- select paymaster --</option>
+            <option v-for="acc in eoaAccounts" :key="acc.id" :value="acc.id">
+              {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
         <div class="col-4"><strong>Token Balances:</strong></div>
         <div class="col-8">
           <div v-if="this.balances && this.balances.length">
@@ -146,6 +200,18 @@ export default {
       </div>
     </div>
   </div>
+
+  <InfoToast
+      v-if="messageSuccess"
+      :message="messageSuccess"
+      @closed="messageSuccess = null;"
+  />
+  <ErrorToast
+      v-if="messageError"
+      :error="messageError"
+      @closed="messageError = null;"
+  />
+
 </template>
 
 <style scoped>

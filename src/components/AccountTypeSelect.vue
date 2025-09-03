@@ -27,7 +27,7 @@ export default {
 <template>
   <select
       v-model="internalValue"
-      class="form-select mb-2 w-25"
+      class="form-select w-50"
       required
   >
     <option disabled value="">-- account type --</option>
