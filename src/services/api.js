@@ -36,6 +36,28 @@ export async function addUser(userRequest) {
     });
 }
 
+export async function assignPermission(user, permission) {
+    return await fetch(`${apiBaseUrl}/users/permissions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify({email: user.email, permission}),
+    });
+}
+
+export async function removePermission(user, permission) {
+    return await fetch(`${apiBaseUrl}/users/permissions`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify({email: user.email, permission}),
+    });
+}
+
 export async function fetchCounterpartyInfo() {
     const response = fetch(`${apiBaseUrl}/counterparties`, {
         headers: {

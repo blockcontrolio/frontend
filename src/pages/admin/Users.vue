@@ -1,7 +1,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {formatDate, validEmail, validPassword} from "../../js/utils.js";
-import {addUser, fetchUsers} from "../../services/api.js";
+import {addUser, assignPermission, fetchUsers, removePermission} from "../../services/api.js";
 import UserRoleSelect from "../../components/UserRoleSelect.vue";
 import InfoToast from "../../components/toast/InfoToast.vue";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       users: [],
+      availablePermissions: ['ACCOUNT_MANAGE', 'TOKEN_MANAGE'],
       showUserForm: false,
       form: {
         email: "",
@@ -93,6 +94,35 @@ export default {
     },
     passwordsMatch() {
       return this.form.password === this.form.confirmPassword
+    },
+    openPermissionModal(user) {
+      user.showPermissionDropdown = true
+      user.newPermission = ""
+    },
+    async assignPermission(user) {
+      if (!user.newPermission) {
+        return
+      }
+      if (!user.permissions.includes(user.newPermission)) {
+        const response = await assignPermission(user, user.newPermission);
+        if (response.ok) {
+          user.permissions.push(user.newPermission)
+        }
+      }
+      user.newPermission = ""
+    },
+    cancelPermissionAssign(user) {
+      user.showPermissionDropdown = false
+      user.newPermission = ""
+    },
+    async removePermission(user, perm) {
+      const response = await removePermission(user, perm);
+      if (response.ok) {
+        user.permissions = user.permissions.filter(p => p !== perm)
+      }
+    },
+    remainingPermissions(user) {
+      return this.availablePermissions.filter(p => !user.permissions.includes(p))
     },
   },
   mounted() {
@@ -174,11 +204,62 @@ export default {
         <tr v-for="user in users" :key="user.email">
           <td class="mono">{{ user.email }}</td>
           <td class="mono">{{ user.role }}</td>
-          <td class="mono">{{ user.permissions }}</td>
+          <td class="align-top" style="width: 315px">
+            <!-- permission dropdown with Add/Cancel buttons -->
+            <transition name="fade-slide">
+              <div v-if="user.showPermissionDropdown && remainingPermissions(user).length > 0"
+                   class="mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <select v-model="user.newPermission"
+                          class="form-select form-select-sm w-auto">
+                    <option disabled value="">-- select permission --</option>
+                    <option v-for="perm in remainingPermissions(user)"
+                            :key="perm"
+                            :value="perm">
+                      {{ perm }}
+                    </option>
+                  </select>
+
+                  <!-- button group -->
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-primary"
+                            @click="assignPermission(user)">
+                      Add
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary"
+                            @click="cancelPermissionAssign(user)">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </transition>
+
+            <!-- assigned permissions as outlined chips -->
+            <div class="d-flex flex-wrap align-items-center gap-1">
+              <div v-for="perm in user.permissions"
+                   :key="perm"
+                   class="border border-danger-subtle text-danger rounded-pill px-2 d-flex align-items-center gap-1">
+                {{ perm }}
+                <button class="btn-close btn-sm ms-1 small"
+                        style="width: 20px; height: 20px; line-height: 1;"
+                        @click="removePermission(user, perm)"
+                        aria-label="Remove"></button>
+              </div>
+              <!-- plus button (only shows if there are still assignable permissions) -->
+              <button v-if="remainingPermissions(user).length > 0 && !user.showPermissionDropdown"
+                      class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 20px; height: 20px; line-height: 1;"
+                      @click="openPermissionModal(user)">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+          </td>
           <td class="mono">{{ user.enabled }}</td>
           <td>
             <small class="text-muted">{{ formatDate(user.createdAt) }}</small>
           </td>
+
         </tr>
         </tbody>
       </table>
@@ -201,5 +282,16 @@ export default {
 </template>
 
 <style scoped>
+/* fade & slide down animation */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.85s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
 
 </style>
