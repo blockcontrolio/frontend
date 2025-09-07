@@ -14,6 +14,28 @@ export async function fetchNetworks() {
     });
 }
 
+export async function fetchUsers() {
+    return await fetch(`${apiBaseUrl}/users`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to load users', err);
+    });
+}
+
+export async function addUser(userRequest) {
+    return await fetch(`${apiBaseUrl}/users`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify(userRequest),
+    });
+}
+
 export async function fetchCounterpartyInfo() {
     const response = fetch(`${apiBaseUrl}/counterparties`, {
         headers: {

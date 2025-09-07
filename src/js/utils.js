@@ -29,3 +29,15 @@ export function shortenString(value) {
     }
     return value ? value.substring(0, 8).trim() + "…" : "";
 }
+
+export function validEmail(email) {
+    // simple & safe regex, not overly strict
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return re.test(email)
+}
+
+export function validPassword(password) {
+    // Example rule: 4+ chars, one number, one uppercase, one lowercase
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{4,}$/
+    return re.test(password)
+}

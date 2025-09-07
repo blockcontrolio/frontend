@@ -2,18 +2,23 @@
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {resetAllStores} from "../js/stores/resetStores.js";
+import {useUserStore} from "../js/stores/userStore.js";
 
 export default {
   name: "NavBar",
   setup() {
     const networkStore = useNetworkStore();
     const counterpartyStore = useCounterpartyStore();
-    return {networkStore, counterpartyStore};
+    const userStore = useUserStore();
+    return {networkStore, counterpartyStore, userStore};
   },
   computed: {
     counterparty() {
       return this.counterpartyStore.counterparty;
     },
+    adminView() {
+      return this.userStore.user?.role === 'ADMIN';
+    }
   },
   created() {
 
@@ -46,6 +51,7 @@ export default {
       <h4 class="mt-2 bold">BlockControl</h4>
       <div>
         <router-link v-if="false" class="nav-link" :to="hasAuthToken() ? '/' : ''" @click.prevent="handleClick">Dashboard</router-link>
+        <router-link v-if="adminView" class="nav-link" :to="hasAuthToken() ? '/users' : ''" @click.prevent="handleClick">Users</router-link>
         <hr class="sidebar-divider"/>
         <router-link
             class="nav-link d-flex align-items-center gap-2"
