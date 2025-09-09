@@ -221,40 +221,38 @@ export default {
           <td class="mono">{{ user.role }}</td>
           <td class="align-top" style="width: 315px">
             <!-- permission dropdown with Add/Cancel buttons -->
-            <transition name="fade-slide">
-              <div v-if="user.showPermissionDropdown && remainingPermissions(user).length > 0"
-                   class="mb-2">
-                <div class="d-flex align-items-center gap-2">
-                  <select v-model="user.newPermission"
-                          class="form-select form-select-sm w-auto">
-                    <option disabled value="">-- select permission --</option>
-                    <option v-for="perm in remainingPermissions(user)"
-                            :key="perm"
-                            :value="perm">
-                      {{ perm }}
-                    </option>
-                  </select>
+            <div v-if="user.showPermissionDropdown && remainingPermissions(user).length > 0"
+                 class="mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <select v-model="user.newPermission"
+                        class="form-select form-select-sm w-auto">
+                  <option disabled value="">-- select permission --</option>
+                  <option v-for="perm in remainingPermissions(user)"
+                          :key="perm"
+                          :value="perm">
+                    {{ perm }}
+                  </option>
+                </select>
 
-                  <!-- button group -->
-                  <div class="d-flex gap-1">
-                    <button class="btn btn-sm btn-primary"
-                            @click="assignPermission(user)">
-                      Add
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary"
-                            @click="cancelPermissionAssign(user)">
-                      Cancel
-                    </button>
-                  </div>
+                <!-- button group -->
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-primary"
+                          @click="assignPermission(user)">
+                    Add
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary"
+                          @click="cancelPermissionAssign(user)">
+                    Cancel
+                  </button>
                 </div>
               </div>
-            </transition>
+            </div>
 
             <!-- assigned permissions as outlined chips -->
             <div class="d-flex flex-wrap align-items-center gap-1">
               <div v-for="perm in user.permissions"
                    :key="perm"
-                   class="border border-danger-subtle text-danger rounded-pill px-2 d-flex align-items-center gap-1">
+                   class="d-flex align-items-center border border-danger-subtle text-danger rounded-pill px-2 gap-1">
                 {{ perm }}
                 <button class="btn-close btn-sm ms-1 small"
                         style="width: 20px; height: 20px; line-height: 1;"
@@ -263,7 +261,7 @@ export default {
               </div>
               <!-- plus button (only shows if there are still assignable permissions) -->
               <button v-if="remainingPermissions(user).length > 0 && !user.showPermissionDropdown"
-                      class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center"
+                      class="d-flex align-items-center justify-content-center btn btn-sm btn-outline-success rounded-circle"
                       style="width: 20px; height: 20px; line-height: 1;"
                       @click="openPermissionModal(user)">
                 <i class="bi bi-plus-lg"></i>
@@ -297,16 +295,5 @@ export default {
 </template>
 
 <style scoped>
-/* fade & slide down animation */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.85s ease;
-}
-
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-5px);
-}
 
 </style>
