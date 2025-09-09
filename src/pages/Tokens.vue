@@ -250,7 +250,7 @@ export default {
       this.txSuccess = null;
       this.txError = {
         error: err.error || 'Error',
-        message: err.message || 'Something went wrong'
+        message: err.message || 'Unknown error occurred.'
       };
     },
     handleUnknownError(err) {

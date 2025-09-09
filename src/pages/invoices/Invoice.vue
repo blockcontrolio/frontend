@@ -68,7 +68,7 @@ export default {
         const response = await cancelInvoice(this.invoiceId)
         if (!response.ok) {
           const err = await response.json();
-          this.handleTransferError(err);
+          this.handleError(err);
         } else {
           this.messageSuccess = 'You have cancelled invoice';
           this.invoice.status = 'CANCELLED';
@@ -83,7 +83,7 @@ export default {
         const response = await rejectInvoice(this.invoiceId)
         if (!response.ok) {
           const err = await response.json();
-          this.handleTransferError(err);
+          this.handleError(err);
         } else {
           this.messageSuccess = 'You have rejected invoice';
           this.invoice.status = 'REJECTED';
@@ -98,7 +98,7 @@ export default {
         const response = await executeInvoice(this.invoiceId, this.accountFrom)
         if (!response.ok) {
           const err = await response.json();
-          this.handleTransferError(err);
+          this.handleError(err);
         } else {
           await this.handleSuccess(response);
           this.invoice.status = 'EXECUTED';
@@ -112,17 +112,17 @@ export default {
       let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
       this.transferSuccess = {hash: txData.txHash, message};
     },
+    handleError(err) {
+      this.transferError = {
+        error: err.error || 'Error',
+        message: err.message || 'Unknown error occurred.'
+      };
+    },
     handleUnknownError(err) {
       console.error(err)
       this.transferError = {
         error: 'Network Error',
         message: err.message
-      };
-    },
-    handleTransferError(err) {
-      this.transferError = {
-        error: err.error || 'Error',
-        message: err.message || 'Unknown error occurred.'
       };
     }
   }
