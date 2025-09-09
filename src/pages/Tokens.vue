@@ -24,6 +24,7 @@ import TxToast from "../components/toast/TxToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import RolesModal from "../components/modal/RolesModal.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";
+import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 
 export default {
   name: 'Tokens',
@@ -40,7 +41,8 @@ export default {
   },
   setup() {
     const networkStore = useNetworkStore();
-    return {networkStore};
+    const counterpartyStore = useCounterpartyStore();
+    return {networkStore, counterpartyStore};
   },
   data() {
     return {
@@ -274,6 +276,9 @@ export default {
       }
       return this.importOptions;
     },
+    canCreate() {
+      return this.counterpartyStore.counterparty?.type === 'EMI';
+    },
   }
 };
 </script>
@@ -288,7 +293,7 @@ export default {
               @click="prepareImportForm()">
         Import
       </button>
-      <button class="btn btn-outline-primary btn-sm px-4" type="button"
+      <button v-if="canCreate" class="btn btn-outline-primary btn-sm px-4" type="button"
               @click="this.showTokenForm = 'create'">
         Create New Token
       </button>
@@ -354,7 +359,7 @@ export default {
     </form>
 
     <!-- Create Token Form -->
-    <form v-if="this.showTokenForm === 'create'" @submit.prevent="createToken" class="mb-4">
+    <form v-if="canCreate && this.showTokenForm === 'create'" @submit.prevent="createToken" class="mb-4">
       <input v-model="newToken.name" class="form-control mb-2"
              placeholder="Token Name"
              required/>

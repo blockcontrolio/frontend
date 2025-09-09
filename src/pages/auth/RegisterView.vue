@@ -14,12 +14,20 @@ export default {
   },
   data() {
     return {
+      types: [
+        {
+          code: 'EMI', desc: 'Electronic Money Institution'
+        },
+        {
+          code: 'LSP', desc: 'Licensed Service Provider'
+        }],
       form: {
         email: "",
         password: "",
         confirmPassword: "",
         counterpartyName: "",
         networkId: "",
+        type: ""
       },
       error: null,
       loading: false,
@@ -85,9 +93,19 @@ export default {
           </div>
 
           <div class="mb-3">
+            <label class="form-label">Counterparty Type</label>
+            <select v-model="form.type" class="form-select" required>
+              <option disabled value="">-- counterparty type --</option>
+              <option v-for="type in types" :key="type.code" :value="type.code">
+                {{ type.desc }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
             <label class="form-label">Select Network</label>
             <select v-model="form.networkId" class="form-select" required>
-              <option disabled value="">Choose a network</option>
+              <option disabled value="">-- network --</option>
               <option v-for="net in networks" :key="net.id" :value="net.id">
                 {{ net.name }}
               </option>
