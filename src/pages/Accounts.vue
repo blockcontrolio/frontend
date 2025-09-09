@@ -96,6 +96,11 @@ export default {
           (acc.id || '').includes(query)
       );
     },
+    onlyEoaAccounts() {
+      return this.accounts.filter(acc =>
+          (acc.walletType === 'EOA')
+      );
+    },
     hasErrors() {
       return !!this.errors.ref;
     },
@@ -114,16 +119,16 @@ export default {
     <form v-else @submit.prevent="createAccount" class="mb-4">
       <input
           v-model="form.name"
-          class="form-control mb-2"
+          class="form-control mb-2 w-50"
           placeholder="Account Name"
       />
-      <AccountTypeSelect
+      <AccountTypeSelect class="form-select mb-2 w-25"
           v-model="form.type"
           :account-types="availableAccountTypes"
       />
       <input
           v-model="form.ref"
-          class="form-control mb-2"
+          class="form-control mb-2 w-50"
           placeholder="Reference"
           @input="validateRef"
           required
@@ -143,9 +148,9 @@ export default {
       <!-- paymaster account -->
       <div class="mb-3" v-if="form.walletType === 'SMART'">
         <label class="form-label">Paymaster Account</label>
-        <select v-model="form.paymasterId" class="form-select" required>
+        <select v-model="form.paymasterId" class="form-select w-50" required>
           <option disabled value="">-- select paymaster --</option>
-          <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
+          <option v-for="acc in onlyEoaAccounts" :key="acc.id" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
           </option>
         </select>

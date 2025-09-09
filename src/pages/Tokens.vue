@@ -360,15 +360,15 @@ export default {
 
     <!-- Create Token Form -->
     <form v-if="canCreate && this.showTokenForm === 'create'" @submit.prevent="createToken" class="mb-4">
-      <input v-model="newToken.name" class="form-control mb-2"
+      <input v-model="newToken.name" class="form-control mb-2 w-50"
              placeholder="Token Name"
              required/>
-      <input v-model="newToken.symbol" class="form-control mb-2"
+      <input v-model="newToken.symbol" class="form-control mb-2 w-50"
              placeholder="Symbol"
              required/>
 
       <div class="mb-3">
-        <select v-model="newToken.accountId" class="form-select" required>
+        <select v-model="newToken.accountId" class="form-select w-50" required>
           <option disabled value="">-- owner account --</option>
           <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
             {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}

@@ -79,8 +79,8 @@ export default {
     },
     handleError(err) {
       this.messageError = {
-        error: err.error || 'Error',
-        message: err.message || 'Unknown error occurred.'
+        error: err.errorCode || 'Error',
+        message: err.errorMessage || 'Unknown error occurred.'
       };
     },
     handleUnknownError(err) {
