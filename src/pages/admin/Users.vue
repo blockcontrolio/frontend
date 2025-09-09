@@ -104,21 +104,36 @@ export default {
         return
       }
       if (!user.permissions.includes(user.newPermission)) {
-        const response = await assignPermission(user, user.newPermission);
-        if (response.ok) {
-          user.permissions.push(user.newPermission)
+        try {
+          const response = await assignPermission(user, user.newPermission);
+          if (response.ok) {
+            user.permissions.push(user.newPermission)
+            user.showPermissionDropdown = false
+            user.newPermission = ""
+          } else {
+            const err = await response.json();
+            this.handleError(err);
+          }
+        } catch (err) {
+          this.handleUnknownError(err);
         }
       }
-      user.newPermission = ""
     },
     cancelPermissionAssign(user) {
       user.showPermissionDropdown = false
       user.newPermission = ""
     },
     async removePermission(user, perm) {
-      const response = await removePermission(user, perm);
-      if (response.ok) {
-        user.permissions = user.permissions.filter(p => p !== perm)
+      try {
+        const response = await removePermission(user, perm);
+        if (response.ok) {
+          user.permissions = user.permissions.filter(p => p !== perm)
+        } else {
+          const err = await response.json();
+          this.handleError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
       }
     },
     remainingPermissions(user) {

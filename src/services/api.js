@@ -37,24 +37,26 @@ export async function addUser(userRequest) {
 }
 
 export async function assignPermission(user, permission) {
-    return await fetch(`${apiBaseUrl}/users/permissions`, {
+    const userId = user.email;
+    return await fetch(`${apiBaseUrl}/users/${userId}/permissions`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
-        body: JSON.stringify({email: user.email, permission}),
+        body: JSON.stringify({permissions: [permission]}),
     });
 }
 
 export async function removePermission(user, permission) {
-    return await fetch(`${apiBaseUrl}/users/permissions`, {
+    const userId = user.email;
+    return await fetch(`${apiBaseUrl}/users/${userId}/permissions`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
-        body: JSON.stringify({email: user.email, permission}),
+        body: JSON.stringify({permissions: [permission]}),
     });
 }
 
