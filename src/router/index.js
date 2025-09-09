@@ -1,5 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Dashboard from '../pages/Dashboard.vue'
+import Users from "../pages/admin/Users.vue";
+//
 import Transfer from '../pages/Transfer.vue'
 import PrepareInvoice from '../pages/invoices/Prepare.vue';
 import Accounts from '../pages/Accounts.vue'
@@ -84,7 +86,11 @@ const routes = [
     {
         path: '/register',
         component: RegisterView
-    }
+    },
+    {
+        path: '/users',
+        component: Users
+    },
 ]
 
 const router = createRouter({

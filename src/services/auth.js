@@ -1,5 +1,9 @@
 const authBaseUrl = import.meta.env.VITE_AUTH_BASE || `${window.location.origin}/auth`;
 
+function loadAuthToken() {
+    return localStorage.getItem('auth-token') || '';
+}
+
 export function isJwtExpired(token) {
     if (!token) return true;
     try {
@@ -25,5 +29,16 @@ export async function register(form) {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(form),
+    });
+}
+
+export async function fetchUserInfo() {
+    return await fetch(`${authBaseUrl}/user-info`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to load user info', err);
     });
 }
