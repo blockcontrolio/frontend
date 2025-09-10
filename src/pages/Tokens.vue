@@ -256,7 +256,7 @@ export default {
     handleUnknownError(err) {
       console.error(err)
       this.txSuccess = null;
-      this.transferError = {
+      this.txError = {
         error: 'Network Error',
         message: err.message
       };

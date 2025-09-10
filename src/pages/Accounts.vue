@@ -4,12 +4,16 @@ import {createAccount, fetchAccounts} from '../services/api'
 import {formatDate} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
+import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
+import ErrorToast from "../components/toast/ErrorToast.vue";
+import InfoToast from "../components/toast/InfoToast.vue";
 
 export default {
-  components: {AccountTypeSelect, AddrScanLink},
+  components: {InfoToast, ErrorToast, AccountTypeSelect, AddrScanLink},
   setup() {
     let router = useRouter();
-    return {router}
+    const counterpartyStore = useCounterpartyStore();
+    return {router, counterpartyStore}
   },
   data() {
     return {
@@ -28,6 +32,8 @@ export default {
       errors: {
         ref: ""
       },
+      success: null,
+      error: null
     }
   },
   methods: {
@@ -39,16 +45,39 @@ export default {
     async createAccount() {
       this.resetError();
       this.validateRef();
-      if (this.hasErrors) return; // proceed with sending the transfer request using fetch
-      const res = await createAccount(this.form);
-      if (res.ok) {
-        const added = await res.json();
-        this.accounts.push({...added, show: false});
-        this.clearForm();
-        this.showCreateForm = false; // hide form
-      } else {
-        alert('Failed to create account');
+      if (this.hasErrors) {
+        return;
       }
+      try {
+        const res = await createAccount(this.form);
+        if (res.ok) {
+          const added = await res.json();
+          this.accounts.push({...added, show: false});
+          this.success = `${this.form.type} account has been created`;
+          this.clearForm();
+          this.showCreateForm = false; // hide form
+        } else {
+          const err = await res.json();
+          this.handleError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
+    handleError(err) {
+      this.success = null;
+      this.error = {
+        error: err.error || 'Error',
+        message: err.message || 'Failed to create account.'
+      };
+    },
+    handleUnknownError(err) {
+      console.error(err)
+      this.success = null;
+      this.error = {
+        error: 'Network Error',
+        message: err.message
+      };
     },
     clearForm() {
       this.form = {ref: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
@@ -73,6 +102,9 @@ export default {
   },
   computed: {
     availableAccountTypes() {
+      if (this.counterpartyStore.counterparty?.type === 'LSP') {
+        return ['DISTRIBUTOR', 'CLIENT']
+      }
       if (this.accounts.length === 0) {
         return ['ADMIN'];
       }
@@ -220,6 +252,18 @@ export default {
     </div>
     <div v-else class="">No accounts yet. Please create</div>
   </div>
+
+  <InfoToast
+      v-if="success"
+      :message="success"
+      @closed="success = null;"
+  />
+  <ErrorToast
+      v-if="error"
+      :error="error"
+      @closed="error = null"
+  />
+
 </template>
 
 <style scoped>
