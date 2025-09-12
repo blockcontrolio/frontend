@@ -370,8 +370,8 @@ export default {
       <div class="mb-3">
         <select v-model="newToken.accountId" class="form-select w-50" required>
           <option disabled value="">-- owner account --</option>
-          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN')" :key="acc.ref" :value="acc.id">
+            {{ acc.name || '(Unnamed)' }}
           </option>
         </select>
       </div>

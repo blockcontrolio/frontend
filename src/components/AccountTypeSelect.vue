@@ -8,7 +8,7 @@ export default {
     },
     accountTypes: {
       type: Array,
-      default: () => ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER']
+      default: () => ['ADMIN', 'ISSUER', 'OPERATOR', 'DISTRIBUTOR', 'CLIENT']
     },
   },
   computed: {

@@ -325,7 +325,7 @@ export default {
                 required>
           <option disabled value="">-- target account --</option>
           <option v-for="acc in availableTargetAccounts" :key="acc.id + '-to'" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+            {{ acc.name || '(Unnamed)' }}
           </option>
         </select>
       </div>

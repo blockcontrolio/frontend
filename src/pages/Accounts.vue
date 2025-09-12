@@ -30,7 +30,7 @@ export default {
       form: {name: "", ref: "", type: "", walletType: "", paymasterId: ""},
       showCreateForm: false,
       errors: {
-        ref: ""
+        name: ""
       },
       success: null,
       error: null
@@ -44,7 +44,7 @@ export default {
     },
     async createAccount() {
       this.resetError();
-      this.validateRef();
+      this.validateName();
       if (this.hasErrors) {
         return;
       }
@@ -82,15 +82,15 @@ export default {
     clearForm() {
       this.form = {ref: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
     },
-    validateRef() {
-      if (this.form.ref.length < 4) {
-        this.errors.ref = 'Ref must be unique and contain at least 4 letters or numbers';
+    validateName() {
+      if (this.form.name.length < 4) {
+        this.errors.name = 'Name must be unique and contain at least 4 letters or numbers';
       } else {
-        this.errors.ref = "";
+        this.errors.name = "";
       }
     },
     resetError() {
-      this.errors.ref = null;
+      this.errors.name = null;
     },
     findMasterAccName(paymasterId) {
       return this.accounts.find(acc => acc.id === paymasterId)
@@ -134,7 +134,7 @@ export default {
       );
     },
     hasErrors() {
-      return !!this.errors.ref;
+      return !!this.errors.name;
     },
   }
 }
@@ -153,7 +153,11 @@ export default {
           v-model="form.name"
           class="form-control mb-2 w-50"
           placeholder="Account Name"
+          @input="validateName"
+          required
       />
+      <div v-if="errors.name" class="form-text mb-2 text-danger">{{ errors.name }}</div>
+
       <AccountTypeSelect class="form-select mb-2 w-25"
           v-model="form.type"
           :account-types="availableAccountTypes"
@@ -161,11 +165,8 @@ export default {
       <input
           v-model="form.ref"
           class="form-control mb-2 w-50"
-          placeholder="Reference"
-          @input="validateRef"
-          required
+          placeholder="External Reference (Optional)"
       />
-      <div v-if="errors.ref" class="form-text mb-2">{{ errors.ref }}</div>
 
       <select
           v-model="form.walletType"
@@ -183,7 +184,7 @@ export default {
         <select v-model="form.paymasterId" class="form-select w-50" required>
           <option disabled value="">-- select paymaster --</option>
           <option v-for="acc in onlyEoaAccounts" :key="acc.id" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+            {{ acc.name || '(Unnamed)' }}
           </option>
         </select>
       </div>
@@ -224,7 +225,7 @@ export default {
         </tr>
         </thead>
         <tbody>
-        <tr v-for="acc in filteredAccounts" :key="acc.ref">
+        <tr v-for="acc in filteredAccounts" :key="acc.id">
           <td>
             <router-link :to="{ name: 'account-details', params: { id: acc.id } }"
                          class="">
