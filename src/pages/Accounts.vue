@@ -17,7 +17,7 @@ export default {
   },
   data() {
     return {
-      accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
+      accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'OPERATOR', 'CLIENT'],
       walletTypes: [
         {
           code: 'EOA', desc: 'Externally Owned Account'
@@ -203,7 +203,7 @@ export default {
       </div>
     </form>
 
-    <div class="my-3">
+    <div v-if="accounts && accounts.length > 0" class="my-3">
       <input
           type="text"
           class="form-control"
@@ -251,7 +251,7 @@ export default {
         </tbody>
       </table>
     </div>
-    <div v-else class="">No accounts yet. Please create</div>
+    <div v-else class="text-center">No accounts created yet. Please create.</div>
   </div>
 
   <InfoToast
