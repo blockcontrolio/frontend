@@ -27,7 +27,7 @@ export default {
         }],
       searchQuery: "",
       accounts: [],
-      form: {name: "", ref: "", type: "", walletType: "", paymasterId: ""},
+      form: {name: "", externalId: "", type: "", walletType: "", paymasterId: ""},
       showCreateForm: false,
       errors: {
         name: ""
@@ -80,7 +80,7 @@ export default {
       };
     },
     clearForm() {
-      this.form = {ref: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
+      this.form = {externalId: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
     },
     validateName() {
       if (this.form.name.length < 4) {
@@ -124,8 +124,7 @@ export default {
       if (!query) return this.accounts;
       return this.accounts.filter(acc =>
           (acc.name || '').toLowerCase().includes(query) ||
-          (acc.ref || '').toLowerCase().includes(query) ||
-          (acc.id || '').includes(query)
+          (acc.externalId || '').toLowerCase().includes(query)
       );
     },
     onlyEoaAccounts() {
@@ -163,9 +162,9 @@ export default {
           :account-types="availableAccountTypes"
       />
       <input
-          v-model="form.ref"
+          v-model="form.externalId"
           class="form-control mb-2 w-50"
-          placeholder="External Reference (Optional)"
+          placeholder="External ID (Optional)"
       />
 
       <select
@@ -208,7 +207,7 @@ export default {
           type="text"
           class="form-control"
           v-model="searchQuery"
-          placeholder="Search by name, ref or ID..."
+          placeholder="Search by Name or External Id"
       />
     </div>
 
@@ -217,7 +216,7 @@ export default {
         <thead>
         <tr>
           <th scope="col">Name</th>
-          <th scope="col">Ref</th>
+          <th scope="col">External Id</th>
           <th scope="col">Type</th>
           <th scope="col">Address</th>
           <th scope="col">Wallet Type</th>
@@ -232,7 +231,7 @@ export default {
               {{ acc.name || '(Unnamed)' }}
             </router-link>
           </td>
-          <td class="mono">{{ acc.ref }}</td>
+          <td class="mono">{{ acc.externalId }}</td>
           <td class="mono">{{ acc.type }}</td>
           <td>
             <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
