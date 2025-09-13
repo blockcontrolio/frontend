@@ -224,7 +224,7 @@ export default {
       this.accountBalances = [];
       this.internal = {from: "", assetId: "", to: "", amount: null}
       this.transfer = {fromAccountId: "", assetId: "", to: "", amount: null}
-      this.crossCp = {fromAccountId: "", assetId: "", toCounterpartyId: "", amount: null, to: ""}
+      this.crossCp = {fromAccountId: "", assetId: "", toCounterpartyId: "", amount: null, toAccountId: ""}
     },
     resetError() {
       this.transferSuccess = null;
