@@ -288,7 +288,7 @@ export default {
       <!-- Source Account -->
       <FromAccountSelector
           v-model="internal.fromAccountId"
-          :accounts="accounts"
+          :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT' || item.type === 'DISTRIBUTOR')"
           :selected-asset="selectedAsset"
           @change="val => { fetchBalances(val); internal.assetId = '' }"
       />
@@ -324,7 +324,7 @@ export default {
                 class="form-select"
                 required>
           <option disabled value="">-- target account --</option>
-          <option v-for="acc in availableTargetAccounts" :key="acc.id + '-to'" :value="acc.id">
+          <option v-for="acc in availableTargetAccounts.filter((item) => item.type === 'ADMIN' || item.type === 'ISSUER' || item.type === 'CLIENT')" :key="acc.id + '-to'" :value="acc.id">
             {{ acc.name }}
           </option>
         </select>
@@ -349,7 +349,7 @@ export default {
 
       <FromAccountSelector
           v-model="transfer.fromAccountId"
-          :accounts="accounts"
+          :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT')"
           :selected-asset="selectedAsset"
           @change="val => { fetchBalances(val); transfer.assetId = '' }"
       />
@@ -410,7 +410,7 @@ export default {
 
       <FromAccountSelector
           v-model="crossCp.fromAccountId"
-          :accounts="accounts"
+          :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT' || item.type === 'DISTRIBUTOR')"
           :selected-asset="selectedAsset"
           @change="val => { fetchBalances(val); crossCp.assetId = '' }"
       />
