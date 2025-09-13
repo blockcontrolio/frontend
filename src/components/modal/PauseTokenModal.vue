@@ -44,7 +44,7 @@ export default {
               <select v-model="form.pauserAccountId" class="form-select" required>
                 <option disabled value="">-- select pauser --</option>
                 <option v-for="acc in accounts.filter((item) => item.type === 'OPERATOR')" :key="acc.id" :value="acc.id">
-                  {{ acc.name || '(Unnamed)' }}
+                  {{ acc.name }}
                 </option>
               </select>
             </div>

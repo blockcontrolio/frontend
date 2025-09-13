@@ -42,7 +42,7 @@ export default {
     >
       <option disabled value="">{{ placeholder }}</option>
       <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-        {{ acc.name || '(Unnamed)' }}
+        {{ acc.name }}
       </option>
     </select>
 

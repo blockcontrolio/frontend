@@ -159,7 +159,7 @@ export default {
           <select v-model="account.paymasterId" class="form-select w-50" required>
             <option disabled value="">-- select paymaster --</option>
             <option v-for="acc in eoaAccounts" :key="acc.id" :value="acc.id">
-              {{ acc.name || '(Unnamed)' }}
+              {{ acc.name }}
             </option>
           </select>
         </div>

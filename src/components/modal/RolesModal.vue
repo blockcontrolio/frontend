@@ -64,7 +64,7 @@ export default {
             <select v-model="form.adminAccountId" class="form-select" required>
               <option disabled value="">-- select admin --</option>
               <option v-for="acc in adminAccounts" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }}
+                {{ acc.name }}
               </option>
             </select>
           </div>
@@ -74,7 +74,7 @@ export default {
             <select v-model="form.userAccountId" class="form-select" required>
               <option disabled value="">-- select user --</option>
               <option v-for="acc in userAccounts" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }}
+                {{ acc.name }}
               </option>
             </select>
           </div>

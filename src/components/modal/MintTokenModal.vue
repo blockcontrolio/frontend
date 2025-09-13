@@ -58,7 +58,7 @@ export default {
             <select v-model="form.issuerAccountId" class="form-select" required>
               <option disabled value="">-- select issuer --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }}
+                {{ acc.name }}
               </option>
             </select>
           </div>
@@ -68,7 +68,7 @@ export default {
             <select v-model="form.recipientAccountId" class="form-select" required>
               <option disabled value="">-- select recipient --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'DISTRIBUTOR')" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }}
+                {{ acc.name }}
               </option>
             </select>
           </div>

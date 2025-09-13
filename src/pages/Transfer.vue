@@ -325,7 +325,7 @@ export default {
                 required>
           <option disabled value="">-- target account --</option>
           <option v-for="acc in availableTargetAccounts" :key="acc.id + '-to'" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }}
+            {{ acc.name }}
           </option>
         </select>
       </div>
@@ -438,7 +438,7 @@ export default {
                 required>
           <option disabled value="">-- target account --</option>
           <option v-for="acc in selectedPartnership.targetAccounts" :key="acc.id + '-to'" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }}
+            {{ acc.name }}
           </option>
         </select>
       </div>

@@ -183,7 +183,7 @@ export default {
         <select v-model="form.paymasterId" class="form-select w-50" required>
           <option disabled value="">-- select paymaster --</option>
           <option v-for="acc in onlyEoaAccounts" :key="acc.id" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }}
+            {{ acc.name }}
           </option>
         </select>
       </div>
@@ -228,7 +228,7 @@ export default {
           <td>
             <router-link :to="{ name: 'account-details', params: { id: acc.id } }"
                          class="">
-              {{ acc.name || '(Unnamed)' }}
+              {{ acc.name }}
             </router-link>
           </td>
           <td class="mono">{{ acc.externalId }}</td>

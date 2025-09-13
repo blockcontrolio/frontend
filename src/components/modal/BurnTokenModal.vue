@@ -66,7 +66,7 @@ export default {
                     v-on:change="this.fetchBalance(form.redemptionAccountId)">
               <option disabled value="">-- select account --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }}
+                {{ acc.name }}
               </option>
             </select>
             <!-- acc balance preview -->

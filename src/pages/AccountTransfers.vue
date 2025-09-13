@@ -97,13 +97,13 @@ export default {
         <td v-if="!accountId" class="mono">
           <router-link :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }"
                        class="">
-            {{ transfer.accountFrom?.name || '(Unnamed)' }}
+            {{ transfer.accountFrom?.name }}
           </router-link>
         </td>
         <td v-if="transfer.transferType === 'INTERNAL'" class="mono">
           <router-link :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }"
                        class="">
-            {{ transfer.accountTo?.name || '(Unnamed)' }}
+            {{ transfer.accountTo?.name }}
           </router-link>
         </td>
         <td v-else class="mono">
