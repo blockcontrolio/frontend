@@ -15,6 +15,7 @@ import FromAccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import Pending from "./invoices/Pending.vue";
+import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 
 export default {
   components: {
@@ -200,7 +201,10 @@ export default {
         return;
       }
       try {
-        this.crossCp.toCounterpartyId = this.selectedPartnership.targetCounterpartyId;
+        const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
+        const {targetCounterpartyId, sourceCounterpartyId} = this.selectedPartnership;
+        this.crossCp.toCounterpartyId = [targetCounterpartyId, sourceCounterpartyId]
+            .find(id => id !== loggedInCounterpartyId);
         const response = await sendCrossCounterparty(this.crossCp)
         if (!response.ok) {
           const err = await response.json();
