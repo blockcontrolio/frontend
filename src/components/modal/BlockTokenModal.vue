@@ -62,7 +62,7 @@ export default {
             <label class="form-label">Limiter Account</label>
             <select v-model="this.form.limiterAccountId" class="form-select" required>
               <option disabled value="">-- select limiter --</option>
-              <option v-for="acc in accounts.filter((item) => item.type === 'OPERATOR')" :key="acc.id" :value="acc.id">
+              <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'OPERATOR')" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
               </option>
             </select>

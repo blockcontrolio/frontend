@@ -65,7 +65,7 @@ export default {
             <select v-model="form.redemptionAccountId" class="form-select" required
                     v-on:change="this.fetchBalance(form.redemptionAccountId)">
               <option disabled value="">-- select account --</option>
-              <option v-for="acc in accounts.filter((item) => item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
+              <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
               </option>
             </select>
