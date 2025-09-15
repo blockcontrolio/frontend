@@ -57,7 +57,7 @@ export default {
         <span class="label">Account From:</span>
         <router-link v-if="transfer.accountFrom && transfer.accountFrom.id"
                      :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }">
-          {{ transfer.accountFrom?.name || '(Unnamed)' }}
+          {{ transfer.accountFrom?.name }}
         </router-link>
       </div>
       <div class="tx-line" v-if="transfer.transferType === 'CROSS'">
@@ -68,7 +68,7 @@ export default {
         <span class="label">Account To:</span>
         <router-link v-if="transfer.accountTo && transfer.accountTo.id"
                      :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }">
-          {{ transfer.accountTo?.name || '(Unnamed)' }}
+          {{ transfer.accountTo?.name }}
         </router-link>
       </div>
       <div class="tx-line" v-if="transfer.transferType === 'EXTERNAL'">

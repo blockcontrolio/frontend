@@ -76,8 +76,8 @@ export default {
     };
   },
   mounted() {
-    this.fetchTokens();
     this.fetchAccounts();
+    this.fetchTokens();
     let selectedNetwork = useNetworkStore().selectedNetwork;
     this.fetchAcceptedPartnerships(selectedNetwork?.id);
   },
@@ -277,7 +277,7 @@ export default {
       return this.importOptions;
     },
     canCreate() {
-      return this.counterpartyStore.counterparty?.type === 'EMI';
+      return this.counterpartyStore.counterparty?.type === 'EMI' && this.accounts.some((item) => item.type === 'ADMIN');
     },
   }
 };
@@ -370,8 +370,8 @@ export default {
       <div class="mb-3">
         <select v-model="newToken.accountId" class="form-select w-50" required>
           <option disabled value="">-- owner account --</option>
-          <option v-for="acc in accounts" :key="acc.ref" :value="acc.id">
-            {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+          <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN')" :key="acc.ref" :value="acc.id">
+            {{ acc.name }}
           </option>
         </select>
       </div>
@@ -506,7 +506,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-else class="">No tokens created yet.</div>
+    <div v-else class="text-center">No tokens created yet. Admin account required to create a token.</div>
 
     <BurnTokenModal v-if="this.modalType === 'burn' && this.selectedToken"
                     :accounts="this.accounts"

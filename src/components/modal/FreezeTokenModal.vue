@@ -63,8 +63,8 @@ export default {
             <label class="form-label">Freezer Account</label>
             <select v-model="this.form.custodianAccountId" class="form-select" required>
               <option disabled value="">-- select freezer --</option>
-              <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+              <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'OPERATOR')" :key="acc.id" :value="acc.id">
+                {{ acc.name }}
               </option>
             </select>
           </div>

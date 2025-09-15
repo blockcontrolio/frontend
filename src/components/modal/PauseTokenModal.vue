@@ -43,8 +43,8 @@ export default {
               <label class="form-label">Issuer Account</label>
               <select v-model="form.pauserAccountId" class="form-select" required>
                 <option disabled value="">-- select pauser --</option>
-                <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                  {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+                <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'OPERATOR')" :key="acc.id" :value="acc.id">
+                  {{ acc.name }}
                 </option>
               </select>
             </div>

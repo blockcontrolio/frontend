@@ -23,7 +23,18 @@ export default {
       return this.accounts.filter(acc => acc.type === 'ADMIN')
     },
     userAccounts() {
-      return this.accounts.filter(acc => acc.type !== 'ADMIN')
+      const excluded = ['ADMIN', 'CLIENT', 'DISTRIBUTOR'];
+      return this.accounts.filter(acc => !excluded.includes(acc.type));
+    },
+    rolesByType() {
+      let selectedAccount = this.accounts.find(acc => acc.id === this.form.userAccountId);
+      if (selectedAccount?.type === 'ISSUER') {
+        return ['MINTER', 'BURNER'];
+      }
+      if (selectedAccount?.type === 'OPERATOR') {
+        return ['LIMITER', 'PAUSER', 'CUSTODIAN'];
+      }
+      return this.roles;
     }
   },
   methods: {
@@ -53,7 +64,7 @@ export default {
             <select v-model="form.adminAccountId" class="form-select" required>
               <option disabled value="">-- select admin --</option>
               <option v-for="acc in adminAccounts" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+                {{ acc.name }}
               </option>
             </select>
           </div>
@@ -63,7 +74,7 @@ export default {
             <select v-model="form.userAccountId" class="form-select" required>
               <option disabled value="">-- select user --</option>
               <option v-for="acc in userAccounts" :key="acc.id" :value="acc.id">
-                {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+                {{ acc.name }}
               </option>
             </select>
           </div>
@@ -72,7 +83,7 @@ export default {
             <label class="form-label">Role</label>
             <select v-model="form.role" class="form-select" required>
               <option disabled value="">-- select role --</option>
-              <option v-for="role in this.roles" :key="role" :value="role">
+              <option v-for="role in rolesByType" :key="role" :value="role">
                 {{ role }}
               </option>
             </select>

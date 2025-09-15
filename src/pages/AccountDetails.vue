@@ -10,7 +10,7 @@ export default {
   data() {
     return {
       eoaAccounts: [],
-      accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'CLIENT', 'PAUSER', 'CUSTODIAN', 'LIMITER'],
+      accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'OPERATOR', 'CLIENT'],
       account: {
         ref: "",
         name: "",
@@ -148,10 +148,7 @@ export default {
       <div class="row mb-3">
         <div class="col-4"><strong>Type:</strong></div>
         <div class="col-8">
-          <AccountTypeSelect
-              v-model="account.type"
-              :account-types="availableAccountTypes"
-          />
+          <div class="col-8">{{ account.type }}</div>
         </div>
       </div>
 
@@ -162,7 +159,7 @@ export default {
           <select v-model="account.paymasterId" class="form-select w-50" required>
             <option disabled value="">-- select paymaster --</option>
             <option v-for="acc in eoaAccounts" :key="acc.id" :value="acc.id">
-              {{ acc.name || '(Unnamed)' }} — {{ acc.ref }}
+              {{ acc.name }}
             </option>
           </select>
         </div>
