@@ -12,7 +12,7 @@ export default {
       eoaAccounts: [],
       accountTypes: ['ADMIN', 'ISSUER', 'DISTRIBUTOR', 'OPERATOR', 'CLIENT'],
       account: {
-        ref: "",
+        externalId: "",
         name: "",
         type: "",
         walletType: "",
@@ -134,8 +134,8 @@ export default {
     </button>
     <div v-if="account" class="card p-3 mt-3">
       <div class="row mb-3">
-        <div class="col-4"><strong>Ref:</strong></div>
-        <div class="col-8">{{ account.ref }}</div>
+        <div class="col-4"><strong>External Id:</strong></div>
+        <div class="col-8">{{ account.externalId }}</div>
       </div>
 
       <!-- inline name field -->

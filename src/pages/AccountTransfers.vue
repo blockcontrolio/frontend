@@ -95,18 +95,18 @@ export default {
         </td>
         <td class="mono">{{ transfer.transferType }}</td>
         <td class="mono">
-          <router-link v-if="transfer.accountFrom?.id"
-                       :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }">
-            {{ transfer.accountFrom.name }}
+          <router-link v-if="transfer.from.accountId"
+                       :to="{ name: 'account-details', params: { id: transfer.from.accountId } }">
+            {{ transfer.from.accountName }}
           </router-link>
-          <addr-scan-link v-else :type="'account'" :address="transfer.addressFrom"></addr-scan-link>
+          <addr-scan-link v-else :type="'account'" :address="transfer.from.address"></addr-scan-link>
         </td>
         <td class="mono">
-          <router-link v-if="transfer.accountTo?.id"
-                       :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }">
-            {{ transfer.accountTo.name }}
+          <router-link v-if="transfer.to.accountId"
+                       :to="{ name: 'account-details', params: { id: transfer.to.accountId } }">
+            {{ transfer.to.accountName }}
           </router-link>
-          <addr-scan-link v-else :type="'account'" :address="transfer.addressTo"></addr-scan-link>
+          <addr-scan-link v-else :type="'account'" :address="transfer.to.address"></addr-scan-link>
         </td>
         <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{ transfer.asset?.symbol }}</td>
         <td class="text-center">
