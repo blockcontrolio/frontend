@@ -18,6 +18,7 @@ export default {
   data() {
     return {
       filterType: "", // bound to the dropdown
+      filterDirection: "", // bound to the dropdown
       transfers: []
     };
   },
@@ -41,12 +42,20 @@ export default {
   },
   computed: {
     filteredTransfers() {
-      if (!this.filterType || this.filterType === "") {
-        return this.transfers;
-      }
-      return this.transfers.filter(
-          (transfer) => transfer.transferType === this.filterType
-      );
+      const filters = {
+        transferType: this.filterType,
+        direction: this.filterDirection,
+        // later: add more fields if needed
+      };
+
+      return this.transfers.filter((transfer) => {
+        return Object.entries(filters).every(([key, value]) => {
+          // skip empty filters
+          if (!value || value === "") return true;
+          // check field matches
+          return transfer[key] === value;
+        });
+      });
     }
   }
 };
@@ -63,13 +72,18 @@ export default {
       Return to List
     </button>
 
-    <!-- filter dropdown -->
-    <div class="w-25 my-3">
-      <select v-model="filterType" class="form-select">
+    <!-- filter dropdowns -->
+    <div class="d-flex my-3 gap-2">
+      <select v-model="filterType" class="form-select w-25" v-on:change="filterDirection = ''">
         <option value="">All Types</option>
         <option value="INTERNAL">INTERNAL</option>
         <option value="EXTERNAL">EXTERNAL</option>
         <option value="CROSS">CROSS COUNTERPARTY</option>
+      </select>
+      <select v-model="filterDirection" class="form-select w-25" :disabled="!filterType || filterType === 'INTERNAL'">
+        <option value="">Direction</option>
+        <option value="INCOMING">INCOMING</option>
+        <option value="OUTGOING">OUTGOING</option>
       </select>
     </div>
 
@@ -77,7 +91,7 @@ export default {
       <thead class="">
       <tr>
         <th scope="col">ID</th>
-        <th scope="col">Type</th>
+        <th scope="col" style="width: 110px;">Type</th>
         <th scope="col">From</th>
         <th scope="col">To</th>
         <th scope="col">Amount</th>
@@ -93,19 +107,39 @@ export default {
             {{ transfer.internalId.substring(0, 6) }}…{{ transfer.internalId.substring(transfer.internalId.length - 4) }}
           </router-link>
         </td>
-        <td class="mono">{{ transfer.transferType }}</td>
-        <td class="mono">
-          <router-link v-if="transfer.from.accountId"
-                       :to="{ name: 'account-details', params: { id: transfer.from.accountId } }">
-            {{ transfer.from.accountName }}
-          </router-link>
+        <td class="">
+          <span class="d-flex justify-content-between align-items-center">
+          <span class="small me-2">{{ transfer.transferType }}</span>
+            <i v-if="transfer.direction === 'OUTGOING'" class="bi bi-arrow-up-right-circle-fill"></i>
+            <i v-if="transfer.direction === 'INCOMING'" class="bi bi-arrow-down-left-circle-fill"></i>
+          </span>
+        </td>
+        <!--from-->
+        <td class="">
+          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'INCOMING'">
+            <i class="bi bi-building me-1"></i>
+            {{ transfer.from.counterpartyName }}
+          </span>
+          <span v-else-if="transfer.from.accountId">
+            <i class="bi bi-person-bounding-box me-2"></i>
+            <router-link :to="{ name: 'account-details', params: { id: transfer.from.accountId } }">
+              {{ transfer.from.accountName }}
+            </router-link>
+          </span>
           <addr-scan-link v-else :type="'account'" :address="transfer.from.address"></addr-scan-link>
         </td>
-        <td class="mono">
-          <router-link v-if="transfer.to.accountId"
-                       :to="{ name: 'account-details', params: { id: transfer.to.accountId } }">
-            {{ transfer.to.accountName }}
-          </router-link>
+        <!--to-->
+        <td class="">
+          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'OUTGOING'">
+            <i class="bi bi-building me-1"></i>
+            {{ transfer.to.counterpartyName }}
+          </span>
+          <span v-else-if="transfer.to.accountId">
+            <i class="bi bi-person-bounding-box me-2"></i>
+            <router-link :to="{ name: 'account-details', params: { id: transfer.to.accountId } }">
+              {{ transfer.to.accountName }}
+            </router-link>
+          </span>
           <addr-scan-link v-else :type="'account'" :address="transfer.to.address"></addr-scan-link>
         </td>
         <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{ transfer.asset?.symbol }}</td>
