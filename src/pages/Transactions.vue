@@ -47,7 +47,8 @@ export default {
         <tbody>
         <tr v-for="tx in transactions" :key="tx.internalId">
           <td>
-            <router-link :to="{ name: 'transaction-details', params: { id: tx.internalId } }">
+            <router-link class="text-nowrap"
+                :to="{ name: 'transaction-details', params: { id: tx.internalId } }">
               {{ tx.internalId.substring(0, 6) }}…{{ tx.internalId.substring(tx.internalId.length - 4) }}
             </router-link>
           </td>

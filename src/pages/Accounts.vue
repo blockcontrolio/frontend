@@ -227,14 +227,14 @@ export default {
         <tr v-for="acc in filteredAccounts" :key="acc.id">
           <td>
             <router-link :to="{ name: 'account-details', params: { id: acc.id } }"
-                         class="">
+                         class="text-nowrap">
               {{ acc.name }}
             </router-link>
           </td>
           <td class="mono">{{ acc.externalId }}</td>
           <td class="mono">{{ acc.type }}</td>
           <td>
-            <addr-scan-link :type="'account'" :address="acc.address"></addr-scan-link>
+            <addr-scan-link :type="'account'" :address="acc.address" :short="true"></addr-scan-link>
           </td>
           <td class="mono">
             {{ acc.walletType }}
