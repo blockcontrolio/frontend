@@ -1,10 +1,11 @@
 <script>
 import {useExplorerUtils} from "../../js/composables/explorerUtils.js";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
+import {shortenString} from "../../js/utils.js";
 
 export default {
   name: "AddrScanLink",
-  props: ['type', 'address'],
+  props: ['type', 'address', 'short'],
   setup() {
     const {tokenLink, walletLink} = useExplorerUtils();
 
@@ -14,6 +15,7 @@ export default {
     };
   },
   methods: {
+    shortenString,
     isClipboardSupported,
     copyAddress(address) {
       copyToClipboard(address)
@@ -38,11 +40,11 @@ export default {
 
 <template>
   <span class="mono">
-    <a class="text-decoration-none me-2" :href="buildLink()" target="_blank"
+    <a class="text-decoration-none me-2 text-nowrap" :href="buildLink()" target="_blank"
        rel="noopener noreferrer">
-      {{ this.address }}
+      {{ this.short ? shortenString(this.address) : this.address }}
     </a>
-    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer"
+    <i v-if="!this.short && isClipboardSupported()" class="bi bi-clipboard pointer"
        @click="copyAddress(this.address)"
        title="Copy to clipboard">
     </i>

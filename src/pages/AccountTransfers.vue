@@ -3,10 +3,11 @@ import {useExplorerUtils} from "../js/composables/explorerUtils.js";
 import {formatDate, roundAmount} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
+import TxScanLink from "../components/etherscan/TxScanLink.vue";
 
 export default {
   name: 'Transfers',
-  components: {AddrScanLink},
+  components: {TxScanLink, AddrScanLink},
   props: ['accountId'],
   setup() {
     const {etherScanLink} = useExplorerUtils();
@@ -103,7 +104,7 @@ export default {
       <tbody>
       <tr v-for="transfer in filteredTransfers" :key="transfer.internalId">
         <td>
-          <router-link :to="{ name: 'transfer-details', params: { transferId: transfer.internalId } }">
+          <router-link class="text-nowrap" :to="{ name: 'transfer-details', params: { transferId: transfer.internalId } }">
             {{ transfer.internalId.substring(0, 6) }}…{{ transfer.internalId.substring(transfer.internalId.length - 4) }}
           </router-link>
         </td>
@@ -126,7 +127,7 @@ export default {
               {{ transfer.from.accountName }}
             </router-link>
           </span>
-          <addr-scan-link v-else :type="'account'" :address="transfer.from.address"></addr-scan-link>
+          <addr-scan-link v-else :type="'account'" :address="transfer.from.address" :short="true"></addr-scan-link>
         </td>
         <!--to-->
         <td class="">
@@ -140,7 +141,7 @@ export default {
               {{ transfer.to.accountName }}
             </router-link>
           </span>
-          <addr-scan-link v-else :type="'account'" :address="transfer.to.address"></addr-scan-link>
+          <addr-scan-link v-else :type="'account'" :address="transfer.to.address" :short="true"></addr-scan-link>
         </td>
         <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{ transfer.asset?.symbol }}</td>
         <td class="text-center">
@@ -150,11 +151,7 @@ export default {
           </span>
         </td>
         <td>
-          <a class="ether-scan-link" :href="etherScanLink(transfer.txHash)" target="_blank" rel="noopener noreferrer">
-            <code>
-              {{ transfer.txHash.slice(0, 10) }}...
-            </code>
-          </a>
+          <tx-scan-link :hash="transfer.txHash" :short="true"></tx-scan-link>
         </td>
         <td>
           <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>

@@ -1,10 +1,11 @@
 <script>
 import {useExplorerUtils} from "../../js/composables/explorerUtils.js";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
+import {shortenString} from "../../js/utils.js";
 
 export default {
   name: "TxScanLink",
-  props: ['hash'],
+  props: ['hash', 'short'],
   setup() {
     const {etherScanLink} = useExplorerUtils();
 
@@ -13,6 +14,7 @@ export default {
     };
   },
   methods: {
+    shortenString,
     isClipboardSupported,
     copyHash(txHash) {
       copyToClipboard(txHash)
@@ -27,10 +29,10 @@ export default {
 
 <template>
   <span class="mono d-flex align-items-center gap-2">
-    <a class="ether-scan-link" :href="etherScanLink(this.hash)" target="_blank" rel="noopener noreferrer">
-      <code>{{ this.hash }}</code>
+    <a class="ether-scan-link text-nowrap" :href="etherScanLink(this.hash)" target="_blank" rel="noopener noreferrer">
+      <code>{{ this.short ? shortenString(this.hash) : this.hash }}</code>
     </a>
-    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer"
+    <i v-if="!this.short && isClipboardSupported()" class="bi bi-clipboard pointer"
        @click="copyHash(this.hash)"
        title="Copy to clipboard">
     </i>
