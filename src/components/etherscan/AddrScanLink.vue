@@ -1,7 +1,6 @@
 <script>
 import {useExplorerUtils} from "../../js/composables/explorerUtils.js";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
-import {shortenString} from "../../js/utils.js";
 
 export default {
   name: "AddrScanLink",
@@ -15,7 +14,9 @@ export default {
     };
   },
   methods: {
-    shortenString,
+    shortenString() {
+      return this.address.substring(0, 7) + '...' + this.address.substring(this.address.length - 5);
+    },
     isClipboardSupported,
     copyAddress(address) {
       copyToClipboard(address)
@@ -39,14 +40,24 @@ export default {
 </script>
 
 <template>
-  <span class="mono">
-    <a class="text-decoration-none me-2 text-nowrap" :href="buildLink()" target="_blank"
+  <span class="d-flex align-items-center gap-2">
+    <a class="ether-scan-link text-nowrap mono" :href="buildLink()" target="_blank"
        rel="noopener noreferrer">
-      {{ this.short ? shortenString(this.address) : this.address }}
+      {{ this.short ? shortenString() : this.address }}
     </a>
-    <i v-if="!this.short && isClipboardSupported()" class="bi bi-clipboard pointer"
+    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer small"
        @click="copyAddress(this.address)"
        title="Copy to clipboard">
     </i>
   </span>
 </template>
+
+<style>
+.ether-scan-link {
+  text-decoration: none;
+}
+
+.ether-scan-link:hover {
+  text-decoration: underline;
+}
+</style>

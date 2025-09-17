@@ -1,7 +1,6 @@
 <script>
 import {useExplorerUtils} from "../../js/composables/explorerUtils.js";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
-import {shortenString} from "../../js/utils.js";
 
 export default {
   name: "TxScanLink",
@@ -14,7 +13,9 @@ export default {
     };
   },
   methods: {
-    shortenString,
+    shortenString() {
+      return this.hash.substring(0, 7) + '...' + this.hash.substring(this.hash.length - 5);
+    },
     isClipboardSupported,
     copyHash(txHash) {
       copyToClipboard(txHash)
@@ -28,11 +29,11 @@ export default {
 </script>
 
 <template>
-  <span class="mono d-flex align-items-center gap-2">
-    <a class="ether-scan-link text-nowrap" :href="etherScanLink(this.hash)" target="_blank" rel="noopener noreferrer">
-      <code>{{ this.short ? shortenString(this.hash) : this.hash }}</code>
+  <span class="d-flex align-items-center gap-2">
+    <a class="ether-scan-link text-nowrap mono" :href="etherScanLink(this.hash)" target="_blank" rel="noopener noreferrer">
+      <code>{{ this.short ? shortenString() : this.hash }}</code>
     </a>
-    <i v-if="!this.short && isClipboardSupported()" class="bi bi-clipboard pointer"
+    <i v-if="isClipboardSupported()" class="bi bi-clipboard pointer small"
        @click="copyHash(this.hash)"
        title="Copy to clipboard">
     </i>
@@ -41,8 +42,7 @@ export default {
 
 <style scoped>
 .ether-scan-link {
-  color: #d63384; /* same as default <code> in Bootstrap */
-  border-radius: 0.25rem;
+  color: #d63384;
   text-decoration: none;
 }
 
