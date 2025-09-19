@@ -8,7 +8,7 @@ export default {
   components: {TxScanLink, AddrScanLink},
   data() {
     return {
-      transfer: {},
+      transfer: null,
     };
   },
   mounted() {
@@ -46,51 +46,76 @@ export default {
       Return to List
     </button>
 
-    <div class="card border p-3 mt-3">
-      <div class="tx-line">
-        <span class="label">Type:</span>
+    <div v-if="transfer" class="card border p-3 mt-3">
+      <div class="tx-line my-1">
+        <span class="">Type:</span>
         <span class="value">
             {{ transfer.transferType }}
           </span>
       </div>
-      <div class="tx-line">
-        <span class="label">Account From:</span>
-        <router-link v-if="transfer.accountFrom && transfer.accountFrom.id"
-                     :to="{ name: 'account-details', params: { id: transfer.accountFrom.id } }">
-          {{ transfer.accountFrom?.name }}
-        </router-link>
+      <!-- from -->
+      <hr class="account-divider"/>
+      <span class="mb-1">From:</span>
+      <div class="tx-line my-1" v-if="transfer.from.counterpartyId">
+        <span class="small mx-3">Counterparty:</span>
+        <span><i class="bi bi-building me-2"></i>{{ transfer.from.counterpartyName }}</span>
       </div>
-      <div class="tx-line" v-if="transfer.transferType === 'CROSS'">
-        <span class="label">Counterparty To:</span>
-        {{ transfer.counterpartyTo?.name }} :: {{ transfer.accountTo?.name || '(Unnamed Account)' }}
+      <div class="tx-line my-1" v-if="transfer.from.accountId">
+        <span class="small mx-3">From:</span>
+        <span>
+          <i class="bi bi-person-bounding-box me-2"></i>
+          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'INCOMING'">
+            {{ transfer.from.accountName }}
+          </span>
+          <router-link v-else :to="{ name: 'account-details', params: { id: transfer.from.accountId } }">
+            {{ transfer.from.accountName }}
+          </router-link>
+        </span>
       </div>
-      <div class="tx-line" v-if="transfer.transferType === ('INTERNAL' || 'CROSS')">
-        <span class="label">Account To:</span>
-        <router-link v-if="transfer.accountTo && transfer.accountTo.id"
-                     :to="{ name: 'account-details', params: { id: transfer.accountTo.id } }">
-          {{ transfer.accountTo?.name }}
-        </router-link>
+      <div class="tx-line my-1" v-if="transfer.from.address">
+        <span class="small mx-3">Address:</span>
+        <addr-scan-link :type="'account'" :address="transfer.from.address"></addr-scan-link>
       </div>
-      <div class="tx-line" v-if="transfer.transferType === 'EXTERNAL'">
-        <span class="label">To:</span>
-        <addr-scan-link :type="'account'" :address="transfer.to"></addr-scan-link>
+      <!-- to-->
+      <hr class="account-divider"/>
+      <span class="mb-1">To:</span>
+      <div class="tx-line" v-if="transfer.to.counterpartyId">
+        <span class="small mx-3">Counterparty:</span>
+        <span><i class="bi bi-building me-2"></i>{{ transfer.to.counterpartyName }}</span>
       </div>
-      <div class="tx-line">
-        <span class="label">Amount:</span>
+      <div class="tx-line my-1" v-if="transfer.to.accountId">
+        <span class="small mx-3">Account:</span>
+        <span>
+          <i class="bi bi-person-bounding-box me-2"></i>
+          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'OUTGOING'">
+            {{ transfer.to.accountName }}
+          </span>
+          <router-link v-else :to="{ name: 'account-details', params: { id: transfer.to.accountId } }">
+            {{ transfer.to.accountName }}
+          </router-link>
+        </span>
+      </div>
+      <div class="tx-line my-1" v-if="transfer.to.address">
+        <span class="small mx-3">Address:</span>
+        <addr-scan-link :type="'account'" :address="transfer.to.address"></addr-scan-link>
+      </div>
+      <hr class="account-divider"/>
+      <div class="tx-line my-1">
+        <span class="">Amount:</span>
         <span class="value mono">{{ formatAmount(transfer.asset?.amount) }} {{transfer.asset?.symbol}}</span>
       </div>
-      <div class="tx-line">
-        <span class="label">Status:</span>
+      <div class="tx-line my-1">
+        <span class="">Status:</span>
         <span class="status" :class="[transfer.status === 'CONFIRMED' ? 'text-success' : 'text-secondary']">
             {{ transfer.status }}
           </span>
       </div>
-      <div class="tx-line">
-        <span class="label">Created:</span>
-        <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>
+      <div class="tx-line my-1">
+        <span class="">Created:</span>
+        <small class="mono text-muted">{{ formatDate(transfer.createTime) }}</small>
       </div>
-      <div class="tx-line">
-        <span class="label">Hash:</span>
+      <div class="tx-line my-1">
+        <span class="">Hash:</span>
         <tx-scan-link :hash="transfer.txHash"></tx-scan-link>
       </div>
 
@@ -103,11 +128,6 @@ export default {
 .tx-line {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.label {
-  font-weight: bold;
 }
 
 .value {
@@ -123,6 +143,10 @@ export default {
   min-height: 1.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.account-divider {
+  border-top: 1px solid #444;
 }
 
 </style>
