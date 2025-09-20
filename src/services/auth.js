@@ -33,12 +33,19 @@ export async function register(form) {
 }
 
 export async function fetchUserInfo() {
-    return await fetch(`${authBaseUrl}/user-info`, {
+    let response = fetch(`${authBaseUrl}/user-info`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         }
-    }).catch(err => {
-        console.error('Failed to load user info', err);
+    });
+    // Global 403 handling
+    if (response.status === 403) {
+        localStorage.removeItem('auth-token');
+        window.location.href = '/login';
+        throw new Error('Session expired. Redirecting to login.');
+    }
+    return await response.catch(err => {
+        console.error('Failed to load logged in user info', err);
     });
 }

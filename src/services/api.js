@@ -60,24 +60,6 @@ export async function removePermission(user, permission) {
     });
 }
 
-export async function fetchCounterpartyInfo() {
-    const response = fetch(`${apiBaseUrl}/counterparties`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
-        }
-    });
-    // Global 403 handling
-    if (response.status === 403) {
-        localStorage.removeItem('auth-token');
-        window.location.href = '/login';
-        throw new Error('Session expired. Redirecting to login.');
-    }
-    return await response.catch(err => {
-        console.error('Failed to load counterparties info', err);
-    });
-}
-
 export async function fetchAccounts() {
     return await fetch(`${apiBaseUrl}/accounts`, {
         headers: {
