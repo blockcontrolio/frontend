@@ -1,29 +1,47 @@
 import {defineStore} from 'pinia';
-import {fetchCounterpartyInfo} from "../../services/api.js";
+import {fetchUserInfo} from "../../services/auth.js";
 
-export const useCounterpartyStore = defineStore('counterparty', {
+export const useCounterpartyStore = defineStore('user-counterparty-info', {
     state: () => ({
+        user: {
+            email: '',
+            role: '',
+            permissions: []
+        },
         counterparty: {
             internalId: '',
             name: '',
             networks: []
-        },
+        }
     }),
     actions: {
-
-        async fetchCounterparty() {
+        async fetchUserCounterpartInfo() {
             try {
-                const res = await fetchCounterpartyInfo()
+                const res = await fetchUserInfo();
                 if (res.ok) {
-                    this.counterparty = await res.json();
+                    const data = await res.json();
+
+                    // Assume backend returns { email, role, permissions, counterparty: {...} }
+                    this.user = {
+                        email: data.email,
+                        role: data.role,
+                        permissions: data.permissions || []
+                    };
+
+                    this.counterparty = data.counterparty || {
+                        internalId: '',
+                        name: '',
+                        networks: []
+                    };
                 }
             } catch (err) {
-                console.error('Error fetching counterparty:', err);
-                this.counterparty = null;
+                console.error('Error fetching user and counterparty info:', err);
+                this.reset();
             }
         },
 
         reset() {
+            this.user = null;
             this.counterparty = null;
         }
     }

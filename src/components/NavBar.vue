@@ -2,22 +2,20 @@
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {resetAllStores} from "../js/stores/resetStores.js";
-import {useUserStore} from "../js/stores/userStore.js";
 
 export default {
   name: "NavBar",
   setup() {
     const networkStore = useNetworkStore();
     const counterpartyStore = useCounterpartyStore();
-    const userStore = useUserStore();
-    return {networkStore, counterpartyStore, userStore};
+    return {networkStore, counterpartyStore};
   },
   computed: {
     counterparty() {
       return this.counterpartyStore.counterparty;
     },
     adminView() {
-      return this.userStore.user?.role === 'ADMIN';
+      return this.counterpartyStore.user?.role === 'ADMIN';
     }
   },
   created() {

@@ -180,52 +180,52 @@ export default {
         return `Token ${this.selectedToken?.symbol} unpaused for all operations`;
       });
     },
-    async sendFreezeRequest({tokenId, custodianAccountId, user, amount}) {
-      if ([tokenId, custodianAccountId, user, amount].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, custodianAccountId, user, amount) must be defined and non-empty.');
+    async sendFreezeRequest({tokenId, custodianAccountId, address, amount}) {
+      if ([tokenId, custodianAccountId, address, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, custodianAccountId, address, amount) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return freeze(tokenId, {custodianAccountId, user, amount});
+        return freeze(tokenId, {custodianAccountId, address, amount});
       }, () => {
         return `Token ${this.selectedToken?.symbol} freeze done with amount ${amount}`;
       });
     },
-    async sendBlockUserRequest({tokenId, limiterAccountId, user}) {
-      if ([tokenId, limiterAccountId, user].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, limiterAccountId, user) must be defined and non-empty.');
+    async sendBlockAddressRequest({tokenId, limiterAccountId, address}) {
+      if ([tokenId, limiterAccountId, address].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, limiterAccountId, address) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return block(tokenId, {limiterAccountId, user});
+        return block(tokenId, {limiterAccountId, address});
       }, () => {
         return `Token ${this.selectedToken?.symbol} blocked for the address`;
       });
     },
-    async sendUnblockUserRequest({tokenId, limiterAccountId, user}) {
-      if ([tokenId, limiterAccountId, user].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, limiterAccountId, user) must be defined and non-empty.');
+    async sendUnblockAddressRequest({tokenId, limiterAccountId, address}) {
+      if ([tokenId, limiterAccountId, address].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, limiterAccountId, address) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return unblock(tokenId, {limiterAccountId, user});
+        return unblock(tokenId, {limiterAccountId, address});
       }, () => {
         return `Token ${this.selectedToken?.symbol} unblocked for the address`;
       });
     },
-    async sendGrantRoleRequest({tokenId, adminAccountId, userAccountId, role}) {
-      if ([tokenId, adminAccountId, userAccountId, role].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, adminAccountId, userAccountId, role) must be defined and non-empty.');
+    async sendGrantRoleRequest({tokenId, adminAccountId, targetAccountId, role}) {
+      if ([tokenId, adminAccountId, targetAccountId, role].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, adminAccountId, targetAccountId, role) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return grantRole(tokenId, {adminAccountId, userAccountId, role});
+        return grantRole(tokenId, {adminAccountId, targetAccountId, role});
       }, () => {
         return `Role granted`;
       });
     },
-    async sendRevokeRoleRequest({tokenId, adminAccountId, userAccountId, role}) {
-      if ([tokenId, adminAccountId, userAccountId, role].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, adminAccountId, userAccountId, role) must be defined and non-empty.');
+    async sendRevokeRoleRequest({tokenId, adminAccountId, targetAccountId, role}) {
+      if ([tokenId, adminAccountId, targetAccountId, role].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, adminAccountId, targetAccountId, role) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return revokeRole(tokenId, {adminAccountId, userAccountId, role});
+        return revokeRole(tokenId, {adminAccountId, targetAccountId, role});
       }, () => {
         return `Role revoked`;
       });
@@ -405,9 +405,9 @@ export default {
                 <span class="label text-secondary me-2">Total Supply:</span>
                 <span>{{ formatAmount(token?.totalSupply) }}</span>
               </div>
-              <div v-if="token.own === false && token.counterparty" class="mb-1">
+              <div v-if="token.own === false && token.issuerCounterparty" class="mb-1">
                 <span class="label text-secondary me-2">Issuer Counterparty:</span>
-                <span>{{ token.counterparty?.name }}</span>
+                <span>{{ token.issuerCounterparty?.name }}</span>
               </div>
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
@@ -545,14 +545,14 @@ export default {
                      :accounts="this.accounts"
                      :token="this.selectedToken"
                      @close="this.modalType = ''"
-                     @submit="sendBlockUserRequest"
+                     @submit="sendBlockAddressRequest"
     />
     <BlockTokenModal v-if="this.modalType === 'unblock' && this.selectedToken"
                      :modalType="'unblock'"
                      :accounts="this.accounts"
                      :token="this.selectedToken"
                      @close="this.modalType = ''"
-                     @submit="sendUnblockUserRequest"
+                     @submit="sendUnblockAddressRequest"
     />
     <RolesModal v-if="this.modalType === 'grant' && this.selectedToken"
                 :modalType="'grant'"
