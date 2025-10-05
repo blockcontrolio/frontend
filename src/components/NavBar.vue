@@ -97,8 +97,8 @@ export default {
         <!-- display each network -->
         <div v-if="counterparty.networks && counterparty.networks.length">
           <div v-for="(network, index) in counterparty.networks" :key="index" class="network-info mb-2">
-            <strong>{{ network.name }}</strong><br/>
-            Chain ID: {{ network.chainId }}<br/>
+            <span v-if="network.name">Network: {{ network.name }}</span><br v-if="network.name"/>
+            <span v-if="network.chainId">Chain ID: {{ network.chainId }}</span><br v-if="network.chainId"/>
             <a v-if="network.explorerUrl" :href="network.explorerUrl" target="_blank" class="text-decoration-underline small">
               Open Explorer
             </a>

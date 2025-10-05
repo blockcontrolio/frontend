@@ -9,7 +9,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
             permissions: []
         },
         counterparty: {
-            internalId: '',
+            id: '',
             name: '',
             networks: []
         }
@@ -29,7 +29,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
                     };
 
                     this.counterparty = data.counterparty || {
-                        internalId: '',
+                        id: '',
                         name: '',
                         networks: []
                     };

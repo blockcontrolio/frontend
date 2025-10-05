@@ -201,7 +201,7 @@ export default {
         return;
       }
       try {
-        const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
+        const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
         const {targetCounterpartyId, sourceCounterpartyId} = this.selectedPartnership;
         this.crossCp.toCounterpartyId = [targetCounterpartyId, sourceCounterpartyId]
             .find(id => id !== loggedInCounterpartyId);

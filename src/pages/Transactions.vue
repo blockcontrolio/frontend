@@ -45,11 +45,11 @@ export default {
         </tr>
         </thead>
         <tbody>
-        <tr v-for="tx in transactions" :key="tx.internalId">
+        <tr v-for="tx in transactions" :key="tx.id">
           <td>
             <router-link class="text-nowrap"
-                :to="{ name: 'transaction-details', params: { id: tx.internalId } }">
-              {{ tx.internalId.substring(0, 6) }}…{{ tx.internalId.substring(tx.internalId.length - 4) }}
+                :to="{ name: 'transaction-details', params: { id: tx.id } }">
+              {{ tx.id.substring(0, 6) }}…{{ tx.id.substring(tx.id.length - 4) }}
             </router-link>
           </td>
           <td>

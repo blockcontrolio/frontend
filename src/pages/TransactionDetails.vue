@@ -34,7 +34,7 @@ export default {
 
 <template>
 
-  <h5 class="bold p-2">Transaction details: {{ transaction?.internalId }}</h5>
+  <h5 class="bold p-2">Transaction details: {{ transaction?.id }}</h5>
 
   <div class="container">
     <!-- return to transactions list button -->
