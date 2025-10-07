@@ -7,7 +7,10 @@ import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
 export default {
   name: 'Transfers',
-  components: {AddrScanLink, TxScanLink},
+  components: {
+    AddrScanLink,
+    TxScanLink
+  },
   props: ['accountId'],
   setup() {
     const {etherScanLink} = useExplorerUtils();

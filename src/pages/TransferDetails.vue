@@ -1,11 +1,14 @@
 <script>
 import {fetchTransferDetails} from "../services/api.js";
 import {formatAmount, formatDate} from "../js/utils.js";
-import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
+import TxScanLink from "../components/etherscan/TxScanLink.vue";
 
 export default {
-  components: {AddrScanLink, TxScanLink},
+  components: {
+    AddrScanLink,
+    TxScanLink
+  },
   data() {
     return {
       transfer: null,
