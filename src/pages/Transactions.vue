@@ -54,7 +54,6 @@ export default {
           </td>
           <td>
             <span>
-              <span v-if="tx.type === 'NATIVE'" class="me-2" title="Native Transfer">🪙</span>
               {{ tx.type }}
             </span>
           </td>

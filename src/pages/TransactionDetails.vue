@@ -49,7 +49,6 @@ export default {
       <div class="tx-line">
         <span class="label">Type:</span>
         <span class="value">
-            <span v-if="transaction.type === 'NATIVE'" class="me-2" title="Native Transfer">🪙</span>
             {{ transaction.type }}
           </span>
       </div>
