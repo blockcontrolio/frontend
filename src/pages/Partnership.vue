@@ -36,7 +36,7 @@ export default {
     async fetchPartnerships(networkId) {
       const res = await fetchPartnerships(networkId);
       const partnershipsRaw = await res.json();
-      const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
+      const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
       this.partnerships = partnershipsRaw.map(p => ({
         ...p,
         hasRelation: p.relationId !== null,

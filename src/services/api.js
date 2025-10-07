@@ -116,7 +116,7 @@ export async function updateAccount(id, accountInfo) {
 }
 
 export async function fetchAssetBalances(accountId) {
-    return await fetch(`${apiBaseUrl}/accounts/${accountId}/asset-balances`, {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -127,7 +127,7 @@ export async function fetchAssetBalances(accountId) {
 }
 
 export async function fetchAssetBalance(accountId, assetId) {
-    return await fetch(`${apiBaseUrl}/accounts/${accountId}/asset-balances/${assetId}`, {
+    return await fetch(`${apiBaseUrl}/accounts/${accountId}/balances/${assetId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -223,8 +223,8 @@ export async function fetchTransactions() {
 
 }
 
-export async function fetchTransaction(internalId) {
-    return await fetch(`${apiBaseUrl}/transactions/${internalId}`, {
+export async function fetchTransaction(id) {
+    return await fetch(`${apiBaseUrl}/transactions/${id}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`

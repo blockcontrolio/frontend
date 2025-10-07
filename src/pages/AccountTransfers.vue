@@ -2,12 +2,15 @@
 import {useExplorerUtils} from "../js/composables/explorerUtils.js";
 import {formatDate, roundAmount} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
-import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
+import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
 export default {
   name: 'Transfers',
-  components: {TxScanLink, AddrScanLink},
+  components: {
+    AddrScanLink,
+    TxScanLink
+  },
   props: ['accountId'],
   setup() {
     const {etherScanLink} = useExplorerUtils();
@@ -102,16 +105,15 @@ export default {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="transfer in filteredTransfers" :key="transfer.internalId">
+      <tr v-for="transfer in filteredTransfers" :key="transfer.id">
         <td>
-          <router-link class="text-nowrap" :to="{ name: 'transfer-details', params: { transferId: transfer.internalId } }">
-            {{ transfer.internalId.substring(0, 6) }}…{{ transfer.internalId.substring(transfer.internalId.length - 4) }}
+          <router-link class="text-nowrap" :to="{ name: 'transfer-details', params: { transferId: transfer.id } }">
+            {{ transfer.id.substring(0, 6) }}…{{ transfer.id.substring(transfer.id.length - 4) }}
           </router-link>
         </td>
         <td class="">
           <span class="d-flex justify-content-between align-items-center">
           <span class="small me-2">{{ transfer.transferType }}</span>
-            <i v-if="transfer.direction === 'OUTGOING'" class="bi bi-arrow-up-right-circle-fill"></i>
             <i v-if="transfer.direction === 'INCOMING'" class="bi bi-arrow-down-left-circle-fill"></i>
           </span>
         </td>
@@ -119,31 +121,31 @@ export default {
         <td class="">
           <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'INCOMING'">
             <i class="bi bi-building me-1"></i>
-            {{ transfer.from.counterpartyName }}
+            {{ transfer.fromCounterparty.name }}
           </span>
-          <span v-else-if="transfer.from.accountId">
+          <span v-else-if="transfer.fromAccount.id">
             <i class="bi bi-person-bounding-box me-2"></i>
-            <router-link :to="{ name: 'account-details', params: { id: transfer.from.accountId } }">
-              {{ transfer.from.accountName }}
+            <router-link :to="{ name: 'account-details', params: { id: transfer.fromAccount.id } }">
+              {{ transfer.fromAccount.name }}
             </router-link>
           </span>
-          <addr-scan-link v-else :type="'account'" :address="transfer.from.address" :short="true"></addr-scan-link>
+          <addr-scan-link v-else :type="'account'" :address="transfer.fromAddress" :short="true"></addr-scan-link>
         </td>
         <!--to-->
         <td class="">
           <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'OUTGOING'">
             <i class="bi bi-building me-1"></i>
-            {{ transfer.to.counterpartyName }}
+            {{ transfer.toCounterparty.name }}
           </span>
-          <span v-else-if="transfer.to.accountId">
+          <span v-else-if="transfer.toAccount.id">
             <i class="bi bi-person-bounding-box me-2"></i>
-            <router-link :to="{ name: 'account-details', params: { id: transfer.to.accountId } }">
-              {{ transfer.to.accountName }}
+            <router-link :to="{ name: 'account-details', params: { id: transfer.toAccount.id } }">
+              {{ transfer.toAccount.name }}
             </router-link>
           </span>
-          <addr-scan-link v-else :type="'account'" :address="transfer.to.address" :short="true"></addr-scan-link>
+          <addr-scan-link v-else :type="'account'" :address="transfer.toAddress" :short="true"></addr-scan-link>
         </td>
-        <td class="mono">{{ roundAmount(transfer.asset?.amount) }} {{ transfer.asset?.symbol }}</td>
+        <td class="mono">{{ roundAmount(transfer.amount) }} {{ transfer.asset?.symbol }}</td>
         <td class="text-center">
           <span class="badge"
                 :class="{ 'bg-success': transfer.status === 'SUCCESS', 'bg-warning': transfer.status === 'PENDING', 'bg-danger': transfer.status === 'FAILED' }">

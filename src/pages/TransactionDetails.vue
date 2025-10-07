@@ -34,7 +34,7 @@ export default {
 
 <template>
 
-  <h5 class="bold p-2">Transaction details: {{ transaction?.internalId }}</h5>
+  <h5 class="bold p-2">Transaction details: {{ transaction?.id }}</h5>
 
   <div class="container">
     <!-- return to transactions list button -->
@@ -49,7 +49,6 @@ export default {
       <div class="tx-line">
         <span class="label">Type:</span>
         <span class="value">
-            <span v-if="transaction.type === 'NATIVE'" class="me-2" title="Native Transfer">🪙</span>
             {{ transaction.type }}
           </span>
       </div>

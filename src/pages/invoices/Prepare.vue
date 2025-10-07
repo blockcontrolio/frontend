@@ -89,7 +89,8 @@ export default {
       return partnership.partneredAssets?.length > 0;
     },
     selectPayerCounterparty() {
-      const loggedInCounterpartyId = useCounterpartyStore().counterparty.internalId;
+      const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
+
       const {targetCounterpartyId, sourceCounterpartyId} = this.selectedPartnership;
       this.invoice.payerCounterpartyId = [targetCounterpartyId, sourceCounterpartyId]
           .find(id => id !== loggedInCounterpartyId);

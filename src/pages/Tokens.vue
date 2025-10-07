@@ -424,14 +424,14 @@ export default {
                 </button>
                 <ul class="dropdown-menu border">
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'grant')"
                     >
                       Grant
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'revoke')"
                     >
                       Revoke
@@ -450,50 +450,50 @@ export default {
                 </button>
                 <ul class="dropdown-menu border">
                   <li>
-                    <a href="#" class="dropdown-item text-primary"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'mint')"
                     >
-                      🪙 Mint
+                      Mint
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-danger"
+                    <a href="#" class="dropdown-item"
                        :class="{ disabled: !token.totalSupply }"
                        @click.prevent="openModal(token, 'burn')"
                     >
-                      🔥 Burn
+                      Burn
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'pause')"
                     >
                       Pause
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'unpause')"
                     >
                       Unpause
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'freeze')"
                     >
                       Freeze
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'block')"
                     >
                       Block
                     </a>
                   </li>
                   <li>
-                    <a href="#" class="dropdown-item text-warning"
+                    <a href="#" class="dropdown-item"
                        @click.prevent="openModal(token, 'unblock')"
                     >
                       Unblock
