@@ -3,10 +3,11 @@ import {useExplorerUtils} from "../js/composables/explorerUtils.js";
 import {formatDate, roundAmount} from "../js/utils.js";
 import {fetchTransfers} from "../services/api.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
+import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
 export default {
   name: 'Transfers',
-  components: {TxScanLink},
+  components: {AddrScanLink, TxScanLink},
   props: ['accountId'],
   setup() {
     const {etherScanLink} = useExplorerUtils();
@@ -110,7 +111,6 @@ export default {
         <td class="">
           <span class="d-flex justify-content-between align-items-center">
           <span class="small me-2">{{ transfer.transferType }}</span>
-            <i v-if="transfer.direction === 'OUTGOING'" class="bi bi-arrow-up-right-circle-fill"></i>
             <i v-if="transfer.direction === 'INCOMING'" class="bi bi-arrow-down-left-circle-fill"></i>
           </span>
         </td>
@@ -126,6 +126,7 @@ export default {
               {{ transfer.fromAccount.name }}
             </router-link>
           </span>
+          <addr-scan-link v-else :type="'account'" :address="transfer.fromAddress" :short="true"></addr-scan-link>
         </td>
         <!--to-->
         <td class="">
@@ -139,6 +140,7 @@ export default {
               {{ transfer.toAccount.name }}
             </router-link>
           </span>
+          <addr-scan-link v-else :type="'account'" :address="transfer.toAddress" :short="true"></addr-scan-link>
         </td>
         <td class="mono">{{ roundAmount(transfer.amount) }} {{ transfer.asset?.symbol }}</td>
         <td class="text-center">
