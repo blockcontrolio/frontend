@@ -1,5 +1,5 @@
 <script>
-import {fetchTransactions} from "../services/api.js";
+import {fetchTransactions} from "../services/transactions-api.js";
 import {formatDate} from "../js/utils.js";
 import TxDetailsLink from "../components/links/TxDetailsLink.vue";
 

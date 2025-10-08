@@ -1,7 +1,7 @@
 <script>
 import {validateAmount} from "../../js/validations.js";
 import {formatAmount} from "../../js/utils.js";
-import {fetchAssetBalance} from "../../services/api.js";
+import {fetchAssetBalance} from "../../services/accounts-api.js";
 
 export default {
   props: {

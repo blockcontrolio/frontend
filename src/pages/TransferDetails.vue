@@ -1,5 +1,5 @@
 <script>
-import {fetchTransferDetails} from "../services/api.js";
+import {fetchTransferDetails} from "../services/transfers-api.js";
 import {formatAmount, formatDate} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";

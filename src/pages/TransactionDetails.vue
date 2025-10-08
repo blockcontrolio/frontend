@@ -1,5 +1,5 @@
 <script>
-import {fetchTransaction} from "../services/api.js";
+import {fetchTransaction} from "../services/transactions-api.js";
 import {formatDate} from "../js/utils.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";

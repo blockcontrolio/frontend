@@ -1,6 +1,7 @@
 <script>
-import {createToken, fetchAccounts, fetchTokens} from "../services/api.js";
-import {fetchPartnerships} from "../services/partnership.js"
+import {fetchAccounts} from "../services/accounts-api.js";
+import {createToken, fetchTokens} from "../services/tokens-api.js";
+import {fetchPartnerships} from "../services/partnership-api.js"
 import {
   mintToken,
   burnToken,
@@ -20,7 +21,7 @@ import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 import PauseTokenModal from "../components/modal/PauseTokenModal.vue"
 import FreezeTokenModal from "../components/modal/FreezeTokenModal.vue";
 import BlockTokenModal from "../components/modal/BlockTokenModal.vue";
-import TxToast from "../components/toast/TxToast.vue";
+import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import RolesModal from "../components/modal/RolesModal.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";

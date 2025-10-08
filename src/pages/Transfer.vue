@@ -1,15 +1,14 @@
 <script>
+import {fetchAccounts, fetchAssetBalances} from '../services/accounts-api.js';
+import {fetchTokens} from '../services/tokens-api.js';
 import {
-  fetchAccounts,
-  fetchAssetBalances,
-  fetchTokens,
   sendInternalTransfer,
   sendExternalWithdrawal,
   sendCrossCounterparty
-} from '../services/api'
-import {fetchPartnerships} from "../services/partnership.js";
+} from '../services/transfers-api.js'
+import {fetchPartnerships} from "../services/partnership-api.js";
 import {formatAmount} from "../js/utils.js";
-import TxToast from "../components/toast/TxToast.vue";
+import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import FromAccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";

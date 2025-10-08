@@ -7,7 +7,7 @@ import {
   acceptRequest,
   rejectRequest,
   declinePartnership
-} from "../services/partnership.js";
+} from "../services/partnership-api.js";
 import {formatDate} from "../js/utils.js";
 
 export default {

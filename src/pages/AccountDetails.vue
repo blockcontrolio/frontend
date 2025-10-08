@@ -1,6 +1,6 @@
 <script>
 import {formatAmount, formatDate} from "../js/utils.js";
-import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/api.js";
+import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/accounts-api.js";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 import InfoToast from "../components/toast/InfoToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";

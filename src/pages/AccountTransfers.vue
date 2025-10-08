@@ -1,7 +1,7 @@
 <script>
 import {useExplorerUtils} from "../js/composables/explorerUtils.js";
 import {formatDate, roundAmount} from "../js/utils.js";
-import {fetchTransfers} from "../services/api.js";
+import {fetchTransfers} from "../services/transfers-api.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TransferDetailsLink from "../components/links/TransferDetailsLink.vue";

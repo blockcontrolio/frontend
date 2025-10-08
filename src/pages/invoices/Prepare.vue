@@ -1,10 +1,11 @@
 <script>
-import {fetchAccounts, fetchAssetBalances, fetchTokens} from '../../services/api.js'
+import {fetchTokens} from '../../services/tokens-api.js'
+import {fetchAccounts, fetchAssetBalances} from '../../services/accounts-api.js'
 import {prepareCrossCounterpartyInvoice} from '../../services/invoices-api.js'
 import InfoToast from "../../components/toast/InfoToast.vue";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
 import AmountInput from "../../components/transfer/AmountInput.vue";
-import {fetchPartnerships} from "../../services/partnership.js";
+import {fetchPartnerships} from "../../services/partnership-api.js";
 import {useNetworkStore} from "../../js/stores/networkStore.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
