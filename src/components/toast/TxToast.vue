@@ -1,11 +1,17 @@
 <script>
 
 import TxScanLink from "../etherscan/TxScanLink.vue";
+import TxDetailsLink from "../links/TxDetailsLink.vue";
+import TransferDetailsLink from "../links/TransferDetailsLink.vue";
 
 export default {
-  components: {TxScanLink},
+  components: {
+    TransferDetailsLink,
+    TxScanLink,
+    TxDetailsLink
+  },
   props: {
-    txData: {
+    success: {
       required: true,
       validator(val) {
         return val && typeof val.message === 'string';
@@ -52,15 +58,20 @@ export default {
       <div
           class="alert custom-success-alert d-flex justify-content-between align-items-center m-0">
         <!-- ✅ Success -->
-        <div v-if="txData?.hash">
-          ✅ Success! {{ txData.message }}<br/>
-          Tx hash:
-          <tx-scan-link :hash="txData.hash" class="tx-hash"/>
+        <div v-if="success?.transferId">
+          ✅ Success! {{ success?.message }}<br/>
+          Transfer details:
+          <transfer-details-link :transferId="success.transferId" class="text-nowrap"/>
         </div>
-        <div v-if="txData?.id">
-          ✅ Success! {{ txData?.message }}<br/>
-          UUID:
-          <span class="mono">{{txData.id}}</span>
+        <div v-if="success?.hash">
+          ✅ Success! {{ success.message }}<br/>
+          Tx hash:
+          <tx-scan-link :hash="success.hash" class="text-nowrap"/>
+        </div>
+        <div v-if="success?.transactionId">
+          ✅ Success! {{ success?.message }}<br/>
+          Transaction details:
+          <tx-details-link :transactionId="success.transactionId" class="text-nowrap"/>
         </div>
         <div class="d-flex align-items-center justify-content-center">
           <button
@@ -83,7 +94,4 @@ export default {
   border-radius: 0.375rem;
 }
 
-.tx-hash {
-  white-space: nowrap;
-}
 </style>

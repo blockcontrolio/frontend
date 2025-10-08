@@ -107,7 +107,7 @@ export default {
         <span class="">Amount:</span>
         <span class="value mono">{{ formatAmount(transfer.amount) }} {{transfer.asset?.symbol}}</span>
       </div>
-      <div class="tx-line my-1">
+      <div v-if="transfer.status" class="tx-line my-1">
         <span class="">Status:</span>
         <span class="status" :class="[transfer.status === 'CONFIRMED' ? 'text-success' : 'text-secondary']">
             {{ transfer.status }}
@@ -117,7 +117,7 @@ export default {
         <span class="">Created:</span>
         <small class="mono text-muted">{{ formatDate(transfer.createTime) }}</small>
       </div>
-      <div class="tx-line my-1">
+      <div v-if="transfer.txHash" class="tx-line my-1">
         <span class="">Hash:</span>
         <tx-scan-link :hash="transfer.txHash"></tx-scan-link>
       </div>

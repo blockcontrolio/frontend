@@ -233,9 +233,9 @@ export default {
       this.errors.amount = "";
     },
     async handleSuccess(response) {
-      let txData = await response.json();
-      let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
-      this.transferSuccess = {hash: txData.txHash, message};
+      let data = await response.json();
+      let message = `${data.asset.amount} ${data.asset.name} (${data.asset.symbol}) has been transferred`
+      this.transferSuccess = {transferId: data.id, message};
     },
     handleUnknownError(err) {
       console.error(err)
@@ -480,7 +480,7 @@ export default {
 
   <TxToast
       v-if="transferSuccess"
-      :txData="transferSuccess"
+      :success="transferSuccess"
       @closed="transferSuccess = null; selectedTokenInfo = null"
   />
   <ErrorToast

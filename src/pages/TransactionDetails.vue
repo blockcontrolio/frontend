@@ -12,7 +12,7 @@ export default {
     };
   },
   mounted() {
-    const id = this.$route.params.id;
+    const id = this.$route.params.transactionId;
     if (!id || id === "undefined") {
       console.error("Invalid ID passed to fetch transaction");
       return;

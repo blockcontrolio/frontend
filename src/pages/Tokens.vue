@@ -236,7 +236,7 @@ export default {
         let response = await operation();
         if (response.ok) {
           let message = onSuccess();
-          this.txSuccess = {...(await response.json()), message};
+          this.txSuccess = {...(await response.json()), message}; // transactionId + message
         } else {
           const err = await response.json();
           this.handleTxError(err);
@@ -571,7 +571,7 @@ export default {
 
     <TxToast
         v-if="txSuccess"
-        :txData="txSuccess"
+        :success="txSuccess"
         @closed="txSuccess = null; selectedToken = null"
     />
     <ErrorToast
