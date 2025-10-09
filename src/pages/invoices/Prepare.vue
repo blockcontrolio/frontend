@@ -52,7 +52,7 @@ export default {
       return !!this.errors.to || !!this.errors.amount;
     },
     fullLink() {
-      return `${window.location.origin}/invoices/${this.transfer.invoiceId}`;
+      return `${window.location.origin}/invoices/${this.transfer.id}`;
     }
   },
   mounted() {
@@ -196,7 +196,7 @@ export default {
     </div>
   </div>
 
-  <div v-if="transfer.invoiceId" class="d-flex justify-content-center pt-4">
+  <div v-if="transfer.id" class="d-flex justify-content-center pt-4">
     <div class="text-center gap-2">
       <span>Target counterparty will see this request in their incoming list. Copy and share the link directly:</span><br>
       <a :href="fullLink"
