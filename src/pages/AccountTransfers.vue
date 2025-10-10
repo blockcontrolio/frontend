@@ -156,7 +156,7 @@ export default {
           <tx-scan-link v-if="transfer.txHash" :hash="transfer.txHash" :short="true"></tx-scan-link>
         </td>
         <td>
-          <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>
+          <small class="text-muted">{{ formatDate(transfer.createdAt) }}</small>
         </td>
       </tr>
       </tbody>

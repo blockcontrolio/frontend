@@ -66,7 +66,7 @@ export default {
             <span class="mono">{{ tx.value }}</span>
           </td>
           <td>
-            <small class="text-muted">{{ formatDate(tx.createTime) }}</small>
+            <small class="text-muted">{{ formatDate(tx.createdAt) }}</small>
           </td>
         </tr>
         </tbody>

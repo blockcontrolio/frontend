@@ -212,7 +212,7 @@ export default {
           <th scope="col">Role</th>
           <th scope="col">Permissions</th>
           <th scope="col">Enabled</th>
-          <th scope="col">Created At</th>
+          <th scope="col">Create Time</th>
         </tr>
         </thead>
         <tbody>

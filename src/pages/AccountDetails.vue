@@ -182,8 +182,8 @@ export default {
         </div>
       </div>
       <div class="row my-2">
-        <div class="col-4"><strong>Created:</strong></div>
-        <div class="col-8">{{ formatDate(account.createTime) }}</div>
+        <div class="col-4"><strong>Create Time:</strong></div>
+        <div class="col-8">{{ formatDate(account.createdAt) }}</div>
       </div>
 
       <div class="d-flex justify-content-end mt-4">

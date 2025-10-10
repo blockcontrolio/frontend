@@ -71,8 +71,8 @@ export default {
           </span>
       </div>
       <div class="tx-line">
-        <span class="label">Created:</span>
-        <small class="text-muted">{{ formatDate(transaction.createTime) }}</small>
+        <span class="label">Create Time:</span>
+        <small class="text-muted">{{ formatDate(transaction.createdAt) }}</small>
       </div>
       <div class="tx-line">
         <span class="label">Hash:</span>

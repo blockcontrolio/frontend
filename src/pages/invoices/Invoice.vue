@@ -150,7 +150,7 @@ export default {
               {{ invoice.isPayer && invoice.status === 'CREATED' ? 'Execute Invoice' : 'Invoice' }}</h4>
             <!-- requested date -->
             <p class="text-muted text-center small mb-4">
-              Requested: {{ formatDate(invoice.requestedAt) }}
+              Request Time: {{ formatDate(invoice.requestedAt) }}
             </p>
             <!-- status badge -->
             <p class="text-center m-3"
