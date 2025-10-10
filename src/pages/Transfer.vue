@@ -1,15 +1,14 @@
 <script>
+import {fetchAccounts, fetchAssetBalances} from '../services/accounts-api.js';
+import {fetchTokens} from '../services/tokens-api.js';
 import {
-  fetchAccounts,
-  fetchAssetBalances,
-  fetchTokens,
   sendInternalTransfer,
   sendExternalWithdrawal,
   sendCrossCounterparty
-} from '../services/api'
-import {fetchPartnerships} from "../services/partnership.js";
+} from '../services/transfers-api.js'
+import {fetchPartnerships} from "../services/partnership-api.js";
 import {formatAmount} from "../js/utils.js";
-import TxToast from "../components/toast/TxToast.vue";
+import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import FromAccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
@@ -233,9 +232,9 @@ export default {
       this.errors.amount = "";
     },
     async handleSuccess(response) {
-      let txData = await response.json();
-      let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
-      this.transferSuccess = {hash: txData.txHash, message};
+      let data = await response.json();
+      let message = `${data.asset.amount} ${data.asset.name} (${data.asset.symbol}) has been transferred`
+      this.transferSuccess = {transferId: data.id, message};
     },
     handleUnknownError(err) {
       console.error(err)
@@ -480,7 +479,7 @@ export default {
 
   <TxToast
       v-if="transferSuccess"
-      :txData="transferSuccess"
+      :success="transferSuccess"
       @closed="transferSuccess = null; selectedTokenInfo = null"
   />
   <ErrorToast

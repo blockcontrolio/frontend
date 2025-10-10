@@ -7,7 +7,7 @@ import {
   acceptRequest,
   rejectRequest,
   declinePartnership
-} from "../services/partnership.js";
+} from "../services/partnership-api.js";
 import {formatDate} from "../js/utils.js";
 
 export default {
@@ -39,7 +39,7 @@ export default {
       const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
       this.partnerships = partnershipsRaw.map(p => ({
         ...p,
-        hasRelation: p.relationId !== null,
+        hasRelation: p.id !== null,
         ownPendingRequest: p.sourceCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING',
         actionRequired: p.targetCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING'
       }));
@@ -51,7 +51,7 @@ export default {
         const partnershipRaw = await response.json();
         const item = this.partnerships.find(p => p.targetCounterpartyId === targetCounterpartyId);
         if (item) {
-          item.relationId = partnershipRaw.relationId;
+          item.id = partnershipRaw.id;
           item.status = partnershipRaw.status;
           item.requestedAt = partnershipRaw.requestedAt;
           item.ownPendingRequest = true;
@@ -63,9 +63,9 @@ export default {
       const response = await declinePartnership(relationId);
       // mark as own request
       if (response.ok) {
-        const item = this.partnerships.find(p => p.relationId === relationId);
+        const item = this.partnerships.find(p => p.id === relationId);
         if (item) {
-          item.relationId = null;
+          item.id = null;
           item.status = null;
           item.requestedAt = null;
           item.ownPendingRequest = false;
@@ -76,7 +76,7 @@ export default {
     async acceptRequest(relationId) {
       const response = await acceptRequest(relationId);
       if (response.ok) {
-        const item = this.partnerships.find(p => p.relationId === relationId);
+        const item = this.partnerships.find(p => p.id === relationId);
         if (item) {
           item.status = 'ACCEPTED';
           item.actionRequired = false;
@@ -86,7 +86,7 @@ export default {
     async rejectRequest(relationId) {
       const response = await rejectRequest(relationId);
       if (response.ok) {
-        const item = this.partnerships.find(p => p.relationId === relationId);
+        const item = this.partnerships.find(p => p.id === relationId);
         if (item) {
           item.status = 'REJECTED';
           item.actionRequired = false;
@@ -153,7 +153,7 @@ export default {
               <button
                   v-else-if="p.ownPendingRequest"
                   class="btn btn-outline-danger btn-sm"
-                  @click="declinePartnership(p.relationId)"
+                  @click="declinePartnership(p.id)"
               >
                 Decline Request
               </button>
@@ -164,13 +164,13 @@ export default {
               >
                 <button
                     class="btn btn-outline-danger btn-sm"
-                    @click="rejectRequest(p.relationId)"
+                    @click="rejectRequest(p.id)"
                 >
                   Reject
                 </button>
                 <button
                     class="btn btn-outline-success btn-sm"
-                    @click="acceptRequest(p.relationId)"
+                    @click="acceptRequest(p.id)"
                 >
                   Accept
                 </button>

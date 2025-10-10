@@ -15,6 +15,28 @@ export async function importToken(payload) {
     });
 }
 
+export async function fetchTokens() {
+    return await fetch(`${apiBaseUrl}/tokens`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Error fetching account:', err);
+    });
+}
+
+export async function createToken(payload) {
+    return await fetch(`${apiBaseUrl}/tokens`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
 export async function mintToken(tokenId, payload) {
     return await fetch(`${apiBaseUrl}/tokens/${tokenId}/issue`, {
         method: 'POST',

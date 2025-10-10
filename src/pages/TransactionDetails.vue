@@ -1,5 +1,5 @@
 <script>
-import {fetchTransaction} from "../services/api.js";
+import {fetchTransaction} from "../services/transactions-api.js";
 import {formatDate} from "../js/utils.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
@@ -12,7 +12,7 @@ export default {
     };
   },
   mounted() {
-    const id = this.$route.params.id;
+    const id = this.$route.params.transactionId;
     if (!id || id === "undefined") {
       console.error("Invalid ID passed to fetch transaction");
       return;
@@ -71,8 +71,8 @@ export default {
           </span>
       </div>
       <div class="tx-line">
-        <span class="label">Created:</span>
-        <small class="text-muted">{{ formatDate(transaction.createTime) }}</small>
+        <span class="label">Create Time:</span>
+        <small class="text-muted">{{ formatDate(transaction.createdAt) }}</small>
       </div>
       <div class="tx-line">
         <span class="label">Hash:</span>

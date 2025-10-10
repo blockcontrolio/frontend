@@ -1,10 +1,10 @@
 <script>
-import {fetchTransactions} from "../services/api.js";
+import {fetchTransactions} from "../services/transactions-api.js";
 import {formatDate} from "../js/utils.js";
-import TxScanLink from "../components/etherscan/TxScanLink.vue";
+import TxDetailsLink from "../components/links/TxDetailsLink.vue";
 
 export default {
-  components: {TxScanLink},
+  components: {TxDetailsLink},
   data() {
     return {
       transactions: [],
@@ -47,10 +47,7 @@ export default {
         <tbody>
         <tr v-for="tx in transactions" :key="tx.id">
           <td>
-            <router-link class="text-nowrap"
-                :to="{ name: 'transaction-details', params: { id: tx.id } }">
-              {{ tx.id.substring(0, 6) }}…{{ tx.id.substring(tx.id.length - 4) }}
-            </router-link>
+            <tx-details-link :transactionId="tx.id" :short="true"></tx-details-link>
           </td>
           <td>
             <span>
@@ -69,7 +66,7 @@ export default {
             <span class="mono">{{ tx.value }}</span>
           </td>
           <td>
-            <small class="text-muted">{{ formatDate(tx.createTime) }}</small>
+            <small class="text-muted">{{ formatDate(tx.createdAt) }}</small>
           </td>
         </tr>
         </tbody>

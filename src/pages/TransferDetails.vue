@@ -1,5 +1,5 @@
 <script>
-import {fetchTransferDetails} from "../services/api.js";
+import {fetchTransferDetails} from "../services/transfers-api.js";
 import {formatAmount, formatDate} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
@@ -107,17 +107,17 @@ export default {
         <span class="">Amount:</span>
         <span class="value mono">{{ formatAmount(transfer.amount) }} {{transfer.asset?.symbol}}</span>
       </div>
-      <div class="tx-line my-1">
+      <div v-if="transfer.status" class="tx-line my-1">
         <span class="">Status:</span>
         <span class="status" :class="[transfer.status === 'CONFIRMED' ? 'text-success' : 'text-secondary']">
             {{ transfer.status }}
           </span>
       </div>
       <div class="tx-line my-1">
-        <span class="">Created:</span>
-        <small class="mono text-muted">{{ formatDate(transfer.createTime) }}</small>
+        <span class="">Create Time:</span>
+        <small class="mono text-muted">{{ formatDate(transfer.createdAt) }}</small>
       </div>
-      <div class="tx-line my-1">
+      <div v-if="transfer.txHash" class="tx-line my-1">
         <span class="">Hash:</span>
         <tx-scan-link :hash="transfer.txHash"></tx-scan-link>
       </div>

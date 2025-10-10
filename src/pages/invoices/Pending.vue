@@ -41,15 +41,15 @@ export default {
       <tbody>
       <tr
           v-for="invoice in invoices"
-          :key="invoice.invoiceId"
+          :key="invoice.id"
           style="cursor: pointer;"
       >
         <td>
           <router-link
               class="text-decoration-none"
-              :to="`/invoices/${invoice.invoiceId}`"
+              :to="`/invoices/${invoice.id}`"
           >
-            <span>{{ shortenString(invoice.invoiceId) }}</span>
+            <span>{{ shortenString(invoice.id) }}</span>
           </router-link>
         </td>
         <td class="d-flex justify-content-between align-items-center gap-3">

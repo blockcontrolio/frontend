@@ -1,13 +1,15 @@
 <script>
 import {useExplorerUtils} from "../js/composables/explorerUtils.js";
 import {formatDate, roundAmount} from "../js/utils.js";
-import {fetchTransfers} from "../services/api.js";
+import {fetchTransfers} from "../services/transfers-api.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
+import TransferDetailsLink from "../components/links/TransferDetailsLink.vue";
 
 export default {
   name: 'Transfers',
   components: {
+    TransferDetailsLink,
     AddrScanLink,
     TxScanLink
   },
@@ -99,7 +101,7 @@ export default {
         <th scope="col">From</th>
         <th scope="col">To</th>
         <th scope="col">Amount</th>
-        <th scope="col" class="text-center">Status</th>
+        <th v-if="false" scope="col" class="text-center">Status</th>
         <th scope="col">Tx Hash</th>
         <th scope="col">Create Time</th>
       </tr>
@@ -107,9 +109,7 @@ export default {
       <tbody>
       <tr v-for="transfer in filteredTransfers" :key="transfer.id">
         <td>
-          <router-link class="text-nowrap" :to="{ name: 'transfer-details', params: { transferId: transfer.id } }">
-            {{ transfer.id.substring(0, 6) }}…{{ transfer.id.substring(transfer.id.length - 4) }}
-          </router-link>
+          <transfer-details-link :transfer-id="transfer.id" :short="true"></transfer-details-link>
         </td>
         <td class="">
           <span class="d-flex justify-content-between align-items-center">
@@ -146,17 +146,17 @@ export default {
           <addr-scan-link v-else :type="'account'" :address="transfer.toAddress" :short="true"></addr-scan-link>
         </td>
         <td class="mono">{{ roundAmount(transfer.amount) }} {{ transfer.asset?.symbol }}</td>
-        <td class="text-center">
+        <td v-if="false" class="text-center">
           <span class="badge"
                 :class="{ 'bg-success': transfer.status === 'SUCCESS', 'bg-warning': transfer.status === 'PENDING', 'bg-danger': transfer.status === 'FAILED' }">
             {{ transfer.status }}
           </span>
         </td>
         <td>
-          <tx-scan-link :hash="transfer.txHash" :short="true"></tx-scan-link>
+          <tx-scan-link v-if="transfer.txHash" :hash="transfer.txHash" :short="true"></tx-scan-link>
         </td>
         <td>
-          <small class="text-muted">{{ formatDate(transfer.createTime) }}</small>
+          <small class="text-muted">{{ formatDate(transfer.createdAt) }}</small>
         </td>
       </tr>
       </tbody>

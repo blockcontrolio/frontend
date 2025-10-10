@@ -1,10 +1,10 @@
 <script>
-import {fetchAccounts, fetchAssetBalances} from "../../services/api.js";
+import {fetchAccounts, fetchAssetBalances} from "../../services/accounts-api.js";
 import {fetchInvoice, cancelInvoice, executeInvoice, rejectInvoice} from "../../services/invoices-api.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {formatDate} from "../../js/utils.js";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
-import TxToast from "../../components/toast/TxToast.vue";
+import TxToast from "../../components/toast/SuccessToast.vue";
 import InfoToast from "../../components/toast/InfoToast.vue";
 
 export default {
@@ -150,7 +150,7 @@ export default {
               {{ invoice.isPayer && invoice.status === 'CREATED' ? 'Execute Invoice' : 'Invoice' }}</h4>
             <!-- requested date -->
             <p class="text-muted text-center small mb-4">
-              Requested: {{ formatDate(invoice.requestedAt) }}
+              Request Time: {{ formatDate(invoice.requestedAt) }}
             </p>
             <!-- status badge -->
             <p class="text-center m-3"

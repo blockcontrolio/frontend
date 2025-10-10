@@ -59,7 +59,7 @@ const routes = [
         component: Transactions
     },
     {
-        path: '/transactions/:id',
+        path: '/transactions/:transactionId',
         name: 'transaction-details',
         component: TransactionDetails
     },
