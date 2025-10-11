@@ -117,9 +117,9 @@ export default {
         <span class="">Create Time:</span>
         <small class="mono text-muted">{{ formatDate(transfer.createdAt) }}</small>
       </div>
-      <div v-if="transfer.txHash" class="tx-line my-1">
+      <div v-if="transfer.transactionHash" class="tx-line my-1">
         <span class="">Hash:</span>
-        <tx-scan-link :hash="transfer.txHash"></tx-scan-link>
+        <tx-scan-link :hash="transfer.transactionHash"></tx-scan-link>
       </div>
 
     </div>

@@ -241,9 +241,8 @@ export default {
             <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>
           <td>
-            <router-link v-if="acc.transfersTotal" :to="{ name: 'account-transfers', params: { accountId: acc.id } }"
-                         class="">
-              Transfers ({{ acc.transfersTotal }})
+            <router-link :to="{ name: 'account-transfers', params: { accountId: acc.id } }">
+              Transfers
             </router-link>
           </td>
         </tr>

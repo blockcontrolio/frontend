@@ -153,7 +153,7 @@ export default {
           </span>
         </td>
         <td>
-          <tx-scan-link v-if="transfer.txHash" :hash="transfer.txHash" :short="true"></tx-scan-link>
+          <tx-scan-link v-if="transfer.transactionHash" :hash="transfer.transactionHash" :short="true"></tx-scan-link>
         </td>
         <td>
           <small class="text-muted">{{ formatDate(transfer.createdAt) }}</small>

@@ -84,6 +84,9 @@ export default {
   },
   methods: {
     formatAmount,
+    isOwnToken(token) {
+      return useCounterpartyStore().counterparty.id === token?.issuerCounterparty.id;
+    },
     prepareImportForm() {
       this.showTokenForm = 'import';
     },
@@ -402,20 +405,20 @@ export default {
                   <span class="me-2">{{ token.name }}</span><span class="">({{ token.symbol }})</span>
                 </div>
               </div>
-              <div v-if="token.own" class="mb-1">
+              <div v-if="isOwnToken(token)" class="mb-1">
                 <span class="label text-secondary me-2">Total Supply:</span>
                 <span>{{ formatAmount(token?.totalSupply) }}</span>
               </div>
-              <div v-if="token.own === false && token.issuerCounterparty" class="mb-1">
+              <div v-if="!isOwnToken(token)" class="mb-1">
                 <span class="label text-secondary me-2">Issuer Counterparty:</span>
                 <span>{{ token.issuerCounterparty?.name }}</span>
               </div>
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
             <!-- Token Operations -->
-            <div v-if="token.own" class="d-flex gap-2">
+            <div v-if="isOwnToken(token)" class="d-flex gap-2">
               <!--roles dropdown-->
-              <div v-if="token.own" class="dropdown ms-auto">
+              <div class="dropdown ms-auto">
                 <button
                     class="btn btn-outline-secondary btn-sm dropdown-toggle px-4"
                     type="button"
@@ -441,7 +444,7 @@ export default {
                 </ul>
               </div>
               <!--actions dropdown-->
-              <div v-if="token.own" class="dropdown ms-auto">
+              <div class="dropdown ms-auto">
                 <button
                     class="btn btn-outline-secondary btn-sm dropdown-toggle px-4"
                     type="button"

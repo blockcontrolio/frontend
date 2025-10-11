@@ -38,7 +38,7 @@ export async function declinePartnership(relationId) {
 
 export async function acceptRequest(relationId) {
     return await fetch(`${apiBaseUrl}/partnerships/${relationId}/accept`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -48,7 +48,7 @@ export async function acceptRequest(relationId) {
 
 export async function rejectRequest(relationId) {
     return await fetch(`${apiBaseUrl}/partnerships/${relationId}/reject`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`

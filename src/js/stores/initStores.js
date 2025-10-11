@@ -7,8 +7,8 @@ export async function initStores() {
         const networkStore = useNetworkStore();
 
         await counterpartyStore.fetchUserCounterpartInfo();
-        if (counterpartyStore.counterparty?.networks?.length) {
-            networkStore.setNetwork(counterpartyStore.counterparty.networks[0]);
+        if (counterpartyStore.counterparty?.network) {
+            networkStore.setNetwork(counterpartyStore.counterparty.network);
         }
     }
 
