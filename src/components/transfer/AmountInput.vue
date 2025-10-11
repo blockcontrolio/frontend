@@ -11,7 +11,6 @@ export default {
       type: String,
       default: 'Amount to send'
     },
-    selectedAsset: Object,
     validate: Function,
     errorMessage: String
   },

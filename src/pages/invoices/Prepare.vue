@@ -235,7 +235,7 @@ export default {
       <AccountSelector
           v-model="invoice.receiverAccountId"
           :accounts="receivingAccounts"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); invoice.assetId = '' }"
           :placeholder="'-- receiving account --'"
           :label="'To Receiving Account'"
@@ -258,7 +258,6 @@ export default {
       <AmountInput
           v-model="invoice.amount"
           :placeholder="'Amount to receive'"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />

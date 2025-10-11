@@ -10,7 +10,7 @@ import {fetchPartnerships} from "../services/partnership-api.js";
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
-import FromAccountSelector from "../components/transfer/AccountSelector.vue";
+import AccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import Pending from "./invoices/Pending.vue";
@@ -20,7 +20,7 @@ export default {
   components: {
     Pending,
     AmountInput,
-    FromAccountSelector,
+    AccountSelector,
     TxToast,
     ErrorToast
   },
@@ -55,7 +55,7 @@ export default {
       },
       transferSuccess: null,
       transferError: null,
-      accountBalances: [],
+      assetBalances: [],
       selectedAsset: null,
       selectedTokenInfo: null,
       selectedPartnership: {}
@@ -86,7 +86,7 @@ export default {
     },
     async fetchBalances(accountId) {
       let res = await fetchAssetBalances(accountId);
-      this.accountBalances = await res.json();
+      this.assetBalances = await res.json();
     },
     async fetchAcceptedPartnerships() {
       let selectedNetwork = useNetworkStore().selectedNetwork;
@@ -104,15 +104,13 @@ export default {
       return partnership.partneredAssets?.length > 0;
     },
     showBalance(assetId) {
-      this.selectedAsset = this.accountBalances
-          .find(b => b.id === assetId)
-      console.log("Selected asset: ", this.selectedAsset.symbol)
+      this.selectedAsset = this.assetBalances
+          .find(b => b.asset.id === assetId)
       this.selectedToken(assetId)
     },
     selectedToken(assetId) {
       this.selectedTokenInfo = this.tokens
           .find(t => t.id === assetId);
-      console.log("Selected token info: ", this.selectedTokenInfo.id)
     },
     validateToAddress() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
@@ -220,7 +218,7 @@ export default {
     resetSelection() {
       this.selectedTokenInfo = null;
       this.selectedAsset = null;
-      this.accountBalances = [];
+      this.assetBalances = [];
       this.internal = {from: "", assetId: "", to: "", amount: null}
       this.transfer = {fromAccountId: "", assetId: "", to: "", amount: null}
       this.crossCp = {fromAccountId: "", assetId: "", toCounterpartyId: "", amount: null, toAccountId: ""}
@@ -289,10 +287,10 @@ export default {
       <h3 class="mb-4 text-center">Transfer between Accounts</h3>
 
       <!-- Source Account -->
-      <FromAccountSelector
+      <AccountSelector
           v-model="internal.fromAccountId"
           :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT' || item.type === 'DISTRIBUTOR')"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); internal.assetId = '' }"
       />
 
@@ -306,11 +304,11 @@ export default {
         >
           <option disabled value="">-- select asset --</option>
           <option
-              v-for="token in this.accountBalances"
-              :key="token.id"
-              :value="token.id"
+              v-for="balance in this.assetBalances"
+              :key="balance.asset.id"
+              :value="balance.asset.id"
           >
-            {{ token.name }} ({{ token.symbol }})
+            {{ balance.asset.name }} ({{ balance.asset.symbol }})
           </option>
         </select>
         <!-- token details preview -->
@@ -335,7 +333,6 @@ export default {
 
       <AmountInput
           v-model="internal.amount"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />
@@ -350,10 +347,10 @@ export default {
     <form @submit.prevent="submitExternalWithdrawal" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Withdraw to external Address</h3>
 
-      <FromAccountSelector
+      <AccountSelector
           v-model="transfer.fromAccountId"
           :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT')"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); transfer.assetId = '' }"
       />
 
@@ -367,11 +364,11 @@ export default {
         >
           <option disabled value="">-- select asset --</option>
           <option
-              v-for="token in this.accountBalances"
-              :key="token.id"
-              :value="token.id"
+              v-for="balance in this.assetBalances"
+              :key="balance.asset.id"
+              :value="balance.asset.id"
           >
-            {{ token.name }} ({{ token.symbol }})
+            {{ balance.asset.name }} ({{ balance.asset.symbol }})
           </option>
         </select>
         <!-- token details preview -->
@@ -396,7 +393,6 @@ export default {
 
       <AmountInput
           v-model="transfer.amount"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />
@@ -411,10 +407,10 @@ export default {
     <form @submit.prevent="submitCrossCounterparty" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Cross-Counterparty Transfer</h3>
 
-      <FromAccountSelector
+      <AccountSelector
           v-model="crossCp.fromAccountId"
           :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT' || item.type === 'DISTRIBUTOR')"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); crossCp.assetId = '' }"
       />
 
@@ -462,7 +458,6 @@ export default {
 
       <AmountInput
           v-model="crossCp.amount"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />

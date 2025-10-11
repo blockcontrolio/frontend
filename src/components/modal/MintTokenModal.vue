@@ -75,12 +75,10 @@ export default {
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount</label>
-            <input type="number" class="form-control no-spinner"
+            <input type="text" class="form-control no-spinner"
                    v-model.number="form.amount"
                    inputmode="numeric"
-                   pattern="\d*"
-                   min="0"
-                   step="1"
+                   pattern="^\d*\.?\d+$"
                    @input="validateAmount"
                    required/>
           </div>

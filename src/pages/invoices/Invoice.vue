@@ -58,8 +58,7 @@ export default {
     async showBalance(accountId, assetId) {
       const balances = await this.fetchBalances(accountId);
       this.selectedAsset = balances
-          .find(b => b.id === assetId)
-      console.log("Selected asset: ", this.selectedAsset?.symbol)
+          .find(b => b.asset.id === assetId)
     },
     async fetchBalances(accountId) {
       let res = await fetchAssetBalances(accountId);
@@ -169,7 +168,7 @@ export default {
             <AccountSelector v-if="isPayer(invoice) && invoice.status === 'CREATED'"
                              v-model="accountFrom"
                              :accounts="accounts"
-                             :selected-asset="selectedAsset"
+                             :balance="selectedAsset"
                              @change="val => { showBalance(val, invoice.asset.id) }"
                              :label="'Select Your Account'"
             />

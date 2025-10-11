@@ -14,7 +14,7 @@ export default {
         redemptionAccountId: '',
         amount: 0
       },
-      accountBalance: null,
+      assetBalance: null,
       errors: {
         amount: ''
       },
@@ -24,7 +24,7 @@ export default {
     formatAmount,
     async fetchBalance(accountId) {
       let res = await fetchAssetBalance(accountId, this.tokenId);
-      this.accountBalance = await res.json();
+      this.assetBalance = await res.json();
     },
     validateAmount() {
       this.errors.amount = validateAmount(this.form.amount)
@@ -70,20 +70,18 @@ export default {
               </option>
             </select>
             <!-- acc balance preview -->
-            <div v-if="form.redemptionAccountId && accountBalance" class="mt-1 balance">
-              <span class="small label">Balance:</span> <span class="value">{{ formatAmount(accountBalance.amount) }} {{ accountBalance.symbol }}</span>
+            <div v-if="form.redemptionAccountId && assetBalance" class="mt-1 balance">
+              <span class="small label">Balance:</span> <span class="value">{{ formatAmount(assetBalance.amount) }} {{ assetBalance.asset.symbol }}</span>
             </div>
           </div>
 
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount</label>
-            <input type="number" class="form-control no-spinner"
+            <input type="text" class="form-control no-spinner"
                    v-model.number="form.amount"
                    inputmode="numeric"
-                   pattern="\d*"
-                   min="0"
-                   step="1"
+                   pattern="^\d*\.?\d+$"
                    @input="validateAmount"
                    required/>
           </div>

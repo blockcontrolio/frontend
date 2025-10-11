@@ -2,7 +2,7 @@
 import {formatAmount} from "../../js/utils.js";
 
 export default {
-  name: 'FromAccountSelector',
+  name: 'AccountSelector',
   props: {
     modelValue: String, // selected account ID
     accounts: Array,
@@ -18,7 +18,7 @@ export default {
       type: Boolean,
       default: true
     },
-    selectedAsset: Object // optional
+    balance: Object // optional
   },
   emits: ['update:modelValue', 'change'],
   methods: {
@@ -46,9 +46,9 @@ export default {
       </option>
     </select>
 
-    <div v-if="modelValue && selectedAsset" class="mt-1 balance">
+    <div v-if="modelValue && balance" class="mt-1 balance">
       <span class="small label me-2">Balance:</span>
-      <span class="value">{{ formatAmount(selectedAsset.amount) }} {{ selectedAsset.symbol }}</span>
+      <span class="value">{{ formatAmount(balance.amount) }} {{ balance.asset.symbol }}</span>
     </div>
   </div>
 </template>

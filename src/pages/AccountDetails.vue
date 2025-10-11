@@ -166,7 +166,7 @@ export default {
       </div>
 
       <div class="row mb-3">
-        <div class="col-4"><strong>Token Balances:</strong></div>
+        <div class="col-4"><strong>Asset Balances:</strong></div>
         <div class="col-8">
           <div v-if="this.balances && this.balances.length">
             <div

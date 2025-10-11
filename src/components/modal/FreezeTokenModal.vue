@@ -86,12 +86,10 @@ export default {
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount to freeze</label>
-            <input type="number" class="form-control no-spinner"
+            <input type="text" class="form-control no-spinner"
                    v-model.number="this.form.amount"
                    inputmode="numeric"
-                   pattern="\d*"
-                   min="0"
-                   step="1"
+                   pattern="^\d*\.?\d+$"
                    @input="validateAmount"
                    required/>
           </div>
