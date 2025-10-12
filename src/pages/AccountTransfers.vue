@@ -49,7 +49,7 @@ export default {
   computed: {
     filteredTransfers() {
       const filters = {
-        transferType: this.filterType,
+        type: this.filterType,
         direction: this.filterDirection,
         // later: add more fields if needed
       };
@@ -113,13 +113,13 @@ export default {
         </td>
         <td class="">
           <span class="d-flex justify-content-between align-items-center">
-          <span class="small me-2">{{ transfer.transferType }}</span>
+          <span class="small me-2">{{ transfer.type }}</span>
             <i v-if="transfer.direction === 'INCOMING'" class="bi bi-arrow-down-left-circle-fill"></i>
           </span>
         </td>
         <!--from-->
         <td class="">
-          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'INCOMING'">
+          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'INCOMING'">
             <i class="bi bi-building me-1"></i>
             {{ transfer.fromCounterparty.name }}
           </span>
@@ -133,7 +133,7 @@ export default {
         </td>
         <!--to-->
         <td class="">
-          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'OUTGOING'">
+          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'OUTGOING'">
             <i class="bi bi-building me-1"></i>
             {{ transfer.toCounterparty.name }}
           </span>

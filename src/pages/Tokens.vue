@@ -85,7 +85,10 @@ export default {
   methods: {
     formatAmount,
     isOwnToken(token) {
-      return useCounterpartyStore().counterparty.id === token?.issuerCounterparty.id;
+      if (token.issuerCounterparty) {
+        return useCounterpartyStore().counterparty.id === token.issuerCounterparty?.id;
+      }
+      return false;
     },
     prepareImportForm() {
       this.showTokenForm = 'import';

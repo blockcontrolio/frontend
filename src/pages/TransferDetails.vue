@@ -53,7 +53,7 @@ export default {
       <div class="tx-line my-1">
         <span class="">Type:</span>
         <span class="value">
-            {{ transfer.transferType }}
+            {{ transfer.type }}
           </span>
       </div>
       <!-- from -->
@@ -67,7 +67,7 @@ export default {
         <span class="small mx-3">From:</span>
         <span>
           <i class="bi bi-person-bounding-box me-2"></i>
-          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'INCOMING'">
+          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'INCOMING'">
             {{ transfer.fromAccount.name }}
           </span>
           <router-link v-else :to="{ name: 'account-details', params: { id: transfer.fromAccount.id } }">
@@ -75,7 +75,7 @@ export default {
           </router-link>
         </span>
       </div>
-      <div class="tx-line my-1" v-if="transfer.transferType === 'EXTERNAL' && transfer.direction === 'INCOMING' && transfer.fromAddress">
+      <div class="tx-line my-1" v-if="transfer.type === 'EXTERNAL' && transfer.direction === 'INCOMING' && transfer.fromAddress">
         <span class="small mx-3">Address:</span>
         <addr-scan-link :type="'account'" :address="transfer.fromAddress"></addr-scan-link>
       </div>
@@ -90,7 +90,7 @@ export default {
         <span class="small mx-3">Account:</span>
         <span>
           <i class="bi bi-person-bounding-box me-2"></i>
-          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'OUTGOING'">
+          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'OUTGOING'">
             {{ transfer.toAccount.name }}
           </span>
           <router-link v-else :to="{ name: 'account-details', params: { id: transfer.toAccount.id } }">
@@ -98,7 +98,7 @@ export default {
           </router-link>
         </span>
       </div>
-      <div class="tx-line my-1" v-if="transfer.transferType === 'EXTERNAL' && transfer.direction === 'OUTGOING' && transfer.toAddress">
+      <div class="tx-line my-1" v-if="transfer.type === 'EXTERNAL' && transfer.direction === 'OUTGOING' && transfer.toAddress">
         <span class="small mx-3">Address:</span>
         <addr-scan-link :type="'account'" :address="transfer.toAddress"></addr-scan-link>
       </div>
