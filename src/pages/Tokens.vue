@@ -66,7 +66,7 @@ export default {
       newToken: {
         name: '',
         symbol: '',
-        accountId: ''
+        deployerAccountId: ''
       },
       selectedToken: null,
       txSuccess: null,
@@ -122,16 +122,16 @@ export default {
       });
     },
     async createToken() {
-      if ([this.newToken.name, this.newToken.symbol, this.newToken.accountId]
+      if ([this.newToken.name, this.newToken.symbol, this.newToken.deployerAccountId]
           .some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (name, symbol, accountId) must be defined and non-empty.');
+        throw new Error('All parameters (name, symbol, deployerAccountId) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
         return createToken(this.newToken);
       }, () => {
         let symbol = this.newToken.symbol;
         this.showTokenForm = null;
-        this.newToken = {name: '', symbol: '', accountId: ''};
+        this.newToken = {name: '', symbol: '', deployerAccountId: ''};
         return `Token ${symbol} has been created`;
       });
     },
@@ -375,7 +375,7 @@ export default {
              required/>
 
       <div class="mb-3">
-        <select v-model="newToken.accountId" class="form-select w-50" required>
+        <select v-model="newToken.deployerAccountId" class="form-select w-50" required>
           <option disabled value="">-- owner account --</option>
           <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN')" :key="acc.ref" :value="acc.id">
             {{ acc.name }}
