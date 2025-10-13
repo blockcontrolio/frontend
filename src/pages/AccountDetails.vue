@@ -170,15 +170,15 @@ export default {
         <div class="col-8">
           <div v-if="this.balances && this.balances.length">
             <div
-                v-for="token in this.balances"
-                :key="token.id"
+                v-for="balance in this.balances"
+                :key="balance.asset.id"
                 class="d-flex justify-content-between align-items-center border-bottom py-1"
             >
-              <span class="">{{ token.name }} ({{ token.symbol }})</span>
-              <span class="mono">{{ formatAmount(token.amount) }}</span>
+              <span class="">{{ balance.asset.name }} ({{ balance.asset.symbol }})</span>
+              <span class="mono">{{ formatAmount(balance.amount) }}</span>
             </div>
           </div>
-          <div v-else class="text-muted">No token balances</div>
+          <div v-else class="text-muted">No asset balances</div>
         </div>
       </div>
       <div class="row my-2">

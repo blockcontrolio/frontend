@@ -55,7 +55,7 @@ export default {
             </span>
           </td>
           <td>
-            <span class="mono">{{ tx.from }}</span>
+            <span class="mono">{{ tx.fromAddress }}</span>
           </td>
           <td>
             <span class="status" :class="[tx.status === 'CONFIRMED' ? 'text-success' : 'text-secondary']">

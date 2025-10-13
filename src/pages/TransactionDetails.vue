@@ -54,11 +54,11 @@ export default {
       </div>
       <div class="tx-line">
         <span class="label">From:</span>
-        <addr-scan-link :type="'account'" :address="transaction.from"></addr-scan-link>
+        <addr-scan-link :type="'account'" :address="transaction.fromAddress"></addr-scan-link>
       </div>
       <div class="tx-line">
         <span class="label">To:</span>
-        <addr-scan-link :type="'account'" :address="transaction.to"></addr-scan-link>
+        <addr-scan-link :type="'account'" :address="transaction.toAddress"></addr-scan-link>
       </div>
       <div class="tx-line">
         <span class="label">Value:</span>

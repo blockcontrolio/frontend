@@ -412,9 +412,9 @@ export default {
                 <span class="label text-secondary me-2">Total Supply:</span>
                 <span>{{ formatAmount(token?.totalSupply) }}</span>
               </div>
-              <div v-if="!isOwnToken(token)" class="mb-1">
+              <div v-if="token.issuerCounterparty" class="mb-1">
                 <span class="label text-secondary me-2">Issuer Counterparty:</span>
-                <span>{{ token.issuerCounterparty?.name }}</span>
+                <span>{{ token.issuerCounterparty.name }}</span>
               </div>
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
