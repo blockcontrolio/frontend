@@ -40,8 +40,8 @@ export default {
       this.partnerships = partnershipsRaw.map(p => ({
         ...p,
         hasRelation: p.id !== null,
-        ownPendingRequest: p.sourceCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING',
-        actionRequired: p.targetCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING'
+        ownPendingRequest: p.status === 'PENDING' && p.sourceCounterparty.id === loggedInCounterpartyId,
+        actionRequired: p.status === 'PENDING' && p.targetCounterparty.id === loggedInCounterpartyId
       }));
     },
     async sendRequest(targetCounterpartyId) {
@@ -49,7 +49,7 @@ export default {
       // mark as own request
       if (response.ok) {
         const partnershipRaw = await response.json();
-        const item = this.partnerships.find(p => p.targetCounterpartyId === targetCounterpartyId);
+        const item = this.partnerships.find(p => p.targetCounterparty.id === targetCounterpartyId);
         if (item) {
           item.id = partnershipRaw.id;
           item.status = partnershipRaw.status;
@@ -108,7 +108,7 @@ export default {
     <div class="row g-3">
       <div
           v-for="p in partnerships"
-          :key="p.targetCounterpartyId"
+          :key="p.targetCounterparty.id"
           class="col-12"
       >
         <div class="card border p-3">
@@ -116,7 +116,12 @@ export default {
 
             <!-- Counterparty Name -->
             <div class="col-4 text-start">
-              <strong class="text-secondary">{{ p.counterpartyName }}</strong>
+              <span v-if="p.sourceCounterparty">
+                <span class="bold me-2">From:</span>
+                <span class="text-secondary">{{ p.sourceCounterparty.name }}</span><br>
+              </span>
+              <span class="bold me-2" v-if="p.sourceCounterparty">To: </span>
+              <span class="text-secondary">{{ p.targetCounterparty.name }}</span>
             </div>
 
             <!-- Mid column -->
@@ -145,7 +150,7 @@ export default {
               <button
                   v-if="p.hasRelation === false"
                   class="btn btn-outline-primary btn-sm"
-                  @click="sendRequest(p.targetCounterpartyId)"
+                  @click="sendRequest(p.targetCounterparty.id)"
               >
                 Request Partnership
               </button>
