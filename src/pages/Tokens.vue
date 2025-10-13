@@ -147,22 +147,22 @@ export default {
       }
     },
     // all requests
-    async sendMintRequest({tokenId, issuerAccountId, recipientAccountId, amount}) {
-      if ([tokenId, issuerAccountId, recipientAccountId, amount].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, issuerAccountId, recipientAccountId, amount) must be defined and non-empty.');
+    async sendMintRequest({tokenId, minterAccountId, recipientAccountId, amount}) {
+      if ([tokenId, minterAccountId, recipientAccountId, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, minterAccountId, recipientAccountId, amount) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return mintToken(tokenId, {issuerAccountId, recipientAccountId, amount});
+        return mintToken(tokenId, {minterAccountId, recipientAccountId, amount});
       }, () => {
         return `Token ${this.selectedToken?.symbol} minted with amount ${amount}`;
       });
     },
-    async sendBurnRequest({tokenId, redemptionAccountId, amount}) {
-      if ([tokenId, redemptionAccountId, amount].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, redemptionAccountId, amount) must be defined and non-empty.');
+    async sendBurnRequest({tokenId, burnerAccountId, amount}) {
+      if ([tokenId, burnerAccountId, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, burnerAccountId, amount) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return burnToken(tokenId, {redemptionAccountId, amount});
+        return burnToken(tokenId, {burnerAccountId, amount});
       }, () => {
         return `Token ${this.selectedToken?.symbol} burned with amount ${amount}`;
       });

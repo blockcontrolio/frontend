@@ -67,7 +67,7 @@ export default {
         <span class="small mx-3">From:</span>
         <span>
           <i class="bi bi-person-bounding-box me-2"></i>
-          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'INCOMING'">
+          <span v-if="transfer.type === 'CROSS_COUNTERPARTY' && transfer.direction === 'INCOMING'">
             {{ transfer.fromAccount.name }}
           </span>
           <router-link v-else :to="{ name: 'account-details', params: { id: transfer.fromAccount.id } }">
@@ -90,7 +90,7 @@ export default {
         <span class="small mx-3">Account:</span>
         <span>
           <i class="bi bi-person-bounding-box me-2"></i>
-          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'OUTGOING'">
+          <span v-if="transfer.type === 'CROSS_COUNTERPARTY' && transfer.direction === 'OUTGOING'">
             {{ transfer.toAccount.name }}
           </span>
           <router-link v-else :to="{ name: 'account-details', params: { id: transfer.toAccount.id } }">

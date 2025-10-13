@@ -70,7 +70,7 @@ export async function rejectInvoice(invoiceId) {
 
 export async function executeInvoice(invoiceId, payerAccountId) {
     return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/execute`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`

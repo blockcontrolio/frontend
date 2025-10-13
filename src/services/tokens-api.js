@@ -38,7 +38,7 @@ export async function createToken(payload) {
 }
 
 export async function mintToken(tokenId, payload) {
-    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/issue`, {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/mint`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ export async function mintToken(tokenId, payload) {
 }
 
 export async function burnToken(tokenId, payload) {
-    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/redeem`, {
+    return await fetch(`${apiBaseUrl}/tokens/${tokenId}/burn`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

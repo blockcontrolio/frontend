@@ -9,7 +9,7 @@ export default {
   data() {
     return {
       form: {
-        issuerAccountId: '',
+        minterAccountId: '',
         recipientAccountId: '',
         amount: 0
       },
@@ -54,8 +54,8 @@ export default {
         <div class="modal-body">
           <!-- Issuer Account -->
           <div class="mb-3">
-            <label class="form-label">Issuer Account</label>
-            <select v-model="form.issuerAccountId" class="form-select" required>
+            <label class="form-label">Minter Account</label>
+            <select v-model="form.minterAccountId" class="form-select" required>
               <option disabled value="">-- select issuer --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
                 {{ acc.name }}

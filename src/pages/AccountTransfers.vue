@@ -84,7 +84,7 @@ export default {
         <option value="">All Types</option>
         <option value="INTERNAL">INTERNAL</option>
         <option value="EXTERNAL">EXTERNAL</option>
-        <option value="CROSS">CROSS COUNTERPARTY</option>
+        <option value="CROSS_COUNTERPARTY">CROSS COUNTERPARTY</option>
       </select>
       <select v-model="filterDirection" class="form-select w-25" :disabled="!filterType || filterType === 'INTERNAL'">
         <option value="">Direction</option>
@@ -119,7 +119,7 @@ export default {
         </td>
         <!--from-->
         <td class="">
-          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'INCOMING'">
+          <span v-if="transfer.type === 'CROSS_COUNTERPARTY' && transfer.direction === 'INCOMING'">
             <i class="bi bi-building me-1"></i>
             {{ transfer.fromCounterparty.name }}
           </span>
@@ -133,7 +133,7 @@ export default {
         </td>
         <!--to-->
         <td class="">
-          <span v-if="transfer.type === 'CROSS' && transfer.direction === 'OUTGOING'">
+          <span v-if="transfer.type === 'CROSS_COUNTERPARTY' && transfer.direction === 'OUTGOING'">
             <i class="bi bi-building me-1"></i>
             {{ transfer.toCounterparty.name }}
           </span>

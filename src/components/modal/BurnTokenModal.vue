@@ -11,7 +11,7 @@ export default {
   data() {
     return {
       form: {
-        redemptionAccountId: '',
+        burnerAccountId: '',
         amount: 0
       },
       assetBalance: null,
@@ -61,16 +61,16 @@ export default {
         <div class="modal-body">
           <!-- Redemption Account -->
           <div class="mb-3">
-            <label class="form-label">Redemption Account</label>
-            <select v-model="form.redemptionAccountId" class="form-select" required
-                    v-on:change="this.fetchBalance(form.redemptionAccountId)">
+            <label class="form-label">Burner Account</label>
+            <select v-model="form.burnerAccountId" class="form-select" required
+                    v-on:change="this.fetchBalance(form.burnerAccountId)">
               <option disabled value="">-- select account --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
               </option>
             </select>
             <!-- acc balance preview -->
-            <div v-if="form.redemptionAccountId && assetBalance" class="mt-1 balance">
+            <div v-if="form.burnerAccountId && assetBalance" class="mt-1 balance">
               <span class="small label">Balance:</span> <span class="value">{{ formatAmount(assetBalance.amount) }} {{ assetBalance.asset.symbol }}</span>
             </div>
           </div>
