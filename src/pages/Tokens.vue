@@ -1,7 +1,7 @@
 <script>
 import {fetchAccounts} from "../services/accounts-api.js";
 import {createToken, fetchTokens} from "../services/tokens-api.js";
-import {fetchPartnerships} from "../services/partnership-api.js"
+import {fetchAcceptedPartnerships} from "../services/partnership-api.js"
 import {
   mintToken,
   burnToken,
@@ -60,7 +60,7 @@ export default {
         }],
       importForm: {
         rel: '',
-        selectedCP: {},
+        selectedCounterparty: {},
         address: ''
       },
       newToken: {
@@ -79,8 +79,9 @@ export default {
   mounted() {
     this.fetchAccounts();
     this.fetchTokens();
-    let selectedNetwork = useNetworkStore().selectedNetwork;
-    this.fetchAcceptedPartnerships(selectedNetwork?.id);
+    let networkId = useNetworkStore().selectedNetwork.id;
+    const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
+    this.fetchAcceptedPartnerships(networkId, loggedInCounterpartyId);
   },
   methods: {
     formatAmount,
@@ -93,12 +94,8 @@ export default {
     prepareImportForm() {
       this.showTokenForm = 'import';
     },
-    async fetchAcceptedPartnerships(networkId) {
-      const res = await fetchPartnerships(networkId);
-      const partnershipsRaw = await res.json();
-      this.partnerships = partnershipsRaw.filter(p => {
-        return p.status === 'ACCEPTED'
-      });
+    async fetchAcceptedPartnerships(networkId, counterpartyId) {
+      this.partnerships = await fetchAcceptedPartnerships(networkId, counterpartyId);
     },
     async fetchTokens() {
       const res = await fetchTokens();
@@ -269,9 +266,8 @@ export default {
       };
     },
     clearImportForm() {
-      this.importForm.rel = '';
-      this.importForm.selectedCP = {}
-      this.importForm.address = '';
+      this.importForm.selectedCounterparty = {}
+      this.importForm.address = "";
     }
   },
   computed: {
@@ -312,6 +308,7 @@ export default {
         <select
             v-model="importForm.rel"
             class="form-select mb-2 w-25"
+            v-on:change="this.clearImportForm()"
             required
         >
           <option disabled value="">-- import option --</option>
@@ -328,24 +325,24 @@ export default {
             @input=""
         />
 
-        <select v-if="importForm.rel === 'PS' && partnerships"
-            v-model="importForm.selectedCP"
+        <select v-if="importForm.rel === 'PS' && partnerships.length > 0"
+            v-model="importForm.selectedCounterparty"
             class="form-select mb-2 w-25"
             required
         >
           <option disabled value="">-- select counterparty --</option>
-          <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
-            {{ cp.counterpartyName }}
+          <option v-for="counterparty in partnerships" :key="counterparty.id" :value="counterparty">
+            {{ counterparty.name }}
           </option>
         </select>
 
-        <select v-if="importForm.rel === 'PS' && importForm.selectedCP?.availableAssets"
+        <select v-if="importForm.rel === 'PS' && importForm.selectedCounterparty"
             v-model="importForm.address"
             class="form-select mb-2 w-25"
             required
         >
           <option disabled value="">-- select token --</option>
-          <option v-for="token in importForm.selectedCP?.availableAssets" :key="token.id" :value="token.address">
+          <option v-for="token in importForm.selectedCounterparty?.availableAssets" :key="token.id" :value="token.address">
             {{ token.name }} ({{ token.symbol }})
           </option>
         </select>

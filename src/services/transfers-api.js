@@ -46,7 +46,7 @@ export async function sendInternalTransfer(data) {
 }
 
 export async function sendExternalWithdrawal(data) {
-    return await fetch(`${apiBaseUrl}/transfers/withdrawals`, {
+    return await fetch(`${apiBaseUrl}/transfers/external`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

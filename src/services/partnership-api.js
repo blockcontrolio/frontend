@@ -4,7 +4,7 @@ function loadAuthToken() {
     return localStorage.getItem('auth-token') || '';
 }
 
-export async function fetchPartnerships(networkId) {
+export async function fetchRawPartnerships(networkId) {
     return await fetch(`${apiBaseUrl}/partnerships?networkId=${networkId}`, {
         headers: {
             'Content-Type': 'application/json',
@@ -54,4 +54,33 @@ export async function rejectRequest(relationId) {
             'Authorization': `Bearer ${loadAuthToken()}`
         },
     });
+}
+
+export async function fetchAcceptedPartnerships(networkId, counterpartyId) {
+    const res = await fetchRawPartnerships(networkId);
+    const partnershipsRaw = await res.json();
+
+    return await partnershipsRaw
+        .filter(p => p.status === 'ACCEPTED')
+        .map(p => {
+            let partner = null;
+
+            if (p.sourceCounterparty?.id === counterpartyId) {
+                partner = p.targetCounterparty;
+            } else if (p.targetCounterparty?.id === counterpartyId) {
+                partner = p.sourceCounterparty;
+            }
+
+            if (partner) {
+                return {
+                    ...partner,
+                    availableAssets: p.availableAssets || [],
+                    partneredAssets: p.partneredAssets || [],
+                    targetAccounts: p.targetAccounts || []
+                };
+            }
+
+            return null;
+        })
+        .filter(Boolean);
 }
