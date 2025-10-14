@@ -27,7 +27,7 @@ export default {
         }],
       searchQuery: "",
       accounts: [],
-      form: {name: "", externalId: "", type: "", walletType: "", paymasterId: ""},
+      form: {name: "", type: "", walletType: ""}, // only required fields
       showCreateForm: false,
       errors: {
         name: ""
@@ -80,7 +80,7 @@ export default {
       };
     },
     clearForm() {
-      this.form = {externalId: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
+      this.form = {name: "", type: "", walletType: ""}; // clear inputs
     },
     validateName() {
       if (this.form.name.length < 4) {
