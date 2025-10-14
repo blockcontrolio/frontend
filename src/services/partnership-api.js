@@ -26,8 +26,8 @@ export async function requestPartnership(targetCounterpartyId) {
     });
 }
 
-export async function declinePartnership(relationId) {
-    return await fetch(`${apiBaseUrl}/partnerships/${relationId}`, {
+export async function declinePartnership(partnershipId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${partnershipId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -36,8 +36,8 @@ export async function declinePartnership(relationId) {
     });
 }
 
-export async function acceptRequest(relationId) {
-    return await fetch(`${apiBaseUrl}/partnerships/${relationId}/accept`, {
+export async function acceptRequest(partnershipId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${partnershipId}/accept`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -46,8 +46,8 @@ export async function acceptRequest(relationId) {
     });
 }
 
-export async function rejectRequest(relationId) {
-    return await fetch(`${apiBaseUrl}/partnerships/${relationId}/reject`, {
+export async function rejectRequest(partnershipId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${partnershipId}/reject`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

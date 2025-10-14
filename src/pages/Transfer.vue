@@ -417,7 +417,7 @@ export default {
                 required
         >
           <option disabled value="">-- select counterparty --</option>
-          <option v-for="counterparty in partnerships" :key="counterparty.partnershipId" :value="counterparty">
+          <option v-for="counterparty in partnerships" :key="counterparty.id" :value="counterparty">
             {{ counterparty.name }}
           </option>
         </select>

@@ -59,11 +59,11 @@ export default {
         }
       }
     },
-    async declinePartnership(relationId) {
-      const response = await declinePartnership(relationId);
+    async declinePartnership(partnershipId) {
+      const response = await declinePartnership(partnershipId);
       // mark as own request
       if (response.ok) {
-        const item = this.partnerships.find(p => p.id === relationId);
+        const item = this.partnerships.find(p => p.id === partnershipId);
         if (item) {
           item.id = null;
           item.status = null;
@@ -73,20 +73,20 @@ export default {
         }
       }
     },
-    async acceptRequest(relationId) {
-      const response = await acceptRequest(relationId);
+    async acceptRequest(partnershipId) {
+      const response = await acceptRequest(partnershipId);
       if (response.ok) {
-        const item = this.partnerships.find(p => p.id === relationId);
+        const item = this.partnerships.find(p => p.id === partnershipId);
         if (item) {
           item.status = 'ACCEPTED';
           item.actionRequired = false;
         }
       }
     },
-    async rejectRequest(relationId) {
-      const response = await rejectRequest(relationId);
+    async rejectRequest(partnershipId) {
+      const response = await rejectRequest(partnershipId);
       if (response.ok) {
-        const item = this.partnerships.find(p => p.id === relationId);
+        const item = this.partnerships.find(p => p.id === partnershipId);
         if (item) {
           item.status = 'REJECTED';
           item.actionRequired = false;

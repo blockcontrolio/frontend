@@ -215,7 +215,7 @@ export default {
                 v-on:change="this.selectPayerCounterparty(selectedPartnership)"
         >
           <option disabled value="">-- payer counterparty --</option>
-          <option v-for="partnership in partnerships" :key="partnership.partnershipId" :value="partnership">
+          <option v-for="partnership in partnerships" :key="partnership.id" :value="partnership">
             {{ partnership.name }}
           </option>
         </select>
