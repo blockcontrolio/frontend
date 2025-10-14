@@ -146,61 +146,35 @@ export default {
             <div class="col-3 text-end">
 
             <!-- action buttons -->
-            <div v-if="!p.status || p.status === 'PENDING'" class="">
-              <button
-                  v-if="p.hasRelation === false"
-                  class="btn btn-outline-primary btn-sm"
-                  @click="sendRequest(p.targetCounterparty.id)"
-              >
-                Request Partnership
-              </button>
-
-              <button
-                  v-else-if="p.ownPendingRequest"
-                  class="btn btn-outline-danger btn-sm"
-                  @click="declinePartnership(p.id)"
-              >
-                Decline Request
-              </button>
-
-              <div
-                  v-else-if="p.actionRequired"
-                  class="d-flex justify-content-end gap-2"
-              >
-                <button
-                    class="btn btn-outline-danger btn-sm"
-                    @click="rejectRequest(p.id)"
-                >
-                  Reject
-                </button>
-                <button
-                    class="btn btn-outline-success btn-sm"
-                    @click="acceptRequest(p.id)"
-                >
-                  Accept
-                </button>
+              <div v-if="!p.status || p.hasRelation === false" class="">
+                <button class="btn btn-outline-primary btn-sm" @click="sendRequest(p.targetCounterparty.id)">Request Partnership</button>
               </div>
-            </div>
-
-            <!-- when status final -->
-            <div v-else class="small">
-              <div v-if="p.status === 'ACCEPTED'" class="label">
-                Operational Accounts Availability:
-                <span class="value me-1">
+              <div v-else-if="p.ownPendingRequest">
+                <button class="btn btn-outline-danger btn-sm" @click="declinePartnership(p.id)">Decline Request</button>
+              </div>
+              <div v-else-if="p.actionRequired" class="d-flex justify-content-end gap-2">
+                <button class="btn btn-outline-danger btn-sm" @click="rejectRequest(p.id)">Reject</button>
+                <button class="btn btn-outline-success btn-sm" @click="acceptRequest(p.id)">Accept</button>
+              </div>
+              <!-- when status final -->
+              <div v-else-if="p.status === 'ACCEPTED' || p.status === 'REJECTED'" class="small">
+                <div v-if="p.status === 'ACCEPTED'" class="label">
+                  Operational Accounts Availability:
+                  <span class="value me-1">
                   {{ p.targetAccounts.length }}
+                  </span>
+                  <i v-if="p.targetAccounts?.length > 0" class="bi bi-check2-circle text-success bold"></i>
+                  <i v-else class="bi bi-ban text-danger bold"></i>
+                </div>
+                <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
+                  <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
+                  <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
                 </span>
-                <i v-if="p.targetAccounts?.length > 0" class="bi bi-check2-circle text-success bold"></i>
-                <i v-else class="bi bi-ban text-danger bold"></i>
+                <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
+                  <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
+                  <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
+                </span>
               </div>
-              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
-                <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
-                <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
-              </span>
-              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
-                <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
-                <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
-              </span>
-            </div>
             </div>
 
           </div>
