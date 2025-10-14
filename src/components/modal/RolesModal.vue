@@ -1,7 +1,13 @@
 <script>
 export default {
   props: {
-    modalType: String,
+    modalType: {
+      type: String,
+      required: true,
+      validator(value) {
+        return ['grant', 'revoke'].includes(value);
+      },
+    },
     accounts: Array,
     tokenId: String
   },
@@ -10,7 +16,7 @@ export default {
       roles: ['ADMIN', 'MINTER', 'PAUSER', 'BURNER', 'CUSTODIAN', 'LIMITER'],
       form: {
         adminAccountId: '',
-        userAccountId: '',
+        targetAccountId: '',
         role: ''
       }
     };
@@ -22,9 +28,14 @@ export default {
     adminAccounts() {
       return this.accounts.filter(acc => acc.type === 'ADMIN')
     },
-    userAccounts() {
-      const excluded = ['ADMIN', 'CLIENT', 'DISTRIBUTOR'];
-      return this.accounts.filter(acc => !excluded.includes(acc.type));
+    targetAccounts() {
+      if (this.modalType === 'grant') {
+        const excludedFromGrant = ['CLIENT', 'DISTRIBUTOR'];
+        return this.accounts.filter(acc => !excludedFromGrant.includes(acc.type));
+      } else if (this.modalType === 'revoke') {
+        const excludedFromRevoke = ['ADMIN', 'CLIENT', 'DISTRIBUTOR'];
+        return this.accounts.filter(acc => !excludedFromRevoke.includes(acc.type));
+      }
     },
     rolesByType() {
       let selectedAccount = this.accounts.find(acc => acc.id === this.form.userAccountId);
@@ -55,7 +66,6 @@ export default {
       <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">{{ name }} Role</h5>
-          <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
           <!-- Admin Account -->
@@ -71,9 +81,9 @@ export default {
           <!-- User Account -->
           <div class="mb-3">
             <label class="form-label">User Account</label>
-            <select v-model="form.userAccountId" class="form-select" required>
+            <select v-model="form.targetAccountId" class="form-select" required>
               <option disabled value="">-- select user --</option>
-              <option v-for="acc in userAccounts" :key="acc.id" :value="acc.id">
+              <option v-for="acc in targetAccounts" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
               </option>
             </select>
