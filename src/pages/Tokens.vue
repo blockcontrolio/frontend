@@ -76,18 +76,21 @@ export default {
   },
   methods: {
     formatAmount,
-    isOwnToken(token) {
-      if (token.issuerCounterparty) {
-        return useCounterpartyStore().counterparty.id === token.issuerCounterparty?.id;
-      }
-      return false;
-    },
     async fetchAcceptedPartnerships(networkId, counterpartyId) {
       this.partnerships = await fetchAcceptedPartnerships(networkId, counterpartyId);
     },
     async fetchTokens() {
       const res = await fetchTokens();
-      this.tokens = await res.json();
+      const json = await res.json();
+
+      const counterpartyId = useCounterpartyStore().counterparty.id;
+
+      this.tokens = json.map(token => ({
+        ...token,
+        isOwnToken: token.issuerCounterparty
+            ? token.issuerCounterparty.id === counterpartyId
+            : false
+      }));
     },
     async fetchAccounts() {
       const res = await fetchAccounts();
@@ -317,7 +320,7 @@ export default {
                   <span class="me-2">{{ token.name }}</span><span class="">({{ token.symbol }})</span>
                 </div>
               </div>
-              <div v-if="isOwnToken(token)" class="mb-1">
+              <div v-if="token.isOwnToken" class="mb-1">
                 <span class="label text-secondary me-2">Total Supply:</span>
                 <span>{{ formatAmount(token?.totalSupply) }}</span>
               </div>
@@ -328,7 +331,7 @@ export default {
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
             <!-- Token Operations -->
-            <div v-if="isOwnToken(token)" class="d-flex gap-2">
+            <div v-if="token.isOwnToken" class="d-flex gap-2">
               <!--roles dropdown-->
               <div class="dropdown ms-auto">
                 <button
