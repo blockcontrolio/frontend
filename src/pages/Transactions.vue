@@ -1,6 +1,6 @@
 <script>
 import {fetchTransactions} from "../services/transactions-api.js";
-import {formatDate} from "../js/utils.js";
+import {formatTimestamp} from "../js/utils.js";
 import TxDetailsLink from "../components/links/TxDetailsLink.vue";
 
 export default {
@@ -18,7 +18,7 @@ export default {
       const res = await fetchTransactions();
       this.transactions = await res.json();
     },
-    formatDate,
+    formatTimestamp,
   }
 };
 </script>
@@ -55,7 +55,7 @@ export default {
             </span>
           </td>
           <td>
-            <span class="mono">{{ tx.from }}</span>
+            <span class="mono">{{ tx.fromAddress }}</span>
           </td>
           <td>
             <span class="status" :class="[tx.status === 'CONFIRMED' ? 'text-success' : 'text-secondary']">
@@ -66,7 +66,7 @@ export default {
             <span class="mono">{{ tx.value }}</span>
           </td>
           <td>
-            <small class="text-muted">{{ formatDate(tx.createdAt) }}</small>
+            <small class="text-muted">{{ formatTimestamp(tx.createdAt) }}</small>
           </td>
         </tr>
         </tbody>

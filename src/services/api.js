@@ -39,7 +39,7 @@ export async function addUser(userRequest) {
 export async function assignPermission(user, permission) {
     const userId = user.email;
     return await fetch(`${apiBaseUrl}/users/${userId}/permissions`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`

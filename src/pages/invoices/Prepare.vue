@@ -5,7 +5,7 @@ import {prepareCrossCounterpartyInvoice} from '../../services/invoices-api.js'
 import InfoToast from "../../components/toast/InfoToast.vue";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
 import AmountInput from "../../components/transfer/AmountInput.vue";
-import {fetchPartnerships} from "../../services/partnership-api.js";
+import {fetchAcceptedPartnerships} from "../../services/partnership-api.js";
 import {useNetworkStore} from "../../js/stores/networkStore.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
 import {copyToClipboard, isClipboardSupported} from "../../js/clipboard.js";
@@ -36,7 +36,7 @@ export default {
         to: "",
         amount: ""
       },
-      selectedAsset: null,
+      selectedAssetBalance: null,
       messageSuccess: '',
       messageError: null,
       selectedTokenInfo: null,
@@ -71,15 +71,11 @@ export default {
       this.accounts = await res.json();
     },
     async fetchAcceptedPartnerships() {
-      let selectedNetwork = useNetworkStore().selectedNetwork;
-      let networkId = selectedNetwork?.id;
-      if ([networkId].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('Network Id undefined or empty.');
-      }
-      const res = await fetchPartnerships(networkId);
-      const partnershipsRaw = await res.json();
-      this.partnerships = partnershipsRaw.filter(p => {
-        return p.status === 'ACCEPTED' && this.hasCrossUsedTokens(p);
+      let networkId = useNetworkStore().selectedNetwork?.id;
+      const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
+      const res = await fetchAcceptedPartnerships(networkId, loggedInCounterpartyId);
+      this.partnerships = res.filter(p => {
+        return this.hasCrossUsedTokens(p);
       });
     },
     async fetchBalances(accountId) {
@@ -90,22 +86,16 @@ export default {
       return partnership.partneredAssets?.length > 0;
     },
     selectPayerCounterparty() {
-      const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
-
-      const {targetCounterpartyId, sourceCounterpartyId} = this.selectedPartnership;
-      this.invoice.payerCounterpartyId = [targetCounterpartyId, sourceCounterpartyId]
-          .find(id => id !== loggedInCounterpartyId);
+      this.invoice.payerCounterpartyId = this.selectedPartnership.id;
     },
     showBalance(assetId) {
-      this.selectedAsset = this.accountBalances
-          .find(b => b.id === assetId)
-      console.log("Selected asset: ", this.selectedAsset.symbol)
+      this.selectedAssetBalance = this.accountBalances
+          .find(b => b.asset.id === assetId)
       this.selectedToken(assetId)
     },
     selectedToken(assetId) {
       this.selectedTokenInfo = this.tokens
           .find(t => t.id === assetId);
-      console.log("Selected token info: ", this.selectedTokenInfo.id)
     },
     validateAmount() {
       let amount = this.invoice.amount;
@@ -152,7 +142,7 @@ export default {
     },
     async handleSuccess(response) {
       this.transfer = await response.json();
-      this.messageSuccess = `You have prepared invoice to receive ${this.invoice.amount} ${this.selectedAsset?.name} (${this.selectedAsset?.symbol})`;
+      this.messageSuccess = `You have prepared invoice to receive ${this.invoice.amount} ${this.selectedAssetBalance?.asset.name} (${this.selectedAssetBalance?.asset.symbol})`;
     },
     handleUnknownError(err) {
       console.error(err)
@@ -225,8 +215,8 @@ export default {
                 v-on:change="this.selectPayerCounterparty(selectedPartnership)"
         >
           <option disabled value="">-- payer counterparty --</option>
-          <option v-for="partnership in partnerships" :key="partnership.relationId" :value="partnership">
-            {{ partnership.counterpartyName }}
+          <option v-for="partnership in partnerships" :key="partnership.id" :value="partnership">
+            {{ partnership.name }}
           </option>
         </select>
       </div>
@@ -235,7 +225,7 @@ export default {
       <AccountSelector
           v-model="invoice.receiverAccountId"
           :accounts="receivingAccounts"
-          :selected-asset="selectedAsset"
+          :balance="selectedAssetBalance"
           @change="val => { fetchBalances(val); invoice.assetId = '' }"
           :placeholder="'-- receiving account --'"
           :label="'To Receiving Account'"
@@ -258,7 +248,6 @@ export default {
       <AmountInput
           v-model="invoice.amount"
           :placeholder="'Amount to receive'"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />

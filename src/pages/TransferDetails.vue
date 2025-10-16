@@ -1,6 +1,6 @@
 <script>
 import {fetchTransferDetails} from "../services/transfers-api.js";
-import {formatAmount, formatDate} from "../js/utils.js";
+import {formatAmount, formatTimestamp} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 
@@ -28,7 +28,7 @@ export default {
       const res = await fetchTransferDetails(id);
       this.transfer = await res.json();
     },
-    formatDate,
+    formatTimestamp,
     goBack() {
       this.$router.push('/transfers');
     },
@@ -53,7 +53,7 @@ export default {
       <div class="tx-line my-1">
         <span class="">Type:</span>
         <span class="value">
-            {{ transfer.transferType }}
+            {{ transfer.type }}
           </span>
       </div>
       <!-- from -->
@@ -67,7 +67,7 @@ export default {
         <span class="small mx-3">From:</span>
         <span>
           <i class="bi bi-person-bounding-box me-2"></i>
-          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'INCOMING'">
+          <span v-if="transfer.type === 'CROSS_COUNTERPARTY' && transfer.direction === 'INCOMING'">
             {{ transfer.fromAccount.name }}
           </span>
           <router-link v-else :to="{ name: 'account-details', params: { id: transfer.fromAccount.id } }">
@@ -75,7 +75,7 @@ export default {
           </router-link>
         </span>
       </div>
-      <div class="tx-line my-1" v-if="transfer.transferType === 'EXTERNAL' && transfer.direction === 'INCOMING' && transfer.fromAddress">
+      <div class="tx-line my-1" v-if="transfer.type === 'EXTERNAL' && transfer.direction === 'INCOMING' && transfer.fromAddress">
         <span class="small mx-3">Address:</span>
         <addr-scan-link :type="'account'" :address="transfer.fromAddress"></addr-scan-link>
       </div>
@@ -90,7 +90,7 @@ export default {
         <span class="small mx-3">Account:</span>
         <span>
           <i class="bi bi-person-bounding-box me-2"></i>
-          <span v-if="transfer.transferType === 'CROSS' && transfer.direction === 'OUTGOING'">
+          <span v-if="transfer.type === 'CROSS_COUNTERPARTY' && transfer.direction === 'OUTGOING'">
             {{ transfer.toAccount.name }}
           </span>
           <router-link v-else :to="{ name: 'account-details', params: { id: transfer.toAccount.id } }">
@@ -98,7 +98,7 @@ export default {
           </router-link>
         </span>
       </div>
-      <div class="tx-line my-1" v-if="transfer.transferType === 'EXTERNAL' && transfer.direction === 'OUTGOING' && transfer.toAddress">
+      <div class="tx-line my-1" v-if="transfer.type === 'EXTERNAL' && transfer.direction === 'OUTGOING' && transfer.toAddress">
         <span class="small mx-3">Address:</span>
         <addr-scan-link :type="'account'" :address="transfer.toAddress"></addr-scan-link>
       </div>
@@ -115,11 +115,11 @@ export default {
       </div>
       <div class="tx-line my-1">
         <span class="">Create Time:</span>
-        <small class="mono text-muted">{{ formatDate(transfer.createdAt) }}</small>
+        <small class="mono text-muted">{{ formatTimestamp(transfer.createdAt) }}</small>
       </div>
-      <div v-if="transfer.txHash" class="tx-line my-1">
+      <div v-if="transfer.transactionHash" class="tx-line my-1">
         <span class="">Hash:</span>
-        <tx-scan-link :hash="transfer.txHash"></tx-scan-link>
+        <tx-scan-link :hash="transfer.transactionHash"></tx-scan-link>
       </div>
 
     </div>

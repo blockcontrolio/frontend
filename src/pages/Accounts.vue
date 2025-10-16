@@ -1,7 +1,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {createAccount, fetchAccounts} from '../services/accounts-api.js'
-import {formatDate} from "../js/utils.js";
+import {formatTimestamp} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
@@ -27,7 +27,7 @@ export default {
         }],
       searchQuery: "",
       accounts: [],
-      form: {name: "", externalId: "", type: "", walletType: "", paymasterId: ""},
+      form: {name: "", type: "", walletType: ""}, // only required fields
       showCreateForm: false,
       errors: {
         name: ""
@@ -37,7 +37,7 @@ export default {
     }
   },
   methods: {
-    formatDate,
+    formatTimestamp,
     async fetchAccounts() {
       let res = await fetchAccounts();
       this.accounts = await res.json();
@@ -80,7 +80,7 @@ export default {
       };
     },
     clearForm() {
-      this.form = {externalId: "", name: "", type: "", walletType: "", paymasterId: ""}; // clear inputs
+      this.form = {name: "", type: "", walletType: ""}; // clear inputs
     },
     validateName() {
       if (this.form.name.length < 4) {
@@ -241,9 +241,8 @@ export default {
             <div v-if="acc.paymasterId">Master Account: {{ findMasterAccName(acc.paymasterId) }}</div>
           </td>
           <td>
-            <router-link v-if="acc.transfersTotal" :to="{ name: 'account-transfers', params: { accountId: acc.id } }"
-                         class="">
-              Transfers ({{ acc.transfersTotal }})
+            <router-link :to="{ name: 'account-transfers', params: { accountId: acc.id } }">
+              Transfers
             </router-link>
           </td>
         </tr>

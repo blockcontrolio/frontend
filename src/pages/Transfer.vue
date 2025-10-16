@@ -6,11 +6,11 @@ import {
   sendExternalWithdrawal,
   sendCrossCounterparty
 } from '../services/transfers-api.js'
-import {fetchPartnerships} from "../services/partnership-api.js";
+import {fetchAcceptedPartnerships} from "../services/partnership-api.js";
 import {formatAmount} from "../js/utils.js";
 import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
-import FromAccountSelector from "../components/transfer/AccountSelector.vue";
+import AccountSelector from "../components/transfer/AccountSelector.vue";
 import AmountInput from "../components/transfer/AmountInput.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import Pending from "./invoices/Pending.vue";
@@ -20,7 +20,7 @@ export default {
   components: {
     Pending,
     AmountInput,
-    FromAccountSelector,
+    AccountSelector,
     TxToast,
     ErrorToast
   },
@@ -55,7 +55,7 @@ export default {
       },
       transferSuccess: null,
       transferError: null,
-      accountBalances: [],
+      assetBalances: [],
       selectedAsset: null,
       selectedTokenInfo: null,
       selectedPartnership: {}
@@ -86,33 +86,27 @@ export default {
     },
     async fetchBalances(accountId) {
       let res = await fetchAssetBalances(accountId);
-      this.accountBalances = await res.json();
+      this.assetBalances = await res.json();
     },
     async fetchAcceptedPartnerships() {
-      let selectedNetwork = useNetworkStore().selectedNetwork;
-      let networkId = selectedNetwork?.id;
-      if ([networkId].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('Network Id undefined or empty.');
-      }
-      const res = await fetchPartnerships(networkId);
-      const partnershipsRaw = await res.json();
-      this.partnerships = partnershipsRaw.filter(p => {
-        return p.status === 'ACCEPTED' && this.hasCrossUsedTokens(p);
+      let networkId = useNetworkStore().selectedNetwork.id;
+      const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
+      const res = await fetchAcceptedPartnerships(networkId, loggedInCounterpartyId);
+      this.partnerships = res.filter(p => {
+        return this.hasCrossUsedTokens(p);
       });
     },
     hasCrossUsedTokens(partnership) {
       return partnership.partneredAssets?.length > 0;
     },
     showBalance(assetId) {
-      this.selectedAsset = this.accountBalances
-          .find(b => b.id === assetId)
-      console.log("Selected asset: ", this.selectedAsset.symbol)
+      this.selectedAsset = this.assetBalances
+          .find(b => b.asset.id === assetId)
       this.selectedToken(assetId)
     },
     selectedToken(assetId) {
       this.selectedTokenInfo = this.tokens
           .find(t => t.id === assetId);
-      console.log("Selected token info: ", this.selectedTokenInfo.id)
     },
     validateToAddress() {
       const hexRegex = /^0x[a-fA-F0-9]{6,}$/;
@@ -200,10 +194,6 @@ export default {
         return;
       }
       try {
-        const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
-        const {targetCounterpartyId, sourceCounterpartyId} = this.selectedPartnership;
-        this.crossCp.toCounterpartyId = [targetCounterpartyId, sourceCounterpartyId]
-            .find(id => id !== loggedInCounterpartyId);
         const response = await sendCrossCounterparty(this.crossCp)
         if (!response.ok) {
           const err = await response.json();
@@ -220,7 +210,7 @@ export default {
     resetSelection() {
       this.selectedTokenInfo = null;
       this.selectedAsset = null;
-      this.accountBalances = [];
+      this.assetBalances = [];
       this.internal = {from: "", assetId: "", to: "", amount: null}
       this.transfer = {fromAccountId: "", assetId: "", to: "", amount: null}
       this.crossCp = {fromAccountId: "", assetId: "", toCounterpartyId: "", amount: null, toAccountId: ""}
@@ -274,7 +264,7 @@ export default {
         <input class="form-check-input border-primary" type="radio" id="cpRadio" value="cross_counterparty"
                v-on:change="this.resetSelection(); this.resetError(); this.fetchAcceptedPartnerships()"
                v-model="selectedForm"/>
-        <label class="form-check-label fw-bold" for="cpRadio">Cross Partnership</label>
+        <label class="form-check-label fw-bold" for="cpRadio">Cross Counterparty</label>
       </div>
       <div class="form-check form-check-inline me-3">
         <input class="form-check-input border-primary" type="radio" id="invoicesRadio" value="invoices"
@@ -289,10 +279,10 @@ export default {
       <h3 class="mb-4 text-center">Transfer between Accounts</h3>
 
       <!-- Source Account -->
-      <FromAccountSelector
+      <AccountSelector
           v-model="internal.fromAccountId"
           :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT' || item.type === 'DISTRIBUTOR')"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); internal.assetId = '' }"
       />
 
@@ -306,11 +296,11 @@ export default {
         >
           <option disabled value="">-- select asset --</option>
           <option
-              v-for="token in this.accountBalances"
-              :key="token.id"
-              :value="token.id"
+              v-for="balance in this.assetBalances"
+              :key="balance.asset.id"
+              :value="balance.asset.id"
           >
-            {{ token.name }} ({{ token.symbol }})
+            {{ balance.asset.name }} ({{ balance.asset.symbol }})
           </option>
         </select>
         <!-- token details preview -->
@@ -335,7 +325,6 @@ export default {
 
       <AmountInput
           v-model="internal.amount"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />
@@ -350,10 +339,10 @@ export default {
     <form @submit.prevent="submitExternalWithdrawal" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Withdraw to external Address</h3>
 
-      <FromAccountSelector
+      <AccountSelector
           v-model="transfer.fromAccountId"
           :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT')"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); transfer.assetId = '' }"
       />
 
@@ -367,11 +356,11 @@ export default {
         >
           <option disabled value="">-- select asset --</option>
           <option
-              v-for="token in this.accountBalances"
-              :key="token.id"
-              :value="token.id"
+              v-for="balance in this.assetBalances"
+              :key="balance.asset.id"
+              :value="balance.asset.id"
           >
-            {{ token.name }} ({{ token.symbol }})
+            {{ balance.asset.name }} ({{ balance.asset.symbol }})
           </option>
         </select>
         <!-- token details preview -->
@@ -396,7 +385,6 @@ export default {
 
       <AmountInput
           v-model="transfer.amount"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />
@@ -411,10 +399,10 @@ export default {
     <form @submit.prevent="submitCrossCounterparty" class="transfer-form card p-3 border rounded">
       <h3 class="mb-4 text-center">Cross-Counterparty Transfer</h3>
 
-      <FromAccountSelector
+      <AccountSelector
           v-model="crossCp.fromAccountId"
           :accounts="accounts.filter((item) => item.type === 'ADMIN' || item.type === 'CLIENT' || item.type === 'DISTRIBUTOR')"
-          :selected-asset="selectedAsset"
+          :balance="selectedAsset"
           @change="val => { fetchBalances(val); crossCp.assetId = '' }"
       />
 
@@ -424,11 +412,13 @@ export default {
 
         <select v-if="partnerships"
                 v-model="selectedPartnership"
-                class="form-select" required
+                class="form-select"
+                v-on:change="this.crossCp.toCounterpartyId = selectedPartnership.id;"
+                required
         >
           <option disabled value="">-- select counterparty --</option>
-          <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
-            {{ cp.counterpartyName }}
+          <option v-for="counterparty in partnerships" :key="counterparty.id" :value="counterparty">
+            {{ counterparty.name }}
           </option>
         </select>
       </div>
@@ -462,7 +452,6 @@ export default {
 
       <AmountInput
           v-model="crossCp.amount"
-          :selected-asset="selectedAsset"
           :validate="validateAmount"
           :error-message="errors.amount"
       />

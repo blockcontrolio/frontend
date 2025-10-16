@@ -9,7 +9,7 @@ export default {
   data() {
     return {
       form: {
-        issuerAccountId: '',
+        minterAccountId: '',
         recipientAccountId: '',
         amount: 0
       },
@@ -49,13 +49,12 @@ export default {
       <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">Mint Token</h5>
-          <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
           <!-- Issuer Account -->
           <div class="mb-3">
-            <label class="form-label">Issuer Account</label>
-            <select v-model="form.issuerAccountId" class="form-select" required>
+            <label class="form-label">Minter Account</label>
+            <select v-model="form.minterAccountId" class="form-select" required>
               <option disabled value="">-- select issuer --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
@@ -75,12 +74,10 @@ export default {
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount</label>
-            <input type="number" class="form-control no-spinner"
+            <input type="text" class="form-control no-spinner"
                    v-model.number="form.amount"
                    inputmode="numeric"
-                   pattern="\d*"
-                   min="0"
-                   step="1"
+                   pattern="^\d*\.?\d+$"
                    @input="validateAmount"
                    required/>
           </div>

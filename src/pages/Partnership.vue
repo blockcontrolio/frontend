@@ -2,13 +2,13 @@
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 import {
-  fetchPartnerships,
+  fetchRawPartnerships,
   requestPartnership,
   acceptRequest,
   rejectRequest,
   declinePartnership
 } from "../services/partnership-api.js";
-import {formatDate} from "../js/utils.js";
+import {formatTimestamp} from "../js/utils.js";
 
 export default {
   setup() {
@@ -22,7 +22,7 @@ export default {
     }
   },
   methods: {
-    formatDate,
+    formatTimestamp,
     statusColor(status) {
       switch (status) {
         case 'ACCEPTED':
@@ -33,15 +33,15 @@ export default {
           return 'text-warning';
       }
     },
-    async fetchPartnerships(networkId) {
-      const res = await fetchPartnerships(networkId);
+    async fetchRawPartnerships(networkId) {
+      const res = await fetchRawPartnerships(networkId);
       const partnershipsRaw = await res.json();
       const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
       this.partnerships = partnershipsRaw.map(p => ({
         ...p,
         hasRelation: p.id !== null,
-        ownPendingRequest: p.sourceCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING',
-        actionRequired: p.targetCounterpartyId === loggedInCounterpartyId && p.status === 'PENDING'
+        ownPendingRequest: p.status === 'PENDING' && p.sourceCounterparty.id === loggedInCounterpartyId,
+        actionRequired: p.status === 'PENDING' && p.targetCounterparty.id === loggedInCounterpartyId
       }));
     },
     async sendRequest(targetCounterpartyId) {
@@ -49,7 +49,7 @@ export default {
       // mark as own request
       if (response.ok) {
         const partnershipRaw = await response.json();
-        const item = this.partnerships.find(p => p.targetCounterpartyId === targetCounterpartyId);
+        const item = this.partnerships.find(p => p.targetCounterparty.id === targetCounterpartyId);
         if (item) {
           item.id = partnershipRaw.id;
           item.status = partnershipRaw.status;
@@ -59,11 +59,11 @@ export default {
         }
       }
     },
-    async declinePartnership(relationId) {
-      const response = await declinePartnership(relationId);
+    async declinePartnership(partnershipId) {
+      const response = await declinePartnership(partnershipId);
       // mark as own request
       if (response.ok) {
-        const item = this.partnerships.find(p => p.id === relationId);
+        const item = this.partnerships.find(p => p.id === partnershipId);
         if (item) {
           item.id = null;
           item.status = null;
@@ -73,20 +73,20 @@ export default {
         }
       }
     },
-    async acceptRequest(relationId) {
-      const response = await acceptRequest(relationId);
+    async acceptRequest(partnershipId) {
+      const response = await acceptRequest(partnershipId);
       if (response.ok) {
-        const item = this.partnerships.find(p => p.id === relationId);
+        const item = this.partnerships.find(p => p.id === partnershipId);
         if (item) {
           item.status = 'ACCEPTED';
           item.actionRequired = false;
         }
       }
     },
-    async rejectRequest(relationId) {
-      const response = await rejectRequest(relationId);
+    async rejectRequest(partnershipId) {
+      const response = await rejectRequest(partnershipId);
       if (response.ok) {
-        const item = this.partnerships.find(p => p.id === relationId);
+        const item = this.partnerships.find(p => p.id === partnershipId);
         if (item) {
           item.status = 'REJECTED';
           item.actionRequired = false;
@@ -96,7 +96,7 @@ export default {
   },
   mounted() {
     let selectedNetwork = useNetworkStore().selectedNetwork;
-    this.fetchPartnerships(selectedNetwork?.id);
+    this.fetchRawPartnerships(selectedNetwork?.id);
   }
 }
 </script>
@@ -108,7 +108,7 @@ export default {
     <div class="row g-3">
       <div
           v-for="p in partnerships"
-          :key="p.targetCounterpartyId"
+          :key="p.targetCounterparty.id"
           class="col-12"
       >
         <div class="card border p-3">
@@ -116,7 +116,12 @@ export default {
 
             <!-- Counterparty Name -->
             <div class="col-4 text-start">
-              <strong class="text-secondary">{{ p.counterpartyName }}</strong>
+              <span v-if="p.sourceCounterparty">
+                <span class="bold me-2">From:</span>
+                <span class="text-secondary">{{ p.sourceCounterparty.name }}</span><br>
+              </span>
+              <span class="bold me-2" v-if="p.sourceCounterparty">To: </span>
+              <span class="text-secondary">{{ p.targetCounterparty.name }}</span>
             </div>
 
             <!-- Mid column -->
@@ -132,7 +137,7 @@ export default {
               <div v-if="p.status === 'PENDING'" class="small">
               <span v-if="p.status === 'PENDING'" class="">
                 <small :class="statusColor(p.status)" class="me-2">Requested:</small>
-                <small class="text-muted">{{ formatDate(p.requestedAt) }}</small>
+                <small class="text-muted">{{ formatTimestamp(p.requestedAt) }}</small>
               </span>
               </div>
             </div>
@@ -141,61 +146,35 @@ export default {
             <div class="col-3 text-end">
 
             <!-- action buttons -->
-            <div v-if="!p.status || p.status === 'PENDING'" class="">
-              <button
-                  v-if="p.hasRelation === false"
-                  class="btn btn-outline-primary btn-sm"
-                  @click="sendRequest(p.targetCounterpartyId)"
-              >
-                Request Partnership
-              </button>
-
-              <button
-                  v-else-if="p.ownPendingRequest"
-                  class="btn btn-outline-danger btn-sm"
-                  @click="declinePartnership(p.id)"
-              >
-                Decline Request
-              </button>
-
-              <div
-                  v-else-if="p.actionRequired"
-                  class="d-flex justify-content-end gap-2"
-              >
-                <button
-                    class="btn btn-outline-danger btn-sm"
-                    @click="rejectRequest(p.id)"
-                >
-                  Reject
-                </button>
-                <button
-                    class="btn btn-outline-success btn-sm"
-                    @click="acceptRequest(p.id)"
-                >
-                  Accept
-                </button>
+              <div v-if="!p.status || p.hasRelation === false" class="">
+                <button class="btn btn-outline-primary btn-sm" @click="sendRequest(p.targetCounterparty.id)">Request Partnership</button>
               </div>
-            </div>
-
-            <!-- when status final -->
-            <div v-else class="small">
-              <div v-if="p.status === 'ACCEPTED'" class="label">
-                Operational Accounts Availability:
-                <span class="value me-1">
+              <div v-else-if="p.ownPendingRequest">
+                <button class="btn btn-outline-danger btn-sm" @click="declinePartnership(p.id)">Decline Request</button>
+              </div>
+              <div v-else-if="p.actionRequired" class="d-flex justify-content-end gap-2">
+                <button class="btn btn-outline-danger btn-sm" @click="rejectRequest(p.id)">Reject</button>
+                <button class="btn btn-outline-success btn-sm" @click="acceptRequest(p.id)">Accept</button>
+              </div>
+              <!-- when status final -->
+              <div v-else-if="p.status === 'ACCEPTED' || p.status === 'REJECTED'" class="small">
+                <div v-if="p.status === 'ACCEPTED'" class="label">
+                  Operational Accounts Availability:
+                  <span class="value me-1">
                   {{ p.targetAccounts.length }}
+                  </span>
+                  <i v-if="p.targetAccounts?.length > 0" class="bi bi-check2-circle text-success bold"></i>
+                  <i v-else class="bi bi-ban text-danger bold"></i>
+                </div>
+                <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
+                  <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
+                  <small class="text-muted">{{ formatTimestamp(p.resolvedAt) }}</small>
                 </span>
-                <i v-if="p.targetAccounts?.length > 0" class="bi bi-check2-circle text-success bold"></i>
-                <i v-else class="bi bi-ban text-danger bold"></i>
+                <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
+                  <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
+                  <small class="text-muted">{{ formatTimestamp(p.resolvedAt) }}</small>
+                </span>
               </div>
-              <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
-                <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
-                <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
-              </span>
-              <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
-                <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
-                <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
-              </span>
-            </div>
             </div>
 
           </div>

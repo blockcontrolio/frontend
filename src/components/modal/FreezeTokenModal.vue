@@ -55,7 +55,6 @@ export default {
       <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">Freeze Token</h5>
-          <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
           <!-- Freezer Account -->
@@ -86,12 +85,10 @@ export default {
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount to freeze</label>
-            <input type="number" class="form-control no-spinner"
+            <input type="text" class="form-control no-spinner"
                    v-model.number="this.form.amount"
                    inputmode="numeric"
-                   pattern="\d*"
-                   min="0"
-                   step="1"
+                   pattern="^\d*\.?\d+$"
                    @input="validateAmount"
                    required/>
           </div>

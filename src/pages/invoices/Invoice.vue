@@ -2,10 +2,11 @@
 import {fetchAccounts, fetchAssetBalances} from "../../services/accounts-api.js";
 import {fetchInvoice, cancelInvoice, executeInvoice, rejectInvoice} from "../../services/invoices-api.js";
 import AccountSelector from "../../components/transfer/AccountSelector.vue";
-import {formatDate} from "../../js/utils.js";
+import {formatTimestamp} from "../../js/utils.js";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
 import TxToast from "../../components/toast/SuccessToast.vue";
 import InfoToast from "../../components/toast/InfoToast.vue";
+import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
 
 export default {
   name: "PayInvoice",
@@ -19,7 +20,6 @@ export default {
         receiverAccount: {},
         asset: {},
         amount: null,
-        isPayer: false,
         status: ''
       },
       accounts: [],
@@ -36,7 +36,10 @@ export default {
     this.fetchAccounts();
   },
   methods: {
-    formatDate,
+    formatTimestamp,
+    isPayer(invoice) {
+      return useCounterpartyStore().counterparty.id === invoice.payerCounterparty.id
+    },
     goBack() {
       if (window.history.length > 1) {
         this.$router.back();
@@ -55,8 +58,7 @@ export default {
     async showBalance(accountId, assetId) {
       const balances = await this.fetchBalances(accountId);
       this.selectedAsset = balances
-          .find(b => b.id === assetId)
-      console.log("Selected asset: ", this.selectedAsset?.symbol)
+          .find(b => b.asset.id === assetId)
     },
     async fetchBalances(accountId) {
       let res = await fetchAssetBalances(accountId);
@@ -108,9 +110,9 @@ export default {
       }
     },
     async handleSuccess(response) {
-      let txData = await response.json();
-      let message = `${txData.asset.amount} ${txData.asset.name} (${txData.asset.symbol}) has been transferred`
-      this.transferSuccess = {hash: txData.txHash, message};
+      let transferData = await response.json();
+      let message = `${transferData.asset.amount} ${transferData.asset.name} (${transferData.asset.symbol}) has been transferred`
+      this.transferSuccess = {hash: transferData.transactionHash, message};
     },
     handleError(err) {
       this.transferError = {
@@ -147,10 +149,10 @@ export default {
         <div class="card rounded border-0">
           <div class="card-body p-4">
             <h4 class="card-title text-center mb-4">
-              {{ invoice.isPayer && invoice.status === 'CREATED' ? 'Execute Invoice' : 'Invoice' }}</h4>
+              {{ isPayer(invoice) && invoice.status === 'CREATED' ? 'Execute Invoice' : 'Invoice' }}</h4>
             <!-- requested date -->
             <p class="text-muted text-center small mb-4">
-              Request Time: {{ formatDate(invoice.requestedAt) }}
+              Request Time: {{ formatTimestamp(invoice.requestedAt) }}
             </p>
             <!-- status badge -->
             <p class="text-center m-3"
@@ -163,26 +165,26 @@ export default {
             </p>
 
             <!-- sender account selection -->
-            <AccountSelector v-if="invoice.isPayer && invoice.status === 'CREATED'"
+            <AccountSelector v-if="isPayer(invoice) && invoice.status === 'CREATED'"
                              v-model="accountFrom"
                              :accounts="accounts"
-                             :selected-asset="selectedAsset"
+                             :balance="selectedAsset"
                              @change="val => { showBalance(val, invoice.asset.id) }"
                              :label="'Select Your Account'"
             />
 
-            <div v-if="invoice.isPayer" class="mb-3">
+            <div v-if="isPayer(invoice)" class="mb-3">
               <label class="form-label">Receiver Counterparty</label>
               <input type="text" class="form-control" :value="invoice.receiverCounterparty?.name" readonly>
             </div>
 
-            <div v-if="!invoice.isPayer" class="mb-3">
+            <div v-if="!isPayer(invoice)" class="mb-3">
               <label class="form-label">Payer Counterparty</label>
               <input type="text" class="form-control" :value="invoice.payerCounterparty?.name" readonly>
             </div>
 
             <!-- Receiving Account -->
-            <div v-if="!invoice.isPayer" class="mb-3">
+            <div v-if="!isPayer(invoice)" class="mb-3">
               <label class="form-label">To Receiving Account</label>
               <input type="text" class="form-control"
                      :value="`${invoice.receiverAccount?.name || 'Unnamed'}`"
@@ -198,7 +200,7 @@ export default {
 
             <!-- action buttons -->
             <div v-if="invoice.status === 'CREATED'">
-              <div v-if="invoice.isPayer" class="d-flex justify-content-end gap-2">
+              <div v-if="isPayer(invoice)" class="d-flex justify-content-end gap-2">
                 <button class="btn btn-sm btn-outline-danger" @click="reject" :disabled="disableButtons">Reject</button>
                 <button class="btn btn-sm btn-primary"
                         :disabled="!accountFrom || invoice.amount > selectedAsset?.amount || disableButtons"
@@ -206,7 +208,7 @@ export default {
                   Execute
                 </button>
               </div>
-              <div v-if="!invoice.isPayer" class="d-flex justify-content-end">
+              <div v-if="!isPayer(invoice)" class="d-flex justify-content-end">
                 <button class="btn btn-sm btn-outline-danger" @click="cancel" :disabled="disableButtons">Cancel</button>
               </div>
             </div>
@@ -220,7 +222,7 @@ export default {
 
   <TxToast
       v-if="transferSuccess"
-      :txData="transferSuccess"
+      :success="transferSuccess"
       @closed="transferSuccess = null;"
   />
   <ErrorToast

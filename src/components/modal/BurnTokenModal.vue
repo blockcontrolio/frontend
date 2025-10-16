@@ -11,10 +11,10 @@ export default {
   data() {
     return {
       form: {
-        redemptionAccountId: '',
+        burnerAccountId: '',
         amount: 0
       },
-      accountBalance: null,
+      assetBalance: null,
       errors: {
         amount: ''
       },
@@ -24,7 +24,7 @@ export default {
     formatAmount,
     async fetchBalance(accountId) {
       let res = await fetchAssetBalance(accountId, this.tokenId);
-      this.accountBalance = await res.json();
+      this.assetBalance = await res.json();
     },
     validateAmount() {
       this.errors.amount = validateAmount(this.form.amount)
@@ -56,34 +56,31 @@ export default {
       <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">Burn Token</h5>
-          <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
           <!-- Redemption Account -->
           <div class="mb-3">
-            <label class="form-label">Redemption Account</label>
-            <select v-model="form.redemptionAccountId" class="form-select" required
-                    v-on:change="this.fetchBalance(form.redemptionAccountId)">
+            <label class="form-label">Burner Account</label>
+            <select v-model="form.burnerAccountId" class="form-select" required
+                    v-on:change="this.fetchBalance(form.burnerAccountId)">
               <option disabled value="">-- select account --</option>
               <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN' || item.type === 'ISSUER')" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
               </option>
             </select>
             <!-- acc balance preview -->
-            <div v-if="form.redemptionAccountId && accountBalance" class="mt-1 balance">
-              <span class="small label">Balance:</span> <span class="value">{{ formatAmount(accountBalance.amount) }} {{ accountBalance.symbol }}</span>
+            <div v-if="form.burnerAccountId && assetBalance" class="mt-1 balance">
+              <span class="small label">Balance:</span> <span class="value">{{ formatAmount(assetBalance.amount) }} {{ assetBalance.asset.symbol }}</span>
             </div>
           </div>
 
           <!-- Amount -->
           <div class="mb-3">
             <label class="form-label">Amount</label>
-            <input type="number" class="form-control no-spinner"
+            <input type="text" class="form-control no-spinner"
                    v-model.number="form.amount"
                    inputmode="numeric"
-                   pattern="\d*"
-                   min="0"
-                   step="1"
+                   pattern="^\d*\.?\d+$"
                    @input="validateAmount"
                    required/>
           </div>

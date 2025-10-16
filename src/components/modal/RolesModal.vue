@@ -1,7 +1,13 @@
 <script>
 export default {
   props: {
-    modalType: String,
+    modalType: {
+      type: String,
+      required: true,
+      validator(value) {
+        return ['grant', 'revoke'].includes(value);
+      },
+    },
     accounts: Array,
     tokenId: String
   },
@@ -10,7 +16,7 @@ export default {
       roles: ['ADMIN', 'MINTER', 'PAUSER', 'BURNER', 'CUSTODIAN', 'LIMITER'],
       form: {
         adminAccountId: '',
-        userAccountId: '',
+        targetAccountId: '',
         role: ''
       }
     };
@@ -22,12 +28,21 @@ export default {
     adminAccounts() {
       return this.accounts.filter(acc => acc.type === 'ADMIN')
     },
-    userAccounts() {
-      const excluded = ['ADMIN', 'CLIENT', 'DISTRIBUTOR'];
-      return this.accounts.filter(acc => !excluded.includes(acc.type));
+    targetAccounts() {
+      if (!this.form.adminAccountId) {
+        return []
+      }
+      const excluded = ['CLIENT', 'DISTRIBUTOR'];
+      if (this.modalType === 'grant') {
+        return this.accounts.filter(acc => !excluded.includes(acc.type));
+      } else if (this.modalType === 'revoke') {
+        return this.accounts
+            .filter(acc => !excluded.includes(acc.type))
+            .filter(acc => acc.id !== this.form.adminAccountId);
+      }
     },
     rolesByType() {
-      let selectedAccount = this.accounts.find(acc => acc.id === this.form.userAccountId);
+      let selectedAccount = this.accounts.find(acc => acc.id === this.form.targetAccountId);
       if (selectedAccount?.type === 'ISSUER') {
         return ['MINTER', 'BURNER'];
       }
@@ -55,7 +70,6 @@ export default {
       <form class="modal-content border" @submit.prevent="submit">
         <div class="modal-header">
           <h5 class="modal-title">{{ name }} Role</h5>
-          <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
           <!-- Admin Account -->
@@ -68,12 +82,12 @@ export default {
               </option>
             </select>
           </div>
-          <!-- User Account -->
+          <!-- Target Account -->
           <div class="mb-3">
-            <label class="form-label">User Account</label>
-            <select v-model="form.userAccountId" class="form-select" required>
-              <option disabled value="">-- select user --</option>
-              <option v-for="acc in userAccounts" :key="acc.id" :value="acc.id">
+            <label class="form-label">Target Account</label>
+            <select v-model="form.targetAccountId" class="form-select" required :disabled="!form.adminAccountId">
+              <option disabled value="">-- select target --</option>
+              <option v-for="acc in targetAccounts" :key="acc.id" :value="acc.id">
                 {{ acc.name }}
               </option>
             </select>
@@ -81,7 +95,7 @@ export default {
           <!-- Roles -->
           <div class="mb-3">
             <label class="form-label">Role</label>
-            <select v-model="form.role" class="form-select" required>
+            <select v-model="form.role" class="form-select" required :disabled="!form.targetAccountId">
               <option disabled value="">-- select role --</option>
               <option v-for="role in rolesByType" :key="role" :value="role">
                 {{ role }}

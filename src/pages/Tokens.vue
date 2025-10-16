@@ -1,35 +1,45 @@
 <script>
 import {fetchAccounts} from "../services/accounts-api.js";
-import {createToken, fetchTokens} from "../services/tokens-api.js";
-import {fetchPartnerships} from "../services/partnership-api.js"
 import {
-  mintToken,
-  burnToken,
-  importToken,
-  pause,
-  unpause,
-  freeze,
+  addToken,
   block,
-  unblock,
+  burnToken,
+  createToken,
+  fetchTokens,
+  freeze,
   grantRole,
-  revokeRole
+  importToken,
+  mintToken,
+  pause,
+  revokeRole,
+  unblock,
+  unpause
 } from "../services/tokens-api.js";
+import {fetchAcceptedPartnerships} from "../services/partnership-api.js"
 import {formatAmount} from "../js/utils.js";
+import TokenImport from "../components/token/TokenImport.vue";
+import TokenCreate from "../components/token/TokenCreate.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 import PauseTokenModal from "../components/modal/PauseTokenModal.vue"
 import FreezeTokenModal from "../components/modal/FreezeTokenModal.vue";
 import BlockTokenModal from "../components/modal/BlockTokenModal.vue";
+import InfoToast from "../components/toast/InfoToast.vue";
 import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import RolesModal from "../components/modal/RolesModal.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
+import TokenAdd from "../components/token/TokenAdd.vue";
 
 export default {
   name: 'Tokens',
   components: {
+    InfoToast,
+    TokenAdd,
+    TokenCreate,
+    TokenImport,
     RolesModal,
     MintTokenModal,
     BurnTokenModal,
@@ -50,26 +60,10 @@ export default {
       tokens: [],
       accounts: [],
       partnerships: [],
-      showTokenForm: '', // import, create
-      importOptions: [
-        {
-          rel: 'EA', desc: 'External Address'
-        },
-        {
-          rel: 'PS', desc: 'Partnerships'
-        }],
-      importForm: {
-        rel: '',
-        selectedCP: {},
-        address: ''
-      },
-      newToken: {
-        name: '',
-        symbol: '',
-        accountId: ''
-      },
+      showTokenForm: null, // import, create
       selectedToken: null,
       txSuccess: null,
+      importSuccess: null,
       txError: null,
       operations: ['mint', 'burn', 'pause', 'unpause', 'freeze', 'block', 'unblock'],
       roleActions: ['grant', 'revoke'],
@@ -79,54 +73,64 @@ export default {
   mounted() {
     this.fetchAccounts();
     this.fetchTokens();
-    let selectedNetwork = useNetworkStore().selectedNetwork;
-    this.fetchAcceptedPartnerships(selectedNetwork?.id);
+    let networkId = useNetworkStore().selectedNetwork.id;
+    const loggedInCounterpartyId = useCounterpartyStore().counterparty.id;
+    this.fetchAcceptedPartnerships(networkId, loggedInCounterpartyId);
   },
   methods: {
     formatAmount,
-    prepareImportForm() {
-      this.showTokenForm = 'import';
-    },
-    async fetchAcceptedPartnerships(networkId) {
-      const res = await fetchPartnerships(networkId);
-      const partnershipsRaw = await res.json();
-      this.partnerships = partnershipsRaw.filter(p => {
-        return p.status === 'ACCEPTED'
-      });
+    async fetchAcceptedPartnerships(networkId, counterpartyId) {
+      this.partnerships = await fetchAcceptedPartnerships(networkId, counterpartyId);
     },
     async fetchTokens() {
       const res = await fetchTokens();
-      this.tokens = await res.json();
+      const json = await res.json();
+
+      const counterpartyId = useCounterpartyStore().counterparty.id;
+
+      this.tokens = json.map(token => ({
+        ...token,
+        isOwnToken: token.issuerCounterparty
+            ? token.issuerCounterparty.id === counterpartyId
+            : false
+      }));
     },
     async fetchAccounts() {
       const res = await fetchAccounts();
       this.accounts = await res.json();
     },
-    async importToken() {
-      let address = this.importForm.address;
+    async importToken(address) {
       if (address === undefined || address === null || address === '') {
-        throw new Error('All parameters (address) must be defined and non-empty.');
+        throw new Error('Address must be defined and non-empty.');
       }
-      await this.handleRequest(() => {
+      await this.handleImportRequest(() => {
         return importToken({address});
       }, () => {
         this.showTokenForm = null;
-        this.clearImportForm();
-        return `Token has been imported`;
+        return `Token address has been imported`;
       });
     },
-    async createToken() {
-      if ([this.newToken.name, this.newToken.symbol, this.newToken.accountId]
+    async addToken(id) {
+      if (id === undefined || id === null || id === '') {
+        throw new Error('Id must be defined and non-empty.');
+      }
+      await this.handleImportRequest(() => {
+        this.showTokenForm = null;
+        return addToken({id});
+      }, () => {
+        return `Counterparty token has been imported`;
+      });
+    },
+    async createToken(newToken) {
+      if ([newToken.name, newToken.symbol, newToken.deployerAccountId]
           .some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (name, symbol, accountId) must be defined and non-empty.');
+        throw new Error('All parameters (name, symbol, deployerAccountId) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return createToken(this.newToken);
+        return createToken(newToken);
       }, () => {
-        let symbol = this.newToken.symbol;
         this.showTokenForm = null;
-        this.newToken = {name: '', symbol: '', accountId: ''};
-        return `Token ${symbol} has been created`;
+        return `Token ${(newToken.symbol)} has been created`;
       });
     },
     openModal(token, modalType) {
@@ -141,22 +145,22 @@ export default {
       }
     },
     // all requests
-    async sendMintRequest({tokenId, issuerAccountId, recipientAccountId, amount}) {
-      if ([tokenId, issuerAccountId, recipientAccountId, amount].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, issuerAccountId, recipientAccountId, amount) must be defined and non-empty.');
+    async sendMintRequest({tokenId, minterAccountId, recipientAccountId, amount}) {
+      if ([tokenId, minterAccountId, recipientAccountId, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, minterAccountId, recipientAccountId, amount) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return mintToken(tokenId, {issuerAccountId, recipientAccountId, amount});
+        return mintToken(tokenId, {minterAccountId, recipientAccountId, amount});
       }, () => {
         return `Token ${this.selectedToken?.symbol} minted with amount ${amount}`;
       });
     },
-    async sendBurnRequest({tokenId, redemptionAccountId, amount}) {
-      if ([tokenId, redemptionAccountId, amount].some(value => value === undefined || value === null || value === '')) {
-        throw new Error('All parameters (tokenId, redemptionAccountId, amount) must be defined and non-empty.');
+    async sendBurnRequest({tokenId, burnerAccountId, amount}) {
+      if ([tokenId, burnerAccountId, amount].some(value => value === undefined || value === null || value === '')) {
+        throw new Error('All parameters (tokenId, burnerAccountId, amount) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return burnToken(tokenId, {redemptionAccountId, amount});
+        return burnToken(tokenId, {burnerAccountId, amount});
       }, () => {
         return `Token ${this.selectedToken?.symbol} burned with amount ${amount}`;
       });
@@ -247,6 +251,21 @@ export default {
       }
       this.modalType = '';
     },
+    async handleImportRequest(operation, onSuccess) {
+      try {
+        let response = await operation();
+        if (response.ok) {
+          let message = onSuccess();
+          let id = await response.json();
+          this.importSuccess = message; // simple message
+        } else {
+          const err = await response.json();
+          this.handleTxError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
     handleTxError(err) {
       this.txSuccess = null;
       this.txError = {
@@ -262,23 +281,13 @@ export default {
         message: err.message
       };
     },
-    clearImportForm() {
-      this.importForm.rel = '';
-      this.importForm.selectedCP = {}
-      this.importForm.address = '';
-    }
   },
   computed: {
-    availableImportOptions() {
-      if (this.partnerships.length === 0) {
-        return [{
-            rel: 'EA', desc: 'External Address'
-          }];
-      }
-      return this.importOptions;
-    },
     canCreate() {
       return this.counterpartyStore.counterparty?.type === 'EMI' && this.accounts.some((item) => item.type === 'ADMIN');
+    },
+    canImport() {
+      return this.accounts.some((item) => item.type === 'ADMIN');
     },
   }
 };
@@ -288,110 +297,37 @@ export default {
   <h3 class="bold p-2 pt-3">Token Management</h3>
 
   <div class="p-2 mt-3">
-    <!-- Toggle Import/Create Form -->
+    <!-- toggle import/create form -->
     <div v-if="!this.showTokenForm" class="d-flex justify-content-end mb-3 gap-2">
-      <button class="btn btn-outline-warning btn-sm px-4" type="button"
-              @click="prepareImportForm()">
-        Import
+      <button v-if="true" class="btn btn-outline-warning btn-sm px-4" type="button" @click="this.showTokenForm = 'import';">
+        Import Token
+      </button>
+      <button v-if="partnerships.length" class="btn btn-outline-warning btn-sm px-4" type="button"
+              @click="this.showTokenForm = 'add';">
+        Add Counterparty Token
       </button>
       <button v-if="canCreate" class="btn btn-outline-primary btn-sm px-4" type="button"
               @click="this.showTokenForm = 'create'">
-        Create New Token
+        Create Token
       </button>
     </div>
 
-    <!-- Import Token Form -->
-    <form v-if="this.showTokenForm === 'import'" @submit.prevent="importToken" class="mb-4">
-      <div class="mb-3">
-        <select
-            v-model="importForm.rel"
-            class="form-select mb-2 w-25"
-            required
-        >
-          <option disabled value="">-- import option --</option>
-          <option v-for="importOption in availableImportOptions" :key="importOption.rel" :value="importOption.rel">
-            {{ importOption.desc }}
-          </option>
-        </select>
+    <TokenAdd v-if="showTokenForm === 'add'"
+              :partnerships="partnerships"
+              @add="addToken"
+              @cancel="showTokenForm = null"
+    />
+    <TokenCreate v-if="showTokenForm === 'create'"
+                 :accounts="accounts"
+                 @create="createToken"
+                 @cancel="showTokenForm = null"
+    />
+    <TokenImport v-if="showTokenForm === 'import'"
+                 @import="importToken"
+                 @cancel="showTokenForm = null"
+    />
 
-        <input v-if="importForm.rel === 'EA'"
-            v-model="importForm.address"
-            class="form-control"
-            placeholder="Token hex address 0x..."
-            pattern="^0x[a-fA-F0-9]{40}$"
-            @input=""
-        />
-
-        <select v-if="importForm.rel === 'PS' && partnerships"
-            v-model="importForm.selectedCP"
-            class="form-select mb-2 w-25"
-            required
-        >
-          <option disabled value="">-- select counterparty --</option>
-          <option v-for="cp in partnerships" :key="cp.relationId" :value="cp">
-            {{ cp.counterpartyName }}
-          </option>
-        </select>
-
-        <select v-if="importForm.rel === 'PS' && importForm.selectedCP?.availableAssets"
-            v-model="importForm.address"
-            class="form-select mb-2 w-25"
-            required
-        >
-          <option disabled value="">-- select token --</option>
-          <option v-for="token in importForm.selectedCP?.availableAssets" :key="token.id" :value="token.address">
-            {{ token.name }} ({{ token.symbol }})
-          </option>
-        </select>
-
-      </div>
-      <div class="d-flex justify-content-end gap-2">
-        <button
-            class="btn btn-outline-danger btn-sm"
-            type="button"
-            @click="this.showTokenForm = null; clearImportForm()"
-        >
-          Cancel
-        </button>
-        <button class="btn btn-outline-primary btn-sm" type="submit">
-          Import Token
-        </button>
-      </div>
-    </form>
-
-    <!-- Create Token Form -->
-    <form v-if="canCreate && this.showTokenForm === 'create'" @submit.prevent="createToken" class="mb-4">
-      <input v-model="newToken.name" class="form-control mb-2 w-50"
-             placeholder="Token Name"
-             required/>
-      <input v-model="newToken.symbol" class="form-control mb-2 w-50"
-             placeholder="Symbol"
-             required/>
-
-      <div class="mb-3">
-        <select v-model="newToken.accountId" class="form-select w-50" required>
-          <option disabled value="">-- owner account --</option>
-          <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN')" :key="acc.ref" :value="acc.id">
-            {{ acc.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="d-flex justify-content-end gap-2">
-        <button
-            class="btn btn-outline-danger btn-sm"
-            type="button"
-            @click="this.showTokenForm = null"
-        >
-          Cancel
-        </button>
-        <button class="btn btn-outline-primary btn-sm" type="submit">
-          Create Token
-        </button>
-      </div>
-    </form>
-
-    <!-- Token Cards -->
+    <!-- tokens list -->
     <div v-if="tokens && tokens.length > 0" class="row mt-4 g-3">
       <div v-for="token in tokens" :key="token.id">
         <div v-if="token.symbol !== 'ETH'" class="card border p-3">
@@ -402,20 +338,20 @@ export default {
                   <span class="me-2">{{ token.name }}</span><span class="">({{ token.symbol }})</span>
                 </div>
               </div>
-              <div v-if="token.own" class="mb-1">
+              <div v-if="token.isOwnToken" class="mb-1">
                 <span class="label text-secondary me-2">Total Supply:</span>
                 <span>{{ formatAmount(token?.totalSupply) }}</span>
               </div>
-              <div v-if="token.own === false && token.issuerCounterparty" class="mb-1">
+              <div v-if="token.issuerCounterparty" class="mb-1">
                 <span class="label text-secondary me-2">Issuer Counterparty:</span>
-                <span>{{ token.issuerCounterparty?.name }}</span>
+                <span>{{ token.issuerCounterparty.name }}</span>
               </div>
               <addr-scan-link :type="'token'" :address="token.address"></addr-scan-link>
             </div>
             <!-- Token Operations -->
-            <div v-if="token.own" class="d-flex gap-2">
+            <div v-if="token.isOwnToken" class="d-flex gap-2">
               <!--roles dropdown-->
-              <div v-if="token.own" class="dropdown ms-auto">
+              <div class="dropdown ms-auto">
                 <button
                     class="btn btn-outline-secondary btn-sm dropdown-toggle px-4"
                     type="button"
@@ -441,7 +377,7 @@ export default {
                 </ul>
               </div>
               <!--actions dropdown-->
-              <div v-if="token.own" class="dropdown ms-auto">
+              <div class="dropdown ms-auto">
                 <button
                     class="btn btn-outline-secondary btn-sm dropdown-toggle px-4"
                     type="button"
@@ -574,6 +510,11 @@ export default {
         v-if="txSuccess"
         :success="txSuccess"
         @closed="txSuccess = null; selectedToken = null"
+    />
+    <InfoToast
+        v-if="importSuccess"
+        :message="importSuccess"
+        @closed="importSuccess = null;"
     />
     <ErrorToast
         v-if="txError"

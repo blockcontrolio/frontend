@@ -1,6 +1,6 @@
 <script>
 import {fetchTransaction} from "../services/transactions-api.js";
-import {formatDate} from "../js/utils.js";
+import {formatTimestamp} from "../js/utils.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 
@@ -24,7 +24,7 @@ export default {
       const res = await fetchTransaction(id);
       this.transaction = await res.json();
     },
-    formatDate,
+    formatTimestamp,
     goBack() {
       this.$router.push('/transactions');
     },
@@ -54,11 +54,11 @@ export default {
       </div>
       <div class="tx-line">
         <span class="label">From:</span>
-        <addr-scan-link :type="'account'" :address="transaction.from"></addr-scan-link>
+        <addr-scan-link :type="'account'" :address="transaction.fromAddress"></addr-scan-link>
       </div>
       <div class="tx-line">
         <span class="label">To:</span>
-        <addr-scan-link :type="'account'" :address="transaction.to"></addr-scan-link>
+        <addr-scan-link :type="'account'" :address="transaction.toAddress"></addr-scan-link>
       </div>
       <div class="tx-line">
         <span class="label">Value:</span>
@@ -72,7 +72,7 @@ export default {
       </div>
       <div class="tx-line">
         <span class="label">Create Time:</span>
-        <small class="text-muted">{{ formatDate(transaction.createdAt) }}</small>
+        <small class="text-muted">{{ formatTimestamp(transaction.createdAt) }}</small>
       </div>
       <div class="tx-line">
         <span class="label">Hash:</span>

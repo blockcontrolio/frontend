@@ -4,7 +4,7 @@ function loadAuthToken() {
     return localStorage.getItem('auth-token') || '';
 }
 
-export async function fetchPartnerships(networkId) {
+export async function fetchRawPartnerships(networkId) {
     return await fetch(`${apiBaseUrl}/partnerships?networkId=${networkId}`, {
         headers: {
             'Content-Type': 'application/json',
@@ -26,8 +26,8 @@ export async function requestPartnership(targetCounterpartyId) {
     });
 }
 
-export async function declinePartnership(relationId) {
-    return await fetch(`${apiBaseUrl}/partnerships/${relationId}`, {
+export async function declinePartnership(partnershipId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${partnershipId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -36,9 +36,9 @@ export async function declinePartnership(relationId) {
     });
 }
 
-export async function acceptRequest(relationId) {
-    return await fetch(`${apiBaseUrl}/partnerships/${relationId}/accept`, {
-        method: 'POST',
+export async function acceptRequest(partnershipId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${partnershipId}/accept`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -46,12 +46,41 @@ export async function acceptRequest(relationId) {
     });
 }
 
-export async function rejectRequest(relationId) {
-    return await fetch(`${apiBaseUrl}/partnerships/${relationId}/reject`, {
-        method: 'POST',
+export async function rejectRequest(partnershipId) {
+    return await fetch(`${apiBaseUrl}/partnerships/${partnershipId}/reject`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
         },
     });
+}
+
+export async function fetchAcceptedPartnerships(networkId, counterpartyId) {
+    const res = await fetchRawPartnerships(networkId);
+    const partnershipsRaw = await res.json();
+
+    return await partnershipsRaw
+        .filter(p => p.status === 'ACCEPTED')
+        .map(p => {
+            let partner = null;
+
+            if (p.sourceCounterparty?.id === counterpartyId) {
+                partner = p.targetCounterparty;
+            } else if (p.targetCounterparty?.id === counterpartyId) {
+                partner = p.sourceCounterparty;
+            }
+
+            if (partner) {
+                return {
+                    ...partner,
+                    availableAssets: p.availableAssets || [],
+                    partneredAssets: p.partneredAssets || [],
+                    targetAccounts: p.targetAccounts || []
+                };
+            }
+
+            return null;
+        })
+        .filter(Boolean);
 }

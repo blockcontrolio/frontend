@@ -50,7 +50,7 @@ export async function fetchInvoice(invoiceId) {
 
 export async function cancelInvoice(invoiceId) {
     return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/cancel`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`
@@ -60,7 +60,7 @@ export async function cancelInvoice(invoiceId) {
 
 export async function rejectInvoice(invoiceId) {
     return await fetch(`${apiBaseUrl}/invoices/${invoiceId}/reject`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${loadAuthToken()}`

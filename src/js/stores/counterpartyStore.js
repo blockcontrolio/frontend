@@ -11,7 +11,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
         counterparty: {
             id: '',
             name: '',
-            networks: []
+            network: []
         }
     }),
     actions: {
@@ -31,7 +31,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
                     this.counterparty = data.counterparty || {
                         id: '',
                         name: '',
-                        networks: []
+                        network: []
                     };
                 }
             } catch (err) {

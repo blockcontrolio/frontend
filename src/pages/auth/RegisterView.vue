@@ -27,7 +27,7 @@ export default {
         confirmPassword: "",
         counterpartyName: "",
         networkId: "",
-        type: ""
+        counterpartyType: ""
       },
       error: null,
       loading: false,
@@ -94,7 +94,7 @@ export default {
 
           <div class="mb-3">
             <label class="form-label">Counterparty Type</label>
-            <select v-model="form.type" class="form-select" required>
+            <select v-model="form.counterpartyType" class="form-select" required>
               <option disabled value="">-- counterparty type --</option>
               <option v-for="type in types" :key="type.code" :value="type.code">
                 {{ type.desc }}

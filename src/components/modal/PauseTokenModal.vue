@@ -1,7 +1,13 @@
 <script>
 export default {
   props: {
-    modalType: String,
+    modalType: {
+      type: String,
+      required: true,
+      validator(value) {
+        return ['pause', 'unpause'].includes(value);
+      },
+    },
     accounts: Array,
     tokenId: String
   },
@@ -35,7 +41,6 @@ export default {
         <form class="modal-content border" @submit.prevent="submit">
           <div class="modal-header">
             <h5 class="modal-title">{{ name }} Token</h5>
-            <button type="button" class="btn-close btn-close-white" @click="$emit('close')"></button>
           </div>
           <div class="modal-body">
             <!-- Pauser Account -->

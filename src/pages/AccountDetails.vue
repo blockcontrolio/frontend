@@ -1,5 +1,5 @@
 <script>
-import {formatAmount, formatDate} from "../js/utils.js";
+import {formatAmount, formatTimestamp} from "../js/utils.js";
 import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/accounts-api.js";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 import InfoToast from "../components/toast/InfoToast.vue";
@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     formatAmount,
-    formatDate,
+    formatTimestamp,
     async fetchEoaAccounts() {
       let res = await fetchAccounts();
       let allAccounts = await res.json();
@@ -166,24 +166,24 @@ export default {
       </div>
 
       <div class="row mb-3">
-        <div class="col-4"><strong>Token Balances:</strong></div>
+        <div class="col-4"><strong>Asset Balances:</strong></div>
         <div class="col-8">
           <div v-if="this.balances && this.balances.length">
             <div
-                v-for="token in this.balances"
-                :key="token.id"
+                v-for="balance in this.balances"
+                :key="balance.asset.id"
                 class="d-flex justify-content-between align-items-center border-bottom py-1"
             >
-              <span class="">{{ token.name }} ({{ token.symbol }})</span>
-              <span class="mono">{{ formatAmount(token.amount) }}</span>
+              <span class="">{{ balance.asset.name }} ({{ balance.asset.symbol }})</span>
+              <span class="mono">{{ formatAmount(balance.amount) }}</span>
             </div>
           </div>
-          <div v-else class="text-muted">No token balances</div>
+          <div v-else class="text-muted">No asset balances</div>
         </div>
       </div>
       <div class="row my-2">
         <div class="col-4"><strong>Create Time:</strong></div>
-        <div class="col-8">{{ formatDate(account.createdAt) }}</div>
+        <div class="col-8">{{ formatTimestamp(account.createdAt) }}</div>
       </div>
 
       <div class="d-flex justify-content-end mt-4">
