@@ -57,19 +57,19 @@ export default {
         style="min-width: fit-content; max-width: none; white-space: nowrap;">
       <div
           class="alert custom-success-alert d-flex justify-content-between align-items-center m-0">
-        <!-- ✅ Success -->
+        <!-- Success -->
         <div v-if="success?.transferId">
-          ✅ Success! {{ success?.message }}<br/>
+          Success! {{ success?.message }}<br/>
           Transfer details:
           <transfer-details-link :transferId="success.transferId" class="text-nowrap"/>
         </div>
         <div v-if="success?.hash">
-          ✅ Success! {{ success.message }}<br/>
+          Success! {{ success.message }}<br/>
           Tx hash:
           <tx-scan-link :hash="success.hash" class="text-nowrap"/>
         </div>
         <div v-if="success?.transactionId">
-          ✅ Success! {{ success?.message }}<br/>
+          Success! {{ success?.message }}<br/>
           Transaction details:
           <tx-details-link :transactionId="success.transactionId" class="text-nowrap"/>
         </div>

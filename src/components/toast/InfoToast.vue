@@ -48,9 +48,9 @@ export default {
         style="min-width: fit-content; max-width: none; white-space: nowrap;">
       <div
           class="alert custom-success-alert d-flex justify-content-between align-items-center m-0">
-        <!-- ✅ Success -->
+        <!-- Success -->
         <div>
-          ✅ Success! {{ message }}
+          Success! {{ message }}
         </div>
         <div class="d-flex align-items-center justify-content-center">
           <button

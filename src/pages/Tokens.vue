@@ -25,6 +25,7 @@ import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
 import PauseTokenModal from "../components/modal/PauseTokenModal.vue"
 import FreezeTokenModal from "../components/modal/FreezeTokenModal.vue";
 import BlockTokenModal from "../components/modal/BlockTokenModal.vue";
+import InfoToast from "../components/toast/InfoToast.vue";
 import TxToast from "../components/toast/SuccessToast.vue";
 import ErrorToast from "../components/toast/ErrorToast.vue";
 import RolesModal from "../components/modal/RolesModal.vue";
@@ -35,6 +36,7 @@ import TokenAdd from "../components/token/TokenAdd.vue";
 export default {
   name: 'Tokens',
   components: {
+    InfoToast,
     TokenAdd,
     TokenCreate,
     TokenImport,
@@ -61,6 +63,7 @@ export default {
       showTokenForm: null, // import, create
       selectedToken: null,
       txSuccess: null,
+      importSuccess: null,
       txError: null,
       operations: ['mint', 'burn', 'pause', 'unpause', 'freeze', 'block', 'unblock'],
       roleActions: ['grant', 'revoke'],
@@ -100,18 +103,18 @@ export default {
       if (address === undefined || address === null || address === '') {
         throw new Error('Address must be defined and non-empty.');
       }
-      await this.handleRequest(() => {
+      await this.handleImportRequest(() => {
         return importToken({address});
       }, () => {
         this.showTokenForm = null;
-        return `Token has been imported`;
+        return `Token address has been imported`;
       });
     },
     async addToken(id) {
       if (id === undefined || id === null || id === '') {
         throw new Error('Id must be defined and non-empty.');
       }
-      await this.handleRequest(() => {
+      await this.handleImportRequest(() => {
         this.showTokenForm = null;
         return addToken({id});
       }, () => {
@@ -248,6 +251,21 @@ export default {
       }
       this.modalType = '';
     },
+    async handleImportRequest(operation, onSuccess) {
+      try {
+        let response = await operation();
+        if (response.ok) {
+          let message = onSuccess();
+          let id = await response.json();
+          this.importSuccess = message; // simple message
+        } else {
+          const err = await response.json();
+          this.handleTxError(err);
+        }
+      } catch (err) {
+        this.handleUnknownError(err);
+      }
+    },
     handleTxError(err) {
       this.txSuccess = null;
       this.txError = {
@@ -281,10 +299,10 @@ export default {
   <div class="p-2 mt-3">
     <!-- toggle import/create form -->
     <div v-if="!this.showTokenForm" class="d-flex justify-content-end mb-3 gap-2">
-      <button v-if="canImport" class="btn btn-outline-warning btn-sm px-4" type="button" @click="this.showTokenForm = 'import';">
+      <button v-if="true" class="btn btn-outline-warning btn-sm px-4" type="button" @click="this.showTokenForm = 'import';">
         Import Token
       </button>
-      <button v-if="canImport && partnerships.length" class="btn btn-outline-warning btn-sm px-4" type="button"
+      <button v-if="partnerships.length" class="btn btn-outline-warning btn-sm px-4" type="button"
               @click="this.showTokenForm = 'add';">
         Add Counterparty Token
       </button>
@@ -492,6 +510,11 @@ export default {
         v-if="txSuccess"
         :success="txSuccess"
         @closed="txSuccess = null; selectedToken = null"
+    />
+    <InfoToast
+        v-if="importSuccess"
+        :message="importSuccess"
+        @closed="importSuccess = null;"
     />
     <ErrorToast
         v-if="txError"
