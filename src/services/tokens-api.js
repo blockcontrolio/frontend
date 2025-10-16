@@ -15,6 +15,17 @@ export async function importToken(payload) {
     });
 }
 
+export async function addToken(payload) {
+    return await fetch(`${apiBaseUrl}/tokens/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
 export async function fetchTokens() {
     return await fetch(`${apiBaseUrl}/tokens`, {
         headers: {

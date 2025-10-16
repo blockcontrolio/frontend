@@ -1,20 +1,24 @@
 <script>
 import {fetchAccounts} from "../services/accounts-api.js";
-import {createToken, fetchTokens} from "../services/tokens-api.js";
-import {fetchAcceptedPartnerships} from "../services/partnership-api.js"
 import {
-  mintToken,
-  burnToken,
-  importToken,
-  pause,
-  unpause,
-  freeze,
+  addToken,
   block,
-  unblock,
+  burnToken,
+  createToken,
+  fetchTokens,
+  freeze,
   grantRole,
-  revokeRole
+  importToken,
+  mintToken,
+  pause,
+  revokeRole,
+  unblock,
+  unpause
 } from "../services/tokens-api.js";
+import {fetchAcceptedPartnerships} from "../services/partnership-api.js"
 import {formatAmount} from "../js/utils.js";
+import TokenImport from "../components/token/TokenImport.vue";
+import TokenCreate from "../components/token/TokenCreate.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import MintTokenModal from "../components/modal/MintTokenModal.vue";
 import BurnTokenModal from "../components/modal/BurnTokenModal.vue"
@@ -26,10 +30,14 @@ import ErrorToast from "../components/toast/ErrorToast.vue";
 import RolesModal from "../components/modal/RolesModal.vue";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
+import TokenAdd from "../components/token/TokenAdd.vue";
 
 export default {
   name: 'Tokens',
   components: {
+    TokenAdd,
+    TokenCreate,
+    TokenImport,
     RolesModal,
     MintTokenModal,
     BurnTokenModal,
@@ -50,24 +58,7 @@ export default {
       tokens: [],
       accounts: [],
       partnerships: [],
-      showTokenForm: '', // import, create
-      importOptions: [
-        {
-          rel: 'EA', desc: 'External Address'
-        },
-        {
-          rel: 'PS', desc: 'Partnerships'
-        }],
-      importForm: {
-        rel: '',
-        selectedCounterparty: {},
-        address: ''
-      },
-      newToken: {
-        name: '',
-        symbol: '',
-        deployerAccountId: ''
-      },
+      showTokenForm: null, // import, create
       selectedToken: null,
       txSuccess: null,
       txError: null,
@@ -91,9 +82,6 @@ export default {
       }
       return false;
     },
-    prepareImportForm() {
-      this.showTokenForm = 'import';
-    },
     async fetchAcceptedPartnerships(networkId, counterpartyId) {
       this.partnerships = await fetchAcceptedPartnerships(networkId, counterpartyId);
     },
@@ -105,31 +93,38 @@ export default {
       const res = await fetchAccounts();
       this.accounts = await res.json();
     },
-    async importToken() {
-      let address = this.importForm.address;
+    async importToken(address) {
       if (address === undefined || address === null || address === '') {
-        throw new Error('All parameters (address) must be defined and non-empty.');
+        throw new Error('Address must be defined and non-empty.');
       }
       await this.handleRequest(() => {
         return importToken({address});
       }, () => {
         this.showTokenForm = null;
-        this.clearImportForm();
         return `Token has been imported`;
       });
     },
-    async createToken() {
-      if ([this.newToken.name, this.newToken.symbol, this.newToken.deployerAccountId]
+    async addToken(id) {
+      if (id === undefined || id === null || id === '') {
+        throw new Error('Id must be defined and non-empty.');
+      }
+      await this.handleRequest(() => {
+        this.showTokenForm = null;
+        return addToken({id});
+      }, () => {
+        return `Counterparty token has been imported`;
+      });
+    },
+    async createToken(newToken) {
+      if ([newToken.name, newToken.symbol, newToken.deployerAccountId]
           .some(value => value === undefined || value === null || value === '')) {
         throw new Error('All parameters (name, symbol, deployerAccountId) must be defined and non-empty.');
       }
       await this.handleRequest(() => {
-        return createToken(this.newToken);
+        return createToken(newToken);
       }, () => {
-        let symbol = this.newToken.symbol;
         this.showTokenForm = null;
-        this.newToken = {name: '', symbol: '', deployerAccountId: ''};
-        return `Token ${symbol} has been created`;
+        return `Token ${(newToken.symbol)} has been created`;
       });
     },
     openModal(token, modalType) {
@@ -265,22 +260,13 @@ export default {
         message: err.message
       };
     },
-    clearImportForm() {
-      this.importForm.selectedCounterparty = {}
-      this.importForm.address = "";
-    }
   },
   computed: {
-    availableImportOptions() {
-      if (this.partnerships.length === 0) {
-        return [{
-            rel: 'EA', desc: 'External Address'
-          }];
-      }
-      return this.importOptions;
-    },
     canCreate() {
       return this.counterpartyStore.counterparty?.type === 'EMI' && this.accounts.some((item) => item.type === 'ADMIN');
+    },
+    canImport() {
+      return this.accounts.some((item) => item.type === 'ADMIN');
     },
   }
 };
@@ -290,111 +276,37 @@ export default {
   <h3 class="bold p-2 pt-3">Token Management</h3>
 
   <div class="p-2 mt-3">
-    <!-- Toggle Import/Create Form -->
+    <!-- toggle import/create form -->
     <div v-if="!this.showTokenForm" class="d-flex justify-content-end mb-3 gap-2">
-      <button class="btn btn-outline-warning btn-sm px-4" type="button"
-              @click="prepareImportForm()">
-        Import
+      <button v-if="canImport" class="btn btn-outline-warning btn-sm px-4" type="button" @click="this.showTokenForm = 'import';">
+        Import Token
+      </button>
+      <button v-if="canImport && partnerships.length" class="btn btn-outline-warning btn-sm px-4" type="button"
+              @click="this.showTokenForm = 'add';">
+        Add Counterparty Token
       </button>
       <button v-if="canCreate" class="btn btn-outline-primary btn-sm px-4" type="button"
               @click="this.showTokenForm = 'create'">
-        Create New Token
+        Create Token
       </button>
     </div>
 
-    <!-- Import Token Form -->
-    <form v-if="this.showTokenForm === 'import'" @submit.prevent="importToken" class="mb-4">
-      <div class="mb-3">
-        <select
-            v-model="importForm.rel"
-            class="form-select mb-2 w-25"
-            v-on:change="this.clearImportForm()"
-            required
-        >
-          <option disabled value="">-- import option --</option>
-          <option v-for="importOption in availableImportOptions" :key="importOption.rel" :value="importOption.rel">
-            {{ importOption.desc }}
-          </option>
-        </select>
+    <TokenAdd v-if="showTokenForm === 'add'"
+              :partnerships="partnerships"
+              @add="addToken"
+              @cancel="showTokenForm = null"
+    />
+    <TokenCreate v-if="showTokenForm === 'create'"
+                 :accounts="accounts"
+                 @create="createToken"
+                 @cancel="showTokenForm = null"
+    />
+    <TokenImport v-if="showTokenForm === 'import'"
+                 @import="importToken"
+                 @cancel="showTokenForm = null"
+    />
 
-        <input v-if="importForm.rel === 'EA'"
-            v-model="importForm.address"
-            class="form-control"
-            placeholder="Token hex address 0x..."
-            pattern="^0x[a-fA-F0-9]{40}$"
-            @input=""
-        />
-
-        <select v-if="importForm.rel === 'PS' && partnerships.length > 0"
-            v-model="importForm.selectedCounterparty"
-            class="form-select mb-2 w-25"
-            required
-        >
-          <option disabled value="">-- select counterparty --</option>
-          <option v-for="counterparty in partnerships" :key="counterparty.id" :value="counterparty">
-            {{ counterparty.name }}
-          </option>
-        </select>
-
-        <select v-if="importForm.rel === 'PS' && importForm.selectedCounterparty"
-            v-model="importForm.address"
-            class="form-select mb-2 w-25"
-            required
-        >
-          <option disabled value="">-- select token --</option>
-          <option v-for="token in importForm.selectedCounterparty?.availableAssets" :key="token.id" :value="token.address">
-            {{ token.name }} ({{ token.symbol }})
-          </option>
-        </select>
-
-      </div>
-      <div class="d-flex justify-content-end gap-2">
-        <button
-            class="btn btn-outline-danger btn-sm"
-            type="button"
-            @click="this.showTokenForm = null; clearImportForm()"
-        >
-          Cancel
-        </button>
-        <button class="btn btn-outline-primary btn-sm" type="submit">
-          Import Token
-        </button>
-      </div>
-    </form>
-
-    <!-- Create Token Form -->
-    <form v-if="canCreate && this.showTokenForm === 'create'" @submit.prevent="createToken" class="mb-4">
-      <input v-model="newToken.name" class="form-control mb-2 w-50"
-             placeholder="Token Name"
-             required/>
-      <input v-model="newToken.symbol" class="form-control mb-2 w-50"
-             placeholder="Symbol"
-             required/>
-
-      <div class="mb-3">
-        <select v-model="newToken.deployerAccountId" class="form-select w-50" required>
-          <option disabled value="">-- owner account --</option>
-          <option v-for="acc in accounts.filter((item) => item.type === 'ADMIN')" :key="acc.ref" :value="acc.id">
-            {{ acc.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="d-flex justify-content-end gap-2">
-        <button
-            class="btn btn-outline-danger btn-sm"
-            type="button"
-            @click="this.showTokenForm = null"
-        >
-          Cancel
-        </button>
-        <button class="btn btn-outline-primary btn-sm" type="submit">
-          Create Token
-        </button>
-      </div>
-    </form>
-
-    <!-- Token Cards -->
+    <!-- tokens list -->
     <div v-if="tokens && tokens.length > 0" class="row mt-4 g-3">
       <div v-for="token in tokens" :key="token.id">
         <div v-if="token.symbol !== 'ETH'" class="card border p-3">
