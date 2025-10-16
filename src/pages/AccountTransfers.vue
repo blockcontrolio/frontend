@@ -1,6 +1,6 @@
 <script>
 import {useExplorerUtils} from "../js/composables/explorerUtils.js";
-import {formatDate, roundAmount} from "../js/utils.js";
+import {formatTimestamp, roundAmount} from "../js/utils.js";
 import {fetchTransfers} from "../services/transfers-api.js";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     roundAmount,
-    formatDate,
+    formatTimestamp,
     async loadTransfers() {
       const res = await fetchTransfers(this.accountId);
       this.transfers = await res.json();
@@ -156,7 +156,7 @@ export default {
           <tx-scan-link v-if="transfer.transactionHash" :hash="transfer.transactionHash" :short="true"></tx-scan-link>
         </td>
         <td>
-          <small class="text-muted">{{ formatDate(transfer.createdAt) }}</small>
+          <small class="text-muted">{{ formatTimestamp(transfer.createdAt) }}</small>
         </td>
       </tr>
       </tbody>

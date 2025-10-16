@@ -1,5 +1,5 @@
 <script>
-import {formatAmount, formatDate} from "../js/utils.js";
+import {formatAmount, formatTimestamp} from "../js/utils.js";
 import {fetchAccount, fetchAccounts, fetchAssetBalances, updateAccount} from "../services/accounts-api.js";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 import InfoToast from "../components/toast/InfoToast.vue";
@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     formatAmount,
-    formatDate,
+    formatTimestamp,
     async fetchEoaAccounts() {
       let res = await fetchAccounts();
       let allAccounts = await res.json();
@@ -183,7 +183,7 @@ export default {
       </div>
       <div class="row my-2">
         <div class="col-4"><strong>Create Time:</strong></div>
-        <div class="col-8">{{ formatDate(account.createdAt) }}</div>
+        <div class="col-8">{{ formatTimestamp(account.createdAt) }}</div>
       </div>
 
       <div class="d-flex justify-content-end mt-4">

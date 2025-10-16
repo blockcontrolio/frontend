@@ -1,6 +1,6 @@
 <script>
 import {fetchTransferDetails} from "../services/transfers-api.js";
-import {formatAmount, formatDate} from "../js/utils.js";
+import {formatAmount, formatTimestamp} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
 
@@ -28,7 +28,7 @@ export default {
       const res = await fetchTransferDetails(id);
       this.transfer = await res.json();
     },
-    formatDate,
+    formatTimestamp,
     goBack() {
       this.$router.push('/transfers');
     },
@@ -115,7 +115,7 @@ export default {
       </div>
       <div class="tx-line my-1">
         <span class="">Create Time:</span>
-        <small class="mono text-muted">{{ formatDate(transfer.createdAt) }}</small>
+        <small class="mono text-muted">{{ formatTimestamp(transfer.createdAt) }}</small>
       </div>
       <div v-if="transfer.transactionHash" class="tx-line my-1">
         <span class="">Hash:</span>

@@ -1,7 +1,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {createAccount, fetchAccounts} from '../services/accounts-api.js'
-import {formatDate} from "../js/utils.js";
+import {formatTimestamp} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import AccountTypeSelect from "../components/AccountTypeSelect.vue";
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
@@ -37,7 +37,7 @@ export default {
     }
   },
   methods: {
-    formatDate,
+    formatTimestamp,
     async fetchAccounts() {
       let res = await fetchAccounts();
       this.accounts = await res.json();

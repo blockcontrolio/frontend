@@ -1,5 +1,5 @@
 <script>
-import {formatDate, shortenString} from "../../js/utils.js";
+import {formatTimestamp, shortenString} from "../../js/utils.js";
 import {fetchInvoicesForPayer} from "../../services/invoices-api.js";
 
 export default {
@@ -11,7 +11,7 @@ export default {
     }
   },
   methods: {
-    formatDate,
+    formatTimestamp,
     shortenString,
     async loadInvoices() {
       try {
@@ -59,7 +59,7 @@ export default {
             {{ invoice.asset?.name }} ({{ invoice.asset?.symbol }})
           </div>
           <small class="text-muted">
-            {{ formatDate(invoice.requestedAt) }}
+            {{ formatTimestamp(invoice.requestedAt) }}
           </small>
         </td>
       </tr>

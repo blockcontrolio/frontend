@@ -8,7 +8,7 @@ import {
   rejectRequest,
   declinePartnership
 } from "../services/partnership-api.js";
-import {formatDate} from "../js/utils.js";
+import {formatTimestamp} from "../js/utils.js";
 
 export default {
   setup() {
@@ -22,7 +22,7 @@ export default {
     }
   },
   methods: {
-    formatDate,
+    formatTimestamp,
     statusColor(status) {
       switch (status) {
         case 'ACCEPTED':
@@ -137,7 +137,7 @@ export default {
               <div v-if="p.status === 'PENDING'" class="small">
               <span v-if="p.status === 'PENDING'" class="">
                 <small :class="statusColor(p.status)" class="me-2">Requested:</small>
-                <small class="text-muted">{{ formatDate(p.requestedAt) }}</small>
+                <small class="text-muted">{{ formatTimestamp(p.requestedAt) }}</small>
               </span>
               </div>
             </div>
@@ -168,11 +168,11 @@ export default {
                 </div>
                 <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
                   <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
-                  <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
+                  <small class="text-muted">{{ formatTimestamp(p.resolvedAt) }}</small>
                 </span>
                 <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
                   <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
-                  <small class="text-muted">{{ formatDate(p.resolvedAt) }}</small>
+                  <small class="text-muted">{{ formatTimestamp(p.resolvedAt) }}</small>
                 </span>
               </div>
             </div>

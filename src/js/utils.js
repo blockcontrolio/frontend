@@ -10,6 +10,19 @@ export function formatDate(isoString) {
     });
 }
 
+export function formatTimestamp(timestamp) {
+    // convert timestamp to milliseconds and construct Date object
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
 export function formatAmount(value) {
     if (value === null || value === undefined) return '0';
     return Number(value).toFixed(20).replace(/\.?0+$/, ''); // removes trailing zeroes

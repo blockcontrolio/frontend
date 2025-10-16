@@ -1,6 +1,6 @@
 <script>
 import {useRouter} from "vue-router";
-import {formatDate, validEmail, validPassword} from "../../js/utils.js";
+import {formatTimestamp, validEmail, validPassword} from "../../js/utils.js";
 import {addUser, assignPermission, fetchUsers, removePermission} from "../../services/api.js";
 import UserRoleSelect from "../../components/UserRoleSelect.vue";
 import InfoToast from "../../components/toast/InfoToast.vue";
@@ -29,7 +29,7 @@ export default {
     }
   },
   methods: {
-    formatDate,
+    formatTimestamp,
     validEmail,
     validPassword,
     async getUsers() {
@@ -270,7 +270,7 @@ export default {
           </td>
           <td class="mono">{{ user.enabled }}</td>
           <td>
-            <small class="text-muted">{{ formatDate(user.createdAt) }}</small>
+            <small class="text-muted">{{ formatTimestamp(user.createdAt) }}</small>
           </td>
 
         </tr>
