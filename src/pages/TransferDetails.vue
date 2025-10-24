@@ -3,9 +3,11 @@ import {fetchTransferDetails} from "../services/transfers-api.js";
 import {formatAmount, formatTimestamp} from "../js/utils.js";
 import AddrScanLink from "../components/etherscan/AddrScanLink.vue";
 import TxScanLink from "../components/etherscan/TxScanLink.vue";
+import TxDetailsLink from "../components/links/TxDetailsLink.vue";
 
 export default {
   components: {
+    TxDetailsLink,
     AddrScanLink,
     TxScanLink
   },
@@ -55,6 +57,12 @@ export default {
         <span class="value">
             {{ transfer.type }}
           </span>
+      </div>
+      <div class="tx-line my-1">
+        <span class="">Transaction:</span>
+        <span class="value">
+          <tx-details-link v-if="transfer.transactionId" :transactionId="transfer.transactionId"></tx-details-link>
+        </span>
       </div>
       <!-- from -->
       <hr class="account-divider"/>

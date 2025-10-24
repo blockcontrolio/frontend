@@ -26,7 +26,11 @@ export default {
     },
     formatTimestamp,
     goBack() {
-      this.$router.push('/transactions');
+      if (window.history.length > 1) {
+        this.$router.back();
+      } else {
+        this.$router.push('/transactions');
+      }
     },
   }
 };
