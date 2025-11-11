@@ -105,78 +105,115 @@ export default {
   <h3 class="p-2 pt-3">Partnership Management</h3>
   <div class="container mt-3">
 
-    <div class="row g-3">
+    <!-- Header Row -->
+    <div class="row fw-bold text-secondary border-bottom pb-2 mb-2 small">
+      <div class="col-3">Partnership</div>
+      <div class="col-3">Transferable Assets</div>
+      <div class="col-2">Status</div>
+      <div class="col-2">Last Action</div>
+      <div class="col-2 text-center">Actions</div>
+    </div>
+
+    <!-- Cards -->
+    <div class="row g-2 pt-2">
       <div
           v-for="p in partnerships"
           :key="p.targetCounterparty.id"
           class="col-12"
       >
-        <div class="card border p-3">
-          <div class="row align-items-center">
+        <div class="card border-0 rounded-3">
+          <div class="card-body py-3">
+            <div class="row align-items-center">
 
-            <!-- Counterparty Name -->
-            <div class="col-4 text-start">
-              <span v-if="p.sourceCounterparty">
-                <span class="bold me-2">From:</span>
-                <span class="text-secondary">{{ p.sourceCounterparty.name }}</span><br>
-              </span>
-              <span class="bold me-2" v-if="p.sourceCounterparty">To: </span>
-              <span class="text-secondary">{{ p.targetCounterparty.name }}</span>
-            </div>
-
-            <!-- Mid column -->
-            <div class="col-5 text-start">
-              <div v-if="p.status === 'ACCEPTED'" class="small">
-                <div class="label me-2">Transferable assets:</div>
-                <div class="value text-secondary-emphasis">
-                  <strong>
-                    {{ p.partneredAssets.map(t => t.symbol).join(', ') }}
-                  </strong>
-                </div>
-              </div>
-              <div v-if="p.status === 'PENDING'" class="small">
-              <span v-if="p.status === 'PENDING'" class="">
-                <small :class="statusColor(p.status)" class="me-2">Requested:</small>
-                <small class="text-muted">{{ formatTimestamp(p.requestedAt) }}</small>
-              </span>
-              </div>
-            </div>
-
-            <!-- Actions column -->
-            <div class="col-3 text-end">
-
-            <!-- action buttons -->
-              <div v-if="!p.status || p.hasRelation === false" class="">
-                <button class="btn btn-outline-primary btn-sm" @click="sendRequest(p.targetCounterparty.id)">Request Partnership</button>
-              </div>
-              <div v-else-if="p.ownPendingRequest">
-                <button class="btn btn-outline-danger btn-sm" @click="declinePartnership(p.id)">Decline Request</button>
-              </div>
-              <div v-else-if="p.actionRequired" class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline-danger btn-sm" @click="rejectRequest(p.id)">Reject</button>
-                <button class="btn btn-outline-success btn-sm" @click="acceptRequest(p.id)">Accept</button>
-              </div>
-              <!-- when status final -->
-              <div v-else-if="p.status === 'ACCEPTED' || p.status === 'REJECTED'" class="small">
-                <div v-if="p.status === 'ACCEPTED'" class="label">
-                  Operational Accounts Availability:
-                  <span class="value me-1">
-                  {{ p.targetAccounts.length }}
+              <!-- Partnership -->
+              <div class="col-3">
+                <div class="fw-semibold">
+                  <span v-if="p.sourceCounterparty">
+                    <span class="text-muted small me-2">From:</span>
+                    {{ p.sourceCounterparty.name }}<br>
                   </span>
-                  <i v-if="p.targetAccounts?.length > 0" class="bi bi-check2-circle text-success bold"></i>
-                  <i v-else class="bi bi-ban text-danger bold"></i>
+                  <span class="text-muted small me-2">To:</span>
+                  <span class="">{{ p.targetCounterparty.name }}</span>
                 </div>
-                <span v-if="p.status === 'ACCEPTED' && p.resolvedAt" class="">
-                  <small :class="statusColor(p.status)" class="me-2">Accepted:</small>
-                  <small class="text-muted">{{ formatTimestamp(p.resolvedAt) }}</small>
-                </span>
-                <span v-if="p.status === 'REJECTED' && p.resolvedAt" class="">
-                  <small :class="statusColor(p.status)" class="me-2">Rejected:</small>
-                  <small class="text-muted">{{ formatTimestamp(p.resolvedAt) }}</small>
-                </span>
               </div>
-            </div>
 
+              <!-- Assets -->
+              <div class="col-3 small">
+                <div class="fw-semibold text-secondary-emphasis">
+                  {{
+                    p.partneredAssets?.length
+                        ? p.partneredAssets.map(t => t.symbol).join(', ')
+                        : ''
+                  }}
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="col-2 small">
+                <span v-if="p.status" :class="statusColor(p.status)" class="fw-semibold">
+                  {{ p.status }}
+                </span>
+                <span v-else class="text-muted fst-italic">Not initiated</span>
+              </div>
+
+              <!-- Date -->
+              <div class="col-2 small text-muted">
+                <template v-if="p.status === 'PENDING'">
+                  {{ formatTimestamp(p.requestedAt) }}
+                </template>
+                <template v-else-if="p.status === 'ACCEPTED' || p.status === 'REJECTED'">
+                  {{ formatTimestamp(p.resolvedAt) }}
+                </template>
+              </div>
+
+              <!-- Actions -->
+              <div class="col-2 text-end">
+                <template v-if="!p.status || p.hasRelation === false">
+                  <button
+                      class="btn btn-outline-primary btn-sm"
+                      @click="sendRequest(p.targetCounterparty.id)"
+                  >
+                    Request
+                  </button>
+                </template>
+
+                <template v-else-if="p.ownPendingRequest">
+                  <button
+                      class="btn btn-outline-danger btn-sm"
+                      @click="declinePartnership(p.id)"
+                  >
+                    Cancel
+                  </button>
+                </template>
+
+                <template v-else-if="p.actionRequired">
+                  <div class="d-flex justify-content-end gap-2">
+                    <button
+                        class="btn btn-outline-danger btn-sm"
+                        @click="rejectRequest(p.id)"
+                    >
+                      Reject
+                    </button>
+                    <button
+                        class="btn btn-outline-success btn-sm"
+                        @click="acceptRequest(p.id)"
+                    >
+                      Accept
+                    </button>
+                  </div>
+                </template>
+
+                <template v-else-if="p.status === 'ACCEPTED'">
+                  <button
+                      class="btn btn-outline-danger btn-sm"
+                      @click="rejectRequest(p.id)"
+                  >
+                    Reject
+                  </button>
+                </template>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
