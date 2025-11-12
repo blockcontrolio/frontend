@@ -51,9 +51,10 @@ export default {
       }
     },
     handleError(err) {
+      const serverMsg = err.message || err.violations?.[0]?.message;
       this.messageError = {
         error: err.error || 'Error',
-        message: err.message || 'Unknown error occurred.'
+        message: serverMsg || 'Unknown error occurred.'
       };
     },
     handleUnknownError(err) {
