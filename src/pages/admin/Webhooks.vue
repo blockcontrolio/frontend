@@ -136,7 +136,10 @@ export default {
             v-model="form.callbackUrl"
             class="form-control mb-2 w-50"
             placeholder="Callback URL"
-            type="url" required
+            type="url"
+            required
+            pattern="https?://.*"
+            title="URL must start with http:// or https://"
         />
 
         <div v-if="error" class="form-text text-danger mb-2">{{ error }}</div>
