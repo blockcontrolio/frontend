@@ -50,6 +50,7 @@ export default {
       <div>
         <router-link v-if="false" class="nav-link" :to="hasAuthToken() ? '/' : ''" @click.prevent="handleClick">Dashboard</router-link>
         <router-link v-if="adminView" class="nav-link" :to="hasAuthToken() ? '/users' : ''" @click.prevent="handleClick">Users</router-link>
+        <router-link v-if="adminView" class="nav-link" :to="hasAuthToken() ? '/webhooks' : ''" @click.prevent="handleClick">Webhooks</router-link>
         <hr class="sidebar-divider"/>
         <router-link
             class="nav-link d-flex align-items-center gap-2"

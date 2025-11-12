@@ -59,3 +59,35 @@ export async function removePermission(user, permission) {
         body: JSON.stringify({permissions: [permission]}),
     });
 }
+
+export async function fetchWebhooks() {
+    return await fetch(`${apiBaseUrl}/webhooks`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to load webhooks', err);
+    });
+}
+
+export async function addWebhook(webhookRequest) {
+    return await fetch(`${apiBaseUrl}/webhooks`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+        body: JSON.stringify(webhookRequest),
+    });
+}
+
+export async function removeWebhook(id) {
+    return await fetch(`${apiBaseUrl}/webhooks/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${loadAuthToken()}`
+        },
+    });
+}

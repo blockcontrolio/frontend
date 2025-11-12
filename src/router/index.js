@@ -13,6 +13,7 @@ import RegisterView from "../pages/auth/RegisterView.vue";
 import Partnership from "../pages/Partnership.vue";
 import TransactionDetails from "../pages/TransactionDetails.vue";
 import InvoiceDetails from "../pages/invoices/Invoice.vue";
+import Webhooks from "../pages/admin/Webhooks.vue";
 
 const routes = [
     {
@@ -86,6 +87,10 @@ const routes = [
     {
         path: '/register',
         component: RegisterView
+    },
+    {
+        path: '/webhooks',
+        component: Webhooks
     },
     {
         path: '/users',
