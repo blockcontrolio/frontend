@@ -1,8 +1,5 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
-
-function loadAuthToken() {
-    return localStorage.getItem('auth-token') || '';
-}
+import {getAccessToken} from "../auth/tokenService.js";
 
 export async function fetchTransfers(accountId) {
     const url = new URL(`${apiBaseUrl}/transfers`);
@@ -14,7 +11,7 @@ export async function fetchTransfers(accountId) {
     return await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Failed to load account transfers', err);
@@ -27,7 +24,7 @@ export async function fetchTransferDetails(transferId) {
     return await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Failed to load account transfers', err);
@@ -39,7 +36,7 @@ export async function sendInternalTransfer(data) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(data)
     });
@@ -50,7 +47,7 @@ export async function sendExternalWithdrawal(data) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(data)
     })
@@ -61,7 +58,7 @@ export async function sendCrossCounterparty(data) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(data)
     })

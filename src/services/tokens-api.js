@@ -1,15 +1,12 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
-
-function loadAuthToken() {
-    return localStorage.getItem('auth-token') || '';
-}
+import {getAccessToken} from "../auth/tokenService.js";
 
 export async function importToken(payload) {
     return await fetch(`${apiBaseUrl}/tokens/import`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -20,7 +17,7 @@ export async function addToken(payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -30,7 +27,7 @@ export async function fetchTokens() {
     return await fetch(`${apiBaseUrl}/tokens`, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Error fetching account:', err);
@@ -42,7 +39,7 @@ export async function createToken(payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -53,7 +50,7 @@ export async function mintToken(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -64,7 +61,7 @@ export async function burnToken(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -75,7 +72,7 @@ export async function pause(tokenId, pauserAccountId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify({pauserAccountId})
     });
@@ -86,7 +83,7 @@ export async function unpause(tokenId, pauserAccountId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify({pauserAccountId})
     });
@@ -97,7 +94,7 @@ export async function freeze(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -108,7 +105,7 @@ export async function block(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -119,7 +116,7 @@ export async function unblock(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -130,7 +127,7 @@ export async function grantRole(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });
@@ -141,7 +138,7 @@ export async function revokeRole(tokenId, payload) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(payload)
     });

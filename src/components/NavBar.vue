@@ -2,6 +2,8 @@
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";
 import {resetAllStores} from "../js/stores/resetStores.js";
+import {clearStorage, getAccessToken} from "../auth/tokenService.js";
+import {logout} from "../auth/cognito.js";
 
 export default {
   name: "NavBar",
@@ -23,7 +25,7 @@ export default {
   },
   methods: {
     hasAuthToken() {
-      return localStorage.getItem('auth-token');
+      return getAccessToken();
     },
     handleClick(e) {
       if (!this.hasAuthToken()) {
@@ -32,7 +34,8 @@ export default {
       }
     },
     logout() {
-      localStorage.removeItem("auth-token");
+      logout()
+      clearStorage();
       window.dispatchEvent(new Event('auth-changed'));
       resetAllStores();
       this.$router.push("/login");

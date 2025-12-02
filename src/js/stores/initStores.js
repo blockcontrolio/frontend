@@ -1,5 +1,6 @@
 import {useCounterpartyStore} from './counterpartyStore.js';
 import {useNetworkStore} from './networkStore.js';
+import {getAccessToken} from "../../auth/tokenService.js";
 
 export async function initStores() {
     if (hasAuthToken()) {
@@ -13,7 +14,7 @@ export async function initStores() {
     }
 
     function hasAuthToken() {
-        return localStorage.getItem('auth-token');
+        return getAccessToken();
     }
 
 }
