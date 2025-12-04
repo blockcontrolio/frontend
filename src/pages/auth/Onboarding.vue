@@ -40,6 +40,12 @@ export default {
       await store.fetchNetworks();
     }
   },
+  async mounted() {
+    // redirect if onboarded
+    if (this.counterpartyStore.isOnboarded) {
+      this.$router.push("/dashboard");
+    }
+  },
   methods: {
     async register() {
       this.error = null;
