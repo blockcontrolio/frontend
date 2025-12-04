@@ -50,9 +50,10 @@ export default {
   <aside class="sidebar d-flex flex-column justify-content-between">
     <!-- navigation menu -->
     <nav class="nav flex-column nav-pills">
-      <h4 class="mt-2 bold">BlockControl</h4>
+      <h4 class="mt-2 bold">
+        <router-link class="nav-link" :to="hasAuthToken() ? '/dashboard' : ''" @click.prevent="handleClick">BlockControl</router-link>
+      </h4>
       <div>
-        <router-link v-if="false" class="nav-link" :to="hasAuthToken() ? '/' : ''" @click.prevent="handleClick">Dashboard</router-link>
         <router-link v-if="adminView" class="nav-link" :to="hasAuthToken() ? '/users' : ''" @click.prevent="handleClick">Users</router-link>
         <router-link v-if="adminView" class="nav-link" :to="hasAuthToken() ? '/webhooks' : ''" @click.prevent="handleClick">Webhooks</router-link>
         <hr class="sidebar-divider"/>

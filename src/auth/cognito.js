@@ -1,6 +1,8 @@
 const domain = import.meta.env.VITE_COGNITO_USER_POOL_DOMAIN;
 const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID;
-const redirectUri = import.meta.env.VITE_COGNITO_REDIRECT_URI;
+const redirectUri = import.meta.env.VITE_COGNITO_REDIRECT_LOGIN_URI;
+const redirectAfterSignUpUri = import.meta.env.VITE_COGNITO_REDIRECT_SIGNUP_URI;
+const homeUrl = import.meta.env.VITE_COGNITO_REDIRECT_LOGOUT_URI;
 const scope = "email openid phone";
 
 /**
@@ -33,7 +35,7 @@ export async function externalLogin() {
 export function externalRegister() {
     window.location = `${domain}/signup?` +
         `client_id=${clientId}` +
-        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&redirect_uri=${encodeURIComponent(redirectAfterSignUpUri)}` +
         `&response_type=code`;
 }
 
@@ -75,7 +77,7 @@ export async function exchangeCodeForToken(code, state) {
 
 export async function logout() {
     window.location = `${domain}/logout?client_id=${clientId}` +
-        `&logout_uri=${encodeURIComponent(import.meta.env.VITE_COGNITO_LOGOUT_URI)}`;
+        `&logout_uri=${encodeURIComponent(homeUrl)}`;
 }
 
 // PKCE helpers
