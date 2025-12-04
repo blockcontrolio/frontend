@@ -1,9 +1,7 @@
 <script>
 import {useCounterpartyStore} from "../js/stores/counterpartyStore.js";
 import {useNetworkStore} from "../js/stores/networkStore.js";
-import {resetAllStores} from "../js/stores/resetStores.js";
-import {clearStorage, getAccessToken} from "../auth/tokenService.js";
-import {logout} from "../auth/cognito.js";
+import {getAccessToken} from "../auth/tokenService.js";
 
 export default {
   name: "NavBar",
@@ -18,12 +16,18 @@ export default {
     },
     adminView() {
       return this.counterpartyStore.user?.role === 'ADMIN';
+    },
+    isOnboarded() {
+      return this.counterpartyStore.isOnboarded;
     }
   },
   created() {
 
   },
   methods: {
+    onboard() {
+      window.location.href = '/onboarding';
+    },
     hasAuthToken() {
       return getAccessToken();
     },
@@ -34,11 +38,8 @@ export default {
       }
     },
     logout() {
-      logout()
-      clearStorage();
       window.dispatchEvent(new Event('auth-changed'));
-      resetAllStores();
-      this.$router.push("/login");
+      window.location.href = '/logout';
     }
   },
   emits: ['missing-jwt'],
@@ -86,13 +87,13 @@ export default {
     <div class="footer text-center py-3">
       <hr class="sidebar-divider"/>
 
-      <div v-if="counterparty" class="counterparty-item">
+      <div v-if="isOnboarded" class="counterparty-item">
         <div class="mb-2">
           <button v-if="counterparty.name" class="btn p-1" title="Logout" @click="logout">
             <i class="bi bi-box-arrow-right"></i>
           </button>
           <h5 v-if="counterparty.name" class="counterparty-name">{{ counterparty.name }}</h5>
-          <h5 v-else class="text-danger">{{ 'Login Error' }}</h5>
+          <p v-else class="text-danger">{{ 'Login Error' }}</p>
           <span class="status-badge">
             <i class="bi bi-building"></i>
           </span>
@@ -109,6 +110,19 @@ export default {
           </div>
         </div>
         <span class="text-danger" v-else>No networks loaded</span>
+      </div>
+      <div v-else>
+        <div class="my-4">
+          <p class="text-danger">{{ 'Complete Onboarding' }}</p>
+          <div class="d-flex flex-column">
+            <button class="btn p-1 btn-sm btn-link" title="Onboard" @click="onboard">
+              Onboard
+            </button>
+            <button class="btn btn-sm btn-link p-1" title="Logout" @click="logout">
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>

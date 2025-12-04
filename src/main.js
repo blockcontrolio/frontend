@@ -17,7 +17,6 @@ const token = getAccessToken();
 
 if (token && isTokenExpired(token)) {
     clearStorage();
-    window.location.href = '/login';
 }
 
 // Wrap await in async function

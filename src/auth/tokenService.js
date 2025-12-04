@@ -4,7 +4,7 @@ export function saveTokens({access_token, id_token}) {
 }
 
 export function getAccessToken() {
-    return localStorage.getItem("access_token");
+    return localStorage.getItem("id_token");
 }
 
 export function clearStorage() {

@@ -30,7 +30,12 @@ export async function externalLogin() {
     window.location.href = `${domain}/oauth2/authorize?${params.toString()}`;
 }
 
-export async function externalRegister() {}
+export function externalRegister() {
+    window.location = `${domain}/signup?` +
+        `client_id=${clientId}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&response_type=code`;
+}
 
 /**
  * Exchange the authorization code for tokens (called from your callback route).

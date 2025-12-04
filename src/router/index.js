@@ -3,7 +3,8 @@ import {getAccessToken} from "../auth/tokenService";
 
 import AuthCallback from "../pages/auth/AuthCallback.vue";
 import LoginSplash from "../pages/auth/LoginSplash.vue";
-import Onboarding from "../pages/auth/OnboardingView.vue";
+import LogoutSplash from "../pages/auth/LogoutSplash.vue";
+import Onboarding from "../pages/auth/Onboarding.vue";
 import Dashboard from '../pages/Dashboard.vue'
 import Users from "../pages/admin/Users.vue";
 import Transfer from '../pages/Transfer.vue'
@@ -27,6 +28,12 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginSplash,
+        meta: {requiresAuth: false}
+    },
+    {
+        path: '/logout',
+        name: 'logout',
+        component: LogoutSplash,
         meta: {requiresAuth: false}
     },
     {
@@ -134,12 +141,15 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.path === '/auth/callback') return next();
+    // safe public pages
+    if (to.path === '/auth/callback' || to.path === '/login' || to.path === '/logout') {
+        return next();
+    }
 
-    const isAuthenticated = !!getAccessToken();
+    const isAuthenticated = getAccessToken();
 
     if (to.meta.requiresAuth && !isAuthenticated) {
-        return next('/login'); // SAFE PUBLIC PAGE
+        return next('/login');
     }
 
     next();

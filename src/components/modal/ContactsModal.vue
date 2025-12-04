@@ -1,9 +1,6 @@
 <script>
 export default {
   name: 'ContactsModal',
-  props: {
-    visible: Boolean
-  },
   emits: ['go-to-login', 'go-to-register'],
   methods: {
     goToLogin() {
@@ -17,9 +14,7 @@ export default {
 </script>
 
 <template>
-  <div
-      class="modal-backdrop d-flex align-items-center justify-content-center"
-      v-if="visible">
+  <div class="modal-backdrop d-flex align-items-center justify-content-center">
     <div class="modal-content-custom border p-3">
       <div class="modal-header border-bottom">
         <h5 class="modal-title">Demo Credentials Required</h5>

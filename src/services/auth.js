@@ -19,14 +19,10 @@ export async function fetchUserInfo() {
             'Authorization': `Bearer ${getAccessToken()}`
         }
     });
-    // Global handling
-    if (response.status === 401) {
-        window.location.href = '/login';
-    }
-    if (response.status === 403) {
+    // global handling
+    if (response.status === 401 || response.status === 403) {
         clearStorage();
-        window.location.href = '/login';
-        throw new Error('Session expired. Redirecting to login.');
+        throw new Error('Not authenticated or session expired. Please login.');
     }
     return await response.catch(err => {
         console.error('Failed to load logged in user info', err);

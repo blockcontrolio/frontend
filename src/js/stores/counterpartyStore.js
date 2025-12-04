@@ -8,6 +8,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
             role: '',
             permissions: []
         },
+        isOnboarded: false,
         counterparty: {
             id: '',
             name: '',
@@ -15,7 +16,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
         }
     }),
     actions: {
-        async fetchUserCounterpartInfo() {
+        async fetchUserCounterpartyInfo() {
             try {
                 const res = await fetchUserInfo();
                 if (res.ok) {
@@ -27,7 +28,7 @@ export const useCounterpartyStore = defineStore('user-counterparty-info', {
                         role: data.role,
                         permissions: data.permissions || []
                     };
-
+                    this.isOnboarded = data.isOnboarded;
                     this.counterparty = data.counterparty || {
                         id: '',
                         name: '',
