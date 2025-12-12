@@ -5,9 +5,10 @@ import {addUser, assignPermission, fetchUsers, removePermission} from "../../ser
 import UserRoleSelect from "../../components/UserRoleSelect.vue";
 import InfoToast from "../../components/toast/InfoToast.vue";
 import ErrorToast from "../../components/toast/ErrorToast.vue";
+import ApiKeyPanel from "../../components/ApiKeyPanel.vue";
 
 export default {
-  components: {ErrorToast, InfoToast, UserRoleSelect},
+  components: {ApiKeyPanel, ErrorToast, InfoToast, UserRoleSelect},
   setup() {
     let router = useRouter();
     return {router}
@@ -16,7 +17,7 @@ export default {
     return {
       users: [],
       availablePermissions: ['ACCOUNT_MANAGE', 'TOKEN_MANAGE'],
-      showUserForm: false,
+      showUserForm: '',
       form: {
         email: "",
         password: "",
@@ -61,7 +62,7 @@ export default {
           const added = await response.json();
           this.users.push({...added, show: false});
           this.clearForm();
-          this.showUserForm = false;
+          this.showUserForm = '';
           this.messageSuccess = 'User has been added';
         } else {
           const err = await response.json();
@@ -160,14 +161,20 @@ export default {
 <template>
   <h3 class="bold p-2 pt-3">Users</h3>
   <div class="p-2 mt-3">
-
-    <div v-if="!showUserForm" class="d-flex d-flex flex-column align-items-end mb-3">
-      <button class="btn btn-outline-primary btn-sm" @click="showUserForm = !showUserForm">
+    <!-- toggle user/api key form -->
+    <div v-if="!this.showUserForm" class="d-flex justify-content-end mb-3 gap-2">
+      <button class="btn btn-outline-primary btn-sm px-4" type="button"
+              @click="this.showUserForm = 'create_api_key'">
+        Manage API Key
+      </button>
+      <button v-if="true" class="btn btn-outline-primary btn-sm px-4" type="button" @click="this.showUserForm = 'add_user';">
         Add User
       </button>
     </div>
 
-    <form v-else @submit.prevent="sendNewUserRequest" class="mb-4">
+    <ApiKeyPanel v-if="showUserForm === 'create_api_key'" class="mb-4"/>
+
+    <form v-else-if="showUserForm === 'add_user'" @submit.prevent="sendNewUserRequest" class="mb-4">
       <input
           v-model="form.email"
           class="form-control mb-2 w-50"

@@ -88,3 +88,34 @@ export async function removeWebhook(id) {
         },
     });
 }
+
+export async function fetchApiKeys() {
+    return await fetch(`${apiBaseUrl}/users/api-keys`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAccessToken()}`
+        }
+    }).catch(err => {
+        console.error('Failed to load api-keys', err);
+    });
+}
+
+export async function generateApiKey() {
+    return await fetch(`${apiBaseUrl}/users/api-keys`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAccessToken()}`
+        }
+    });
+}
+
+export async function revokeApiKey(keyId) {
+    return await fetch(`${apiBaseUrl}/users/api-keys/${keyId}`, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAccessToken()}`
+        }
+    });
+}
