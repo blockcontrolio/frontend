@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './assets/theme.css'
 import router from './router'
 import {initStores} from './js/stores/initStores.js';
-import {isJwtExpired} from "./services/auth.js";
+import {clearStorage, getAccessToken, isTokenExpired} from "./auth/tokenService.js";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -13,11 +13,10 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 
-const token = localStorage.getItem('auth-token');
+const token = getAccessToken();
 
-if (token && isJwtExpired(token)) {
-    localStorage.removeItem('auth-token');
-    window.location.href = '/login';
+if (token && isTokenExpired(token)) {
+    clearStorage();
 }
 
 // Wrap await in async function

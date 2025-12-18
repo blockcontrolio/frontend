@@ -1,8 +1,5 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
-
-function loadAuthToken() {
-    return localStorage.getItem('auth-token') || '';
-}
+import {getAccessToken} from "../auth/tokenService";
 
 export async function fetchNetworks() {
     return await fetch(`${apiBaseUrl}/networks`, {
@@ -18,7 +15,7 @@ export async function fetchUsers() {
     return await fetch(`${apiBaseUrl}/users`, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Failed to load users', err);
@@ -30,7 +27,7 @@ export async function addUser(userRequest) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(userRequest),
     });
@@ -42,7 +39,7 @@ export async function assignPermission(user, permission) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify({permissions: [permission]}),
     });
@@ -54,7 +51,7 @@ export async function removePermission(user, permission) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify({permissions: [permission]}),
     });
@@ -64,7 +61,7 @@ export async function fetchWebhooks() {
     return await fetch(`${apiBaseUrl}/webhooks`, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Failed to load webhooks', err);
@@ -76,7 +73,7 @@ export async function addWebhook(webhookRequest) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify(webhookRequest),
     });
@@ -87,7 +84,7 @@ export async function removeWebhook(id) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
     });
 }

@@ -1,12 +1,11 @@
 <script>
 
 import {useNetworkStore} from "../../js/stores/networkStore.js";
-import {register} from "../../services/auth.js";
+import {onboard} from "../../services/auth.js";
 import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
 import {initStores} from "../../js/stores/initStores.js";
 
 export default {
-  name: "RegisterView",
   setup() {
     const networkStore = useNetworkStore();
     const counterpartyStore = useCounterpartyStore();
@@ -22,9 +21,6 @@ export default {
           code: 'LSP', desc: 'Licensed Service Provider'
         }],
       form: {
-        email: "",
-        password: "",
-        confirmPassword: "",
         counterpartyName: "",
         networkId: "",
         counterpartyType: ""
@@ -44,28 +40,31 @@ export default {
       await store.fetchNetworks();
     }
   },
+  async mounted() {
+    // redirect if onboarded
+    if (this.counterpartyStore.isOnboarded) {
+      this.$router.push("/dashboard");
+    }
+  },
   methods: {
     async register() {
       this.error = null;
       this.loading = true;
 
       try {
-        const res = await register(this.form);
+        const res = await onboard(this.form);
 
         const isJson = res.headers.get("content-type")?.includes("application/json");
         const data = isJson ? await res.json() : null;
 
         if (!res.ok) {
-          this.error = data?.error || res.statusText || "Registration failed";
+          this.error = data?.error || res.statusText || "Onboarding failed";
           this.loading = false;
           return;
         }
 
-        // Save JWT and select network
-        if (data.token) {
-          localStorage.setItem("auth-token", data.token);
-          window.dispatchEvent(new Event('auth-changed'));
-          await initStores();
+        if (data.id) {
+          await initStores(); // preselect network after onboarding
           this.$router.push('/');
         }
       } catch (err) {
@@ -111,33 +110,11 @@ export default {
               </option>
             </select>
           </div>
-
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input v-model="form.email" type="email" class="form-control" required/>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input v-model="form.password" type="password" class="form-control"
-                   required/>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Confirm Password</label>
-            <input v-model="form.confirmPassword" type="password" class="form-control"
-                   required/>
-          </div>
-
           <button type="submit" class="btn btn-outline-primary btn-sm w-100" :disabled="loading">
             {{ loading ? 'Registering...' : 'Register' }}
           </button>
         </form>
         <div v-if="error" class="text-danger mt-3">{{ error }}</div>
-
-        <div class="mt-3 text-center">
-          <router-link to="/login">Already have an account? Log in</router-link>
-        </div>
       </div>
     </div>
   </div>

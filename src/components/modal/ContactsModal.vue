@@ -1,25 +1,20 @@
 <script>
 export default {
   name: 'ContactsModal',
-  props: {
-    visible: Boolean
-  },
-  emits: ['go-to-login', 'proceed-onboarding'],
+  emits: ['go-to-login', 'go-to-register'],
   methods: {
     goToLogin() {
       this.$emit('go-to-login');
     },
-    proceedOnboarding() {
-      this.$emit('proceed-onboarding');
+    register() {
+      this.$emit('go-to-register');
     }
   }
 };
 </script>
 
 <template>
-  <div
-      class="modal-backdrop d-flex align-items-center justify-content-center"
-      v-if="visible">
+  <div class="modal-backdrop d-flex align-items-center justify-content-center">
     <div class="modal-content-custom border p-3">
       <div class="modal-header border-bottom">
         <h5 class="modal-title">Demo Credentials Required</h5>
@@ -46,8 +41,8 @@ export default {
         </ul>
       </div>
       <div class="modal-footer border-top pt-3 gap-3">
-        <button class="btn btn-outline-primary btn-sm" @click="proceedOnboarding">
-          Onboarding
+        <button class="btn btn-outline-primary btn-sm" @click="register">
+          Register
         </button>
         <button class="btn btn-outline-primary btn-sm" @click="goToLogin">
           Go to Login

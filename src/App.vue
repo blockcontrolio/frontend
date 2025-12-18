@@ -1,6 +1,9 @@
 <script>
 import NavBar from './components/NavBar.vue'
 import ContactsModal from './components/modal/ContactsModal.vue';
+import {getAccessToken} from "./auth/tokenService.js";
+import {externalRegister} from "./auth/cognito.js";
+import {initStores} from "./js/stores/initStores.js";
 
 export default {
   components: {ContactsModal, NavBar},
@@ -30,16 +33,19 @@ export default {
     },
     goToLogin() {
       this.closeModal();
-      this.$router.push('/login');
+      window.location.href = '/login';
     },
     register() {
       this.closeModal();
-      this.$router.push('/register');
+      externalRegister();
     },
     checkAuth() {
-      const authToken = localStorage.getItem('auth-token');
+      const authToken = getAccessToken();
       this.showContactsModal = !authToken;
       this.showSidebar = !!authToken;
+      if (authToken) {
+        initStores()
+      }
     }
   }
 }
@@ -48,7 +54,7 @@ export default {
 <template>
   <div class="d-flex">
     <NavBar v-if="showSidebar" @missing-jwt="openContactsModal"/>
-    <ContactsModal v-else :visible="showContactsModal" @go-to-login="goToLogin" @proceed-onboarding="register"/>
+    <ContactsModal v-if="showContactsModal" @go-to-login="goToLogin" @go-to-register="register"/>
     <div class="flex-fill p-4">
       <router-view/>
     </div>

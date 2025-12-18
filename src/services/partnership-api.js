@@ -1,14 +1,11 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
-
-function loadAuthToken() {
-    return localStorage.getItem('auth-token') || '';
-}
+import {getAccessToken} from "../auth/tokenService.js";
 
 export async function fetchRawPartnerships(networkId) {
     return await fetch(`${apiBaseUrl}/partnerships?networkId=${networkId}`, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Failed to load other counterparties for partnership', err);
@@ -20,7 +17,7 @@ export async function requestPartnership(targetCounterpartyId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
         body: JSON.stringify({targetCounterpartyId})
     });
@@ -31,7 +28,7 @@ export async function declinePartnership(partnershipId) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
     });
 }
@@ -41,7 +38,7 @@ export async function acceptRequest(partnershipId) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
     });
 }
@@ -51,7 +48,7 @@ export async function rejectRequest(partnershipId) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loadAuthToken()}`
+            'Authorization': `Bearer ${getAccessToken()}`
         },
     });
 }
