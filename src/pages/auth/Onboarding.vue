@@ -1,7 +1,7 @@
 <script>
 
 import {useNetworkStore} from "../../js/stores/networkStore.js";
-import {onboard} from "../../services/auth.js";
+import {onboard} from "../../services/onboarding.js";
 import {useCounterpartyStore} from "../../js/stores/counterpartyStore.js";
 import {initStores} from "../../js/stores/initStores.js";
 

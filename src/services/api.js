@@ -5,6 +5,7 @@ export async function fetchNetworks() {
     return await fetch(`${apiBaseUrl}/networks`, {
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAccessToken()}`
         }
     }).catch(err => {
         console.error('Failed to load all networks info', err);

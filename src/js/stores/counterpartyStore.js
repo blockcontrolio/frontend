@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia';
-import {fetchUserInfo} from "../../services/auth.js";
+import {fetchUserInfo} from "../../services/onboarding.js";
 
 export const useCounterpartyStore = defineStore('user-counterparty-info', {
     state: () => ({
