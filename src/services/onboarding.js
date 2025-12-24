@@ -1,8 +1,8 @@
-const authBaseUrl = import.meta.env.VITE_AUTH_BASE || `${window.location.origin}/auth`;
+const apiBaseUrl = import.meta.env.VITE_API_BASE || `${window.location.origin}/api/v1`;
 import {clearStorage, getAccessToken} from "../auth/tokenService.js";
 
 export async function onboard(form) {
-    return await fetch(`${authBaseUrl}/onboarding`, {
+    return await fetch(`${apiBaseUrl}/onboarding`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -13,7 +13,7 @@ export async function onboard(form) {
 }
 
 export async function fetchUserInfo() {
-    let response = fetch(`${authBaseUrl}/user-info`, {
+    let response = fetch(`${apiBaseUrl}/user-info`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${getAccessToken()}`
