@@ -31,19 +31,16 @@ export default {
   },
   computed: {
     networks() {
-      return useNetworkStore().networks;
+      return this.networkStore.networks;
     },
-  },
-  async created() {
-    const store = useNetworkStore();
-    if (!store.networks.length) {
-      await store.fetchNetworks();
-    }
   },
   async mounted() {
     // redirect if onboarded
     if (this.counterpartyStore.isOnboarded) {
       this.$router.push("/dashboard");
+    }
+    if (!this.networkStore.networks.length) {
+      await this.networkStore.fetchNetworks();
     }
   },
   methods: {
