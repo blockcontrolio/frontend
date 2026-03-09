@@ -29,16 +29,6 @@ export default {
         <p class="mb-3">
           For safe usage, we recommend requesting a <strong>demo</strong> login credentials, or proceed with your personal onboarding info.
         </p>
-        <ul class="list-unstyled">
-          <li>
-            <strong class="me-1">Email:</strong>
-            <a href="mailto:yurii@blockcontrol.io" class="">yurii@blockcontrol.io</a>
-          </li>
-          <li>
-            <strong class="me-1">Telegram:</strong>
-            <a href="https://t.me/web3yurii" target="_blank" class="">@web3yurii</a>
-          </li>
-        </ul>
       </div>
       <div class="modal-footer border-top pt-3 gap-3">
         <button class="btn btn-outline-primary btn-sm" @click="register">
